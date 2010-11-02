@@ -54,7 +54,7 @@ class IdentiCurse(object):
             input = self.main_window.getch()
 
             if input == ord("r"):
-                update_current()
+                self.update_current()
             elif input == ord("1"):
                 self.current_timeline = "home"
             elif input == ord("2"):
@@ -71,6 +71,16 @@ class IdentiCurse(object):
 
         self.quit();
         
+    def update_current(self):
+        if self.current_timeline == "home":
+            self.timelines["home"] = self.conn.statuses_home_timeline(count=10, page=0)
+        elif self.current_timeline == "mentions":
+            self.timelines["mentions"] = self.conn.statuses_mentions(count=10, page=0)
+        elif self.current_timeline == "direct":
+            self.timelines["direct"] = self.conn.direct_messages(count=10, page=0)
+        elif self.current_timeline == "public":
+            self.timelines["public"] = self.conn.statuses_public_timeline()
+
     def update_timelines(self):
         self.timelines["home"] = self.conn.statuses_home_timeline(count=10, page=0)
         self.timelines["mentions"] = self.conn.statuses_mentions(count=10, page=0)
