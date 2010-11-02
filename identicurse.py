@@ -92,6 +92,10 @@ class IdentiCurse(object):
             elif tokens[0] == "/fav" or tokens[0] == "/f":
                 id = self.timelines[self.current_timeline][int(tokens[1]) - 1]['id']
                 self.conn.favorites_create(id)
+            elif tokens[0] == "/repeat" or tokens[0] == "/rt":
+                id = self.timelines[self.current_timeline][int(tokens[1]) - 1]['id']
+                self.conn.statuses_retweet(id)
+
         else:
             self.conn.statuses_update(input, source="IdentiCurse")
 
