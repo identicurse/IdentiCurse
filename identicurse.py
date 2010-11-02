@@ -72,10 +72,10 @@ class IdentiCurse(object):
         self.quit();
         
     def update_timelines(self):
-        self.timelines["home"] = self.conn.statuses_home_timeline(self, count=10, page=0)
-        #timelines["mentions"] = self.conn.get_mentions()
-        #timelines["direct"] = self.conn.get_direct()
-        #timelines["public"] = self.conn.get_public()
+        self.timelines["home"] = self.conn.statuses_home_timeline(count=10, page=0)
+        self.timelines["mentions"] = self.conn.statuses_mentions(count=10, page=0)
+        self.timelines["direct"] = self.conn.direct_messages(count=10, page=0)
+        self.timelines["public"] = self.conn.statuses_public_timeline()
 
     def display_current_timeline(self):
         self.main_window.erase()
@@ -85,14 +85,14 @@ class IdentiCurse(object):
         c = 1
         for n in tl:
             if self.current_timeline == "direct":
-                pass
+                user = "none"
             else:
                 user = unicode(n["user"]["screen_name"])
 
-            self.main_window.addstr(y,0, str(c))
+            self.main_window.addstr(y,0, unicode(str(c)))
             self.main_window.addstr(y,3, user)
             y += 1
-            text = str(n["text"])
+            text = unicode(n["text"])
             self.main_window.addstr(y,4, text)
             y += 2
  
