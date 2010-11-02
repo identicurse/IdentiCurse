@@ -54,7 +54,7 @@ class IdentiCurse(object):
             input = self.main_window.getch()
 
             if input == ord("r"):
-                update_current()
+                self.update_timelines()
             elif input == ord("1"):
                 self.current_timeline = "home"
             elif input == ord("2"):
@@ -89,11 +89,11 @@ class IdentiCurse(object):
             else:
                 user = unicode(n["user"]["screen_name"])
 
-            self.main_window.addstr(y,0, unicode(str(c)))
+            self.main_window.addstr(y,0, str(c))
             self.main_window.addstr(y,3, user)
             y += 1
-            text = unicode(n["text"])
-            self.main_window.addstr(y,4, text)
+            text = n["text"]
+            self.main_window.addstr(y,4, text.encode("utf-8"))
             y += 2
  
     def quit(self):
