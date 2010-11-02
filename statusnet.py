@@ -79,6 +79,9 @@ class StatusNet(object):
     def statuses_public_timeline(self):
         return self.__makerequest("statuses/public_timeline")
 
+    def statuses_retweet(self, id):
+        return self.__makerequest("statuses/retweet/%d" % (id))
+
     def statuses_user_timeline(self, user_id=0, screen_name="", since_id=0, max_id=0, count=0, page=0, include_rts=False):
         params = {}
         if not (user_id == 0):
