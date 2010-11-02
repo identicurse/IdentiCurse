@@ -74,10 +74,10 @@ class StatusNet(object):
         if not (page == 0):
             params['page'] = str(page)
         
-        return self.__makerequest("statuses/friends_timeline", params)
+        return self.__makerequest("statuses/home_timeline", params)
 
     def statuses_public_timeline(self):
-        return self.__makerequest("statuses/friends_timeline")
+        return self.__makerequest("statuses/public_timeline")
 
     def statuses_user_timeline(self, user_id=0, screen_name="", since_id=0, max_id=0, count=0, page=0, include_rts=False):
         params = {}
@@ -96,5 +96,18 @@ class StatusNet(object):
         if include_rts:
             params['include_rts'] = "true"
         
-        return self.__makerequest("statuses/friends_timeline", params)
+        return self.__makerequest("statuses/user_timeline", params)
+
+    def direct_messages(self, since_id=0, max_id=0, count=0, page=0):
+        params = {}
+        if not (since_id == 0):
+            params['since_id'] = since_id
+        if not (max_id == 0):
+            params['max_id'] = max_id
+        if not (count == 0):
+            params['count'] = str(count)
+        if not (page == 0):
+            params['page'] = str(page)
+        
+        return self.__makerequest("direct_messages", params)
 
