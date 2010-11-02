@@ -229,8 +229,10 @@ class StatusNet(object):
             params['page'] = page
         return self.__makerequest("direct_messages/sent", params)
 
-    def direct_messages_new(self, screen_name, user_id, text):
+    def direct_messages_new(self, screen_name, user_id, text, source=""):
         params = {'screen_name':screen_name, 'user_id':user_id, 'text':text}
+        if not (source == ""):
+            params['source'] = source
         return self.__makerequest("direct_messages/new", params)
 
     # direct_messages/destroy -- NOT IMPLEMENTED BY STATUSNET
