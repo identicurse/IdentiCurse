@@ -2,8 +2,11 @@
 
 import os
 import sys
+import json
 import curses
 from curses import textpad
+
+from statusnet import StatusNet
 
 #import locale
 #locale.setlocale(locale.LC_ALL, '')
@@ -12,13 +15,10 @@ from curses import textpad
 class IdentiCurse(object):
     """Contains Main IdentiCurse application"""
     
-    def __init__(self, config_path):
+    def __init__(self):
 
-        # TODO: Load config
-        self.config = 
-
-        # TODO: Make StatusNet conn
-        self.conn = 
+        self.config = json.loads(open('config.json').read())
+        self.conn = StatusNet(self.config['api_path'], self.config['username'], self.config['password'])
 
         self.timelines = { 
             "home": [],
@@ -30,13 +30,13 @@ class IdentiCurse(object):
         
         curses.wrapper(self.initialise)
 
-    def initialise(self):
+    def initialise(self, screen):
         curses.noecho()
         curses.cbreak()
 
-        y, x = scr.getmaxyx()
+        y, x = screen.getmaxyx()
 
-        self.main_window = scr.subwin(y-1, x, 1, 0)
+        self.main_window = screen.subwin(y-1, x, 1, 0)
         self.main_window.scrollok(1)
         self.main_window.idlok(1)
 
@@ -47,7 +47,7 @@ class IdentiCurse(object):
 
         self.loop()
 
-    def loop(scr):
+    def loop(self):
         running = True
 
         while running:
@@ -102,5 +102,3 @@ class IdentiCurse(object):
     def quit():
         curses.endwin()
         sys.exit()
-
-    

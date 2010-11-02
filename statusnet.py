@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import urllib, urllib2, json
 
-class StatusNet():
+class StatusNet(object):
     def __init__(self, api_path, username, password):
         import base64
         self.api_path = api_path
