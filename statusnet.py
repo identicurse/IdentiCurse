@@ -230,13 +230,38 @@ class StatusNet(object):
 
 ######## Friendships resources ########
 
-    # friendships/create
+    def friendships_create(self, user_id=0, screen_name=""):
+        params = {}
+        if not (user_id == 0):
+            params['user_id'] = user_id
+        if not (screen_name == ""):
+            params['screen_name'] = screen_name
+        return self.__makerequest("friendships/create", params)
     
-    # friendships/destroy
+    def friendships_destroy(self, user_id=0, screen_name=""):
+        params = {}
+        if not (user_id == 0):
+            params['user_id'] = user_id
+        if not (screen_name == ""):
+            params['screen_name'] = screen_name
+        return self.__makerequest("friendships/destroy", params)
     
-    # friendships/exists
+    def friendships_exists(self, user_a, user_b):
+        params = {'user_a':user_a, 'user_b':user_b}
+        return self.__makerequest("friendships/exists", params)
 
-    # friendships/show
+    def friendships_show(self, source_id=0, source_screen_name="", target_id=0, target_screen_name="")
+        params = {}
+        if not (source_id == 0):
+            params['source_id'] = source_id
+        if not (source_screen_name == ""):
+            params['source_screen_name'] = source_screen_name
+        if not (target_id == 0):
+            params['target_id'] = target_id
+        if not (target_screen_name == ""):
+            params['target_screen_name'] = target_screen_name
+        return self.__makerequest("friendships/show", params)
+
 
 
 ######## Friends and followers resources ########
