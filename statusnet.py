@@ -263,12 +263,19 @@ class StatusNet(object):
         return self.__makerequest("friendships/show", params)
 
 
-
 ######## Friends and followers resources ########
 
-    # friends/ids
+    def friends_ids(self, user_id, screen_name, cursor=0):
+        params = {'user_id':user_id, 'screen_name':screen_name}
+        if not (cursor == 0):
+            params['cursor'] = cursor
+        return self.__makerequest("friends/ids", params)
 
-    # followers/ids
+    def followers_ids(self, user_id, screen_name, cursor=0):
+        params = {'user_id':user_id, 'screen_name':screen_name}
+        if not (cursor == 0):
+            params['cursor'] = cursor
+        return self.__makerequest("followers/ids", params)
 
 
 ######## Account resources ########
