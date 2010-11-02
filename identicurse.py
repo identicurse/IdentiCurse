@@ -105,6 +105,9 @@ class IdentiCurse(object):
 
         y = 0
         c = 1
+
+        maxc = self.notice_window.getmaxyx()[0] / 3
+
         for n in tl:
             if self.current_timeline == "direct":
                 user = "none"
@@ -122,6 +125,11 @@ class IdentiCurse(object):
                 self.notice_window.addstr(y,4, str("Caution: Terminal too shit to display this notice."))
             
             y += 2
+            c += 1
+
+            if c == maxc:
+                break
+                
  
     def quit(self):
         curses.endwin()
