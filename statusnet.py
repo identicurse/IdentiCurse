@@ -18,20 +18,17 @@ class StatusNet(object):
             request = urllib2.Request("%s/%s.json" % (self.api_path, resource_path))
         request.add_header("Authorization", "Basic %s" % (self.auth_string))
         
-        try:
-            response = urllib2.urlopen(request)
-            content = response.read()
-            
-            return json.loads(content)
-        except:
-            return []
+        response = urllib2.urlopen(request)
+        content = response.read()
+        
+        return json.loads(content)
 
     def account_verify_credentials(self):
-        result = self.__makerequest("statuses/public_timeline")
-        if len(result) == 0:
-            return False
-        else:
+        try:
+            result = self.__makerequest("statuses/public_timeline")
             return True
+        except:
+            return False
 
     def statuses_update(self, status, source="", in_reply_to_status_id=0):
         params = {'status':status}
@@ -89,7 +86,7 @@ class StatusNet(object):
         return self.__makerequest("statuses/public_timeline")
 
     def statuses_retweet(self, id):
-        params = {'id': id}
+        params = {'id':id}
         return self.__makerequest("statuses/retweet", params)
 
     def statuses_user_timeline(self, user_id=0, screen_name="", since_id=0, max_id=0, count=0, page=0, include_rts=False):
@@ -123,4 +120,9 @@ class StatusNet(object):
             params['page'] = str(page)
         
         return self.__makerequest("direct_messages", params)
+
+    def direct_messages_new(self, screen_name, user_id, text):
+        params = {'screen_name':screen_name, 'user_id':user_id, 'text':text}
+        
+        return self.__makerequest("direct_messages/new", params)
 
