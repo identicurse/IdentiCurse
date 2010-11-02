@@ -8,9 +8,9 @@ from curses import textpad
 
 from statusnet import StatusNet
 
-#import locale
-#locale.setlocale(locale.LC_ALL, '')
-#code = locale.getpreferredencoding()
+import locale
+locale.setlocale(locale.LC_ALL, '')
+code = locale.getpreferredencoding()
 
 class IdentiCurse(object):
     """Contains Main IdentiCurse application"""
@@ -72,33 +72,30 @@ class IdentiCurse(object):
         self.quit();
         
     def update_timelines(self):
-        timelines["home"] = self.conn.get_home()
-        timelines["mentions"] = self.conn.get_mentions()
-        timelines["direct"] = self.conn.get_direct()
-        timelines["public"] = self.conn.get_public()
+        self.timelines["home"] = self.conn.statuses_home_timeline(self, count=10, page=0)
+        #timelines["mentions"] = self.conn.get_mentions()
+        #timelines["direct"] = self.conn.get_direct()
+        #timelines["public"] = self.conn.get_public()
 
     def display_current_timeline(self):
-        # TODO: Make work
-        win.erase()
-        current = config["current_tl"]
-        tl = timelines[current]
+        self.main_window.erase()
+        tl = self.timelines[self.current_timeline]
+
         y = 0
         c = 1
         for n in tl:
-            if current == "direct":
+            if self.current_timeline == "direct":
                 pass
             else:
-                if config["show_names"]:
-                    user = n["user"]["name"]
-                else:
-                    user = m["user"]["screen_name"]
-                win.addstr(y,0, str(c))
-                win.addstr(y,3, user)
+                user = unicode(n["user"]["screen_name"])
+
+            self.main_window.addstr(y,0, str(c))
+            self.main_window.addstr(y,3, user)
             y += 1
             text = str(n["text"])
-            win.addstr(y,4, text)
+            self.main_window.addstr(y,4, text)
             y += 2
  
-    def quit():
+    def quit(self):
         curses.endwin()
         sys.exit()
