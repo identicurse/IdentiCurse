@@ -63,7 +63,7 @@ class StatusNet():
         
         return self.__makerequest("statuses/friends_timeline", params)
 
-    def statuses_home_timeline(self, since_id="", max_id="", count=0, page=0):
+    def statuses_home_timeline(self, since_id=0, max_id=0, count=0, page=0):
         params = {}
         if not (since_id == 0):
             params['since_id'] = since_id
@@ -78,3 +78,23 @@ class StatusNet():
 
     def statuses_public_timeline(self):
         return self.__makerequest("statuses/friends_timeline")
+
+    def statuses_user_timeline(self, user_id=0, screen_name="", since_id=0, max_id=0, count=0, page=0, include_rts=False):
+        params = {}
+        if not (user_id == 0):
+            params['user_id'] = user_id
+        if not (screen_name == ""):
+            params['screen_name'] = screen_name
+        if not (since_id == 0):
+            params['since_id'] = since_id
+        if not (max_id == 0):
+            params['max_id'] = max_id
+        if not (count == 0):
+            params['count'] = str(count)
+        if not (page == 0):
+            params['page'] = str(page)
+        if include_rts:
+            params['include_rts'] = "true"
+        
+        return self.__makerequest("statuses/friends_timeline", params)
+
