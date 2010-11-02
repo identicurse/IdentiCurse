@@ -84,11 +84,15 @@ class IdentiCurse(object):
         if input[0] == "/":
             tokens = input.split(" ")
 
-            if tokens[0] == "/reply":
+            if tokens[0] == "/reply" or tokens[0] == "/r":
                 id = self.timelines[self.current_timeline][int(tokens[1]) - 1]['id']
                 username = self.timelines[self.current_timeline][int(tokens[1]) - 1]["user"]["screen_name"]
                 status = "@" + username + " " + " ".join(tokens[2:])
                 self.conn.statuses_update(status, "IdentiCurse", int(id))
+            elif tokens[0] == "/fav" or tokens[0] == "/f":
+                id = self.timelines[self.current_timeline][int(tokens[1]) - 1]['id']
+                self.conn.favorites_create(id)
+
         else:
             self.conn.statuses_update(input, source="IdentiCurse")
         
