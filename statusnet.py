@@ -41,9 +41,9 @@ class StatusNet(object):
         if not (max_id == 0):
             params['max_id'] = max_id
         if not (count == 0):
-            params['count'] = str(count)
+            params['count'] = count
         if not (page == 0):
-            params['page'] = str(page)
+            params['page'] = page
         return self.__makerequest("statuses/home_timeline", params)
 
     def statuses_friends_timeline(self, since_id=0, max_id=0, count=0, page=0, include_rts=False):
@@ -53,9 +53,9 @@ class StatusNet(object):
         if not (max_id == 0):
             params['max_id'] = max_id
         if not (count == 0):
-            params['count'] = str(count)
+            params['count'] = count
         if not (page == 0):
-            params['page'] = str(page)
+            params['page'] = page
         if include_rts:
             params['include_rts'] = "true"
         return self.__makerequest("statuses/friends_timeline", params)
@@ -67,9 +67,9 @@ class StatusNet(object):
         if not (max_id == 0):
             params['max_id'] = max_id
         if not (count == 0):
-            params['count'] = str(count)
+            params['count'] = count
         if not (page == 0):
-            params['page'] = str(page)
+            params['page'] = page
         if include_rts:
             params['include_rts'] = "true"
         return self.__makerequest("statuses/mentions", params)
@@ -81,9 +81,9 @@ class StatusNet(object):
         if not (max_id == 0):
             params['max_id'] = max_id
         if not (count == 0):
-            params['count'] = str(count)
+            params['count'] = count
         if not (page == 0):
-            params['page'] = str(page)
+            params['page'] = page
         if include_rts:
             params['include_rts'] = "true"
         return self.__makerequest("statuses/replies", params)
@@ -99,9 +99,9 @@ class StatusNet(object):
         if not (max_id == 0):
             params['max_id'] = max_id
         if not (count == 0):
-            params['count'] = str(count)
+            params['count'] = count
         if not (page == 0):
-            params['page'] = str(page)
+            params['page'] = page
         if include_rts:
             params['include_rts'] = "true"
         return self.__makerequest("statuses/user_timeline", params)
@@ -114,9 +114,9 @@ class StatusNet(object):
 #        if not (max_id == 0):
 #            params['max_id'] = max_id
 #        if not (count == 0):
-#            params['count'] = str(count)
+#            params['count'] = count
 #        if not (page == 0):
-#            params['page'] = str(page)
+#            params['page'] = page
 #        return self.__makerequest("statuses/retweeted_by_me", params)
 
 ### StatusNet does not implement this method yet
@@ -127,9 +127,9 @@ class StatusNet(object):
 #        if not (max_id == 0):
 #            params['max_id'] = max_id
 #        if not (count == 0):
-#            params['count'] = str(count)
+#            params['count'] = count
 #        if not (page == 0):
-#            params['page'] = str(page)
+#            params['page'] = page
 #        return self.__makerequest("statuses/retweeted_to_me", params)
 
     def statuses_retweets_of_me(self, since_id=0, max_id=0, count=0, page=0):
@@ -139,9 +139,9 @@ class StatusNet(object):
         if not (max_id == 0):
             params['max_id'] = max_id
         if not (count == 0):
-            params['count'] = str(count)
+            params['count'] = count
         if not (page == 0):
-            params['page'] = str(page)
+            params['page'] = page
         return self.__makerequest("statuses/retweets_of_me", params)
 
 
@@ -204,12 +204,22 @@ class StatusNet(object):
         if not (max_id == 0):
             params['max_id'] = max_id
         if not (count == 0):
-            params['count'] = str(count)
+            params['count'] = count
         if not (page == 0):
-            params['page'] = str(page)
+            params['page'] = page
         return self.__makerequest("direct_messages", params)
 
-    # direct_messages/sent
+    def direct_messages_sent(self, since_id=0, max_id=0, count=0, page=0):
+        params = {}
+        if not (since_id == 0):
+            params['since_id'] = since_id
+        if not (max_id == 0):
+            params['max_id'] = max_id
+        if not (count == 0):
+            params['count'] = count
+        if not (page == 0):
+            params['page'] = page
+        return self.__makerequest("direct_messages/sent", params)
 
     def direct_messages_new(self, screen_name, user_id, text):
         params = {'screen_name':screen_name, 'user_id':user_id, 'text':text}
