@@ -337,9 +337,21 @@ class StatusNet(object):
 
 ######## Block resources ########
 
-    # blocks/create
+    def blocks_create(self, user_id=0, screen_name=""):
+        params = {}
+        if not (user_id == 0):
+            params['user_id'] = user_id
+        if not (screen_name == ""):
+            params['screen_name'] = screen_name
+        return self.__makerequest("blocks/create", params)
 
-    # blocks/destroy
+    def blocks_destroy(self, user_id=0, screen_name=""):
+        params = {}
+        if not (user_id == 0):
+            params['user_id'] = user_id
+        if not (screen_name == ""):
+            params['screen_name'] = screen_name
+        return self.__makerequest("blocks/destroy", params)
 
     # blocks/exists -- NOT YET IMPLEMENTED BY STATUSNET
 
