@@ -250,7 +250,7 @@ class StatusNet(object):
         params = {'user_a':user_a, 'user_b':user_b}
         return self.__makerequest("friendships/exists", params)
 
-    def friendships_show(self, source_id=0, source_screen_name="", target_id=0, target_screen_name="")
+    def friendships_show(self, source_id=0, source_screen_name="", target_id=0, target_screen_name=""):
         params = {}
         if not (source_id == 0):
             params['source_id'] = source_id
