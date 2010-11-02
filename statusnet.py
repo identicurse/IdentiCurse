@@ -151,12 +151,20 @@ class StatusNet(object):
         params = {'id':id}
         return self.__makerequest("statuses/show", params)
 
-    def statuses_update(self, status, source="", in_reply_to_status_id=0):
+    def statuses_update(self, status, source="", in_reply_to_status_id=0, latitude=-200, longitude=-200, place_id="", display_coordinates=False):
         params = {'status':status}
         if not (source == ""):
             params['source'] = source
         if not (in_reply_to_status_id == 0):
             params['in_reply_to_status_id'] = in_reply_to_status_id
+        if not (latitude == -200):
+            params['lat'] = latitude
+        if not (longitude == -200):
+            params['long'] = longitude
+        if not (place_id == ""):
+            params['place_id'] = place_id
+        if display_coordinates:
+            params['display_coordinates'] = "true"
         return self.__makerequest("statuses/update", params)
     
     def statuses_destroy(self, id):
@@ -303,11 +311,21 @@ class StatusNet(object):
 
 ######## Favorite resources ########
 
-    # favorites
+    def favorites(self, id=0, page=0):
+        params = {}
+        if not (id == 0):
+            params['id'] = id
+        if not (page == 0):
+            params['page'] = page
+        return self.__makerequest("favorites", params)
 
-    # favorites/create
+    def favorites_create(self, id):
+        params = {'id':id}
+        return self.__makerequest("favorites/create/%d" % (id), params)
 
-    # favorites/destroy
+    def favorites_destroy(self, id):
+        params = {'id':id}
+        return self.__makerequest("favorites/destroy/%d" % (id), params)
 
 
 ######## Notification resources ########
