@@ -44,7 +44,6 @@ class StatusNet(object):
             params['count'] = str(count)
         if not (page == 0):
             params['page'] = str(page)
-        
         return self.__makerequest("statuses/home_timeline", params)
 
     def statuses_friends_timeline(self, since_id=0, max_id=0, count=0, page=0, include_rts=False):
@@ -59,7 +58,6 @@ class StatusNet(object):
             params['page'] = str(page)
         if include_rts:
             params['include_rts'] = "true"
-        
         return self.__makerequest("statuses/friends_timeline", params)
 
     def statuses_mentions(self, since_id=0, max_id=0, count=0, page=0, include_rts=False):
@@ -74,7 +72,6 @@ class StatusNet(object):
             params['page'] = str(page)
         if include_rts:
             params['include_rts'] = "true"
-        
         return self.__makerequest("statuses/mentions", params)
 
     def statuses_replies(self, since_id=0, max_id=0, count=0, page=0, include_rts=False):  # alias of mentions
@@ -89,7 +86,6 @@ class StatusNet(object):
             params['page'] = str(page)
         if include_rts:
             params['include_rts'] = "true"
-        
         return self.__makerequest("statuses/replies", params)
 
     def statuses_user_timeline(self, user_id=0, screen_name="", since_id=0, max_id=0, count=0, page=0, include_rts=False):
@@ -108,7 +104,6 @@ class StatusNet(object):
             params['page'] = str(page)
         if include_rts:
             params['include_rts'] = "true"
-        
         return self.__makerequest("statuses/user_timeline", params)
 
 ### StatusNet does not implement this method yet
@@ -122,7 +117,6 @@ class StatusNet(object):
 #            params['count'] = str(count)
 #        if not (page == 0):
 #            params['page'] = str(page)
-#        
 #        return self.__makerequest("statuses/retweeted_by_me", params)
 
 ### StatusNet does not implement this method yet
@@ -136,7 +130,6 @@ class StatusNet(object):
 #            params['count'] = str(count)
 #        if not (page == 0):
 #            params['page'] = str(page)
-#        
 #        return self.__makerequest("statuses/retweeted_to_me", params)
 
     def statuses_retweets_of_me(self, since_id=0, max_id=0, count=0, page=0):
@@ -149,13 +142,14 @@ class StatusNet(object):
             params['count'] = str(count)
         if not (page == 0):
             params['page'] = str(page)
-        
         return self.__makerequest("statuses/retweets_of_me", params)
 
 
 ######## Status resources ########
     
-    # statuses/show
+    def statuses_show(self, id):
+        params = {'id':id}
+        return self.__makerequest("statuses/show", params)
 
     def statuses_update(self, status, source="", in_reply_to_status_id=0):
         params = {'status':status}
@@ -163,10 +157,11 @@ class StatusNet(object):
             params['source'] = source
         if not (in_reply_to_status_id == 0):
             params['in_reply_to_status_id'] = in_reply_to_status_id
-        
         return self.__makerequest("statuses/update", params)
     
-    # statuses/destroy
+    def statuses_destroy(self, id):
+        params = {'id':id}
+        return self.__makerequest("statuses/destroy", params)
 
     def statuses_retweet(self, id):
         params = {'id':id}
@@ -194,14 +189,12 @@ class StatusNet(object):
             params['count'] = str(count)
         if not (page == 0):
             params['page'] = str(page)
-        
         return self.__makerequest("direct_messages", params)
 
     # direct_messages/sent
 
     def direct_messages_new(self, screen_name, user_id, text):
         params = {'screen_name':screen_name, 'user_id':user_id, 'text':text}
-        
         return self.__makerequest("direct_messages/new", params)
 
     # direct_messages/destroy -- NOT IMPLEMENTED BY STATUSNET
