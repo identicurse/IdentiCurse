@@ -119,7 +119,7 @@ class IdentiCurse(object):
             try:
                 self.notice_window.addstr(y,4, text.encode("utf-8"))
             except curses.error:
-                self.notice_window.addstr(y,4, "Caution: Terminal too shit to display this notice.".encode())
+                self.notice_window.addstr(y,4, str("Caution: Terminal too shit to display this notice."))
             
             y += 2
  
