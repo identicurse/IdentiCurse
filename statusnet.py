@@ -360,10 +360,12 @@ class StatusNet(object):
 
 ######## Help resources ########
 
-    # help/test
+    def help_test(self):
+        return self.__makerequest("help/test")
 
 
 ######## OAuth resources ########
+# will not be implemented unless this module moves to using OAuth instead of basic
 
     # oauth/request_token
     
@@ -374,8 +376,9 @@ class StatusNet(object):
 
 ######## Search ########
 
-    # search
-
+    def search(self, query):
+        params = {'q':query}
+        return self.__makerequest("search", params)
 
 
 ##########################
