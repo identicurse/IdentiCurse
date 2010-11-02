@@ -35,18 +35,18 @@ class IdentiCurse(object):
         curses.cbreak()
 
         y, x = screen.getmaxyx()
-        self.main_window = screen.subwin(y-1, x, 1, 0)
+        self.main_window = screen.subwin(y-2, x-3, 2, 2)
+        self.main_window.box(0, 0)
 
         y, x = self.main_window.getmaxyx()
-        self.entry_window = self.main_window.subwin(4, x, 1, 0)
+        self.entry_window = self.main_window.subwin(1, x-3, 4, 5)
         self.text_entry = textpad.Textbox(self.entry_window)
 
-        self.notice_window = self.main_window.subwin(y-6, x, 5, 0)
-        self.notice_window.box()
+        self.notice_window = self.main_window.subwin(y-6, x-4, 7, 5)
 
-        self.main_window.scrollok(1)
-        self.main_window.idlok(1)
-        self.main_window.erase()
+        #self.main_window.scrollok(1)
+        #self.main_window.idlok(1)
+        #self.main_window.erase()
 
         self.update_timelines()
         self.display_current_timeline()
