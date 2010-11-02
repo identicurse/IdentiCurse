@@ -35,12 +35,18 @@ class IdentiCurse(object):
         curses.cbreak()
 
         y, x = screen.getmaxyx()
-
         self.main_window = screen.subwin(y-1, x, 1, 0)
+
+        y, x = self.main_window.getmaxyx()
+        self.entry_window = self.main_window.subwin(4, x, 1, 0)
+        self.text_entry = textpad.Textbox(self.entry_window)
+
+        self.notice_window = self.main_window.subwin(y-6, x, 5, 0)
+        self.notice_window.box()
+
         self.main_window.scrollok(1)
         self.main_window.idlok(1)
-
-        # TODO: pad = textpad.Textbox(scr) etc
+        self.main_window.erase()
 
         self.update_timelines()
         self.display_current_timeline()
@@ -64,6 +70,8 @@ class IdentiCurse(object):
                 self.current_timeline = "direct"
             elif input == ord("4"):
                 self.current_timeline = "public"
+            elif input == ord("i"):
+                self.parse_input(self.text_entry.edit())
             elif input == ord("q"):
                 running = False
 
@@ -71,6 +79,9 @@ class IdentiCurse(object):
             self.main_window.refresh()
 
         self.quit();
+
+    def parse_input(self, input):
+        self.conn.statuses_update(input, source="IdentiCurse")
         
     def update_current(self):
         if self.current_timeline == "home":
@@ -89,7 +100,7 @@ class IdentiCurse(object):
         self.timelines["public"] = self.conn.statuses_public_timeline()
 
     def display_current_timeline(self):
-        self.main_window.erase()
+        self.notice_window.erase()
         tl = self.timelines[self.current_timeline]
 
         y = 0
@@ -100,15 +111,15 @@ class IdentiCurse(object):
             else:
                 user = unicode(n["user"]["screen_name"])
 
-            self.main_window.addstr(y,0, str(c))
-            self.main_window.addstr(y,3, user)
+            self.notice_window.addstr(y,0, str(c))
+            self.notice_window.addstr(y,3, user)
             y += 1
             text = n["text"]
 
             try:
-                self.main_window.addstr(y,4, text.encode("utf-8"))
+                self.notice_window.addstr(y,4, text.encode("utf-8"))
             except curses.error:
-                self.main_window.addstr(y,4, "Caution: Terminal too shit to display this notice.")
+                self.notice_window.addstr(y,4, "Caution: Terminal too shit to display this notice.")
             
             y += 2
  
