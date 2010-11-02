@@ -81,7 +81,16 @@ class IdentiCurse(object):
         self.quit();
 
     def parse_input(self, input):
-        self.conn.statuses_update(input, source="IdentiCurse")
+        if input[0] == "/":
+            tokens = input.split(" ")
+
+            if tokens[0] == "/reply":
+                id = self.timelines[self.current_timeline][int(tokens[1]) - 1]['id']
+                username = self.timelines[self.current_timeline][int(tokens[1]) - 1]["user"]["screen_name"]
+                status = "@" + username + " " + " ".join(tokens[2:])
+                self.conn.statuses_update(status, "IdentiCurse", int(id))
+        else:
+            self.conn.statuses_update(input, source="IdentiCurse")
         
     def update_current(self):
         if self.current_timeline == "home":
