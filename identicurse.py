@@ -98,21 +98,25 @@ class IdentiCurse(object):
 
         else:
             self.conn.statuses_update(input, source="IdentiCurse")
+
+        # Why doesn't textpad have a clear method!?
+        self.entry_window.clear()
+        self.text_entry = textpad.Textbox(self.entry_window)
         
     def update_current(self):
         if self.current_timeline == "home":
-            self.timelines["home"] = self.conn.statuses_home_timeline(count=10, page=0)
+            self.timelines["home"] = self.conn.statuses_home_timeline(count=20, page=0)
         elif self.current_timeline == "mentions":
-            self.timelines["mentions"] = self.conn.statuses_mentions(count=10, page=0)
+            self.timelines["mentions"] = self.conn.statuses_mentions(count=20, page=0)
         elif self.current_timeline == "direct":
-            self.timelines["direct"] = self.conn.direct_messages(count=10, page=0)
+            self.timelines["direct"] = self.conn.direct_messages(count=20, page=0)
         elif self.current_timeline == "public":
             self.timelines["public"] = self.conn.statuses_public_timeline()
 
     def update_timelines(self):
-        self.timelines["home"] = self.conn.statuses_home_timeline(count=10, page=0)
-        self.timelines["mentions"] = self.conn.statuses_mentions(count=10, page=0)
-        self.timelines["direct"] = self.conn.direct_messages(count=10, page=0)
+        self.timelines["home"] = self.conn.statuses_home_timeline(count=20, page=0)
+        self.timelines["mentions"] = self.conn.statuses_mentions(count=20, page=0)
+        self.timelines["direct"] = self.conn.direct_messages(count=20, page=0)
         self.timelines["public"] = self.conn.statuses_public_timeline()
 
     def display_current_timeline(self):
