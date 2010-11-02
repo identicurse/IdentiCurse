@@ -6,6 +6,8 @@ class StatusNet(object):
         import base64
         self.api_path = api_path
         self.auth_string = base64.encodestring('%s:%s' % (username, password))[:-1]
+        if not self.account_verify_credentials():
+            raise Exception
     
     def __makerequest(self, resource_path, raw_params={}):
         params = urllib.urlencode(raw_params)
@@ -19,10 +21,17 @@ class StatusNet(object):
         try:
             response = urllib2.urlopen(request)
             content = response.read()
-
+            
             return json.loads(content)
         except:
             return []
+
+    def account_verify_credentials(self):
+        result = self.__makerequest("statuses/public_timeline")
+        if len(result) == 0:
+            return False
+        else:
+            return True
 
     def statuses_update(self, status, source="", in_reply_to_status_id=0):
         params = {'status':status}
@@ -80,7 +89,8 @@ class StatusNet(object):
         return self.__makerequest("statuses/public_timeline")
 
     def statuses_retweet(self, id):
-        return self.__makerequest("statuses/retweet/%d" % (id))
+        params = {'id': id}
+        return self.__makerequest("statuses/retweet", params)
 
     def statuses_user_timeline(self, user_id=0, screen_name="", since_id=0, max_id=0, count=0, page=0, include_rts=False):
         params = {}
