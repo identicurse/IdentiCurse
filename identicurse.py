@@ -54,11 +54,8 @@ class IdentiCurse(object):
             input = self.main_window.getch()
 
             if input == ord("r"):
-<<<<<<< HEAD
                 self.update_timelines()
-=======
                 self.update_current()
->>>>>>> 32617cfb0719ca62234a43b9b3eede21738f2808
             elif input == ord("1"):
                 self.current_timeline = "home"
             elif input == ord("2"):
