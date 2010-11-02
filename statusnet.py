@@ -282,22 +282,23 @@ class StatusNet(object):
 
     def account_verify_credentials(self):
         try:
-            result = self.__makerequest("statuses/public_timeline")
+            result = self.__makerequest("account/verify_credentials")
             return True
         except:
             return False
 
     # account/end_session -- NOT IMPLEMENTED BY STATUSNET
 
-    # account/update_location
+    # account/update_location -- IMPLEMENTED, BUT NO DOCUMENTATION
 
     # account/update_delivery_device -- NOT IMPLEMENTED BY STATUSNET
 
-    # account/rate_limit_status
+    def account_rate_limit_status(self):
+        return self.__makerequest("account/rate_limit_status")
 
-    # account/update_profile_background_image
+    # account/update_profile_background_image - to be implemented when we have a helper function for multipart/form-data encoding
 
-    # account/update_profile_image
+    # account/update_profile_imagee - to be implemented when we have a helper function for multipart/form-data encoding
 
 
 ######## Favorite resources ########
