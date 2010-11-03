@@ -74,7 +74,7 @@ class IdentiCurse(object):
             elif input == ord("4"):
                 self.current_timeline = "public"
             elif input == ord("i"):
-                self.parse_input(self.text_entry.edit())
+                self.parse_input(self.text_entry.edit(self.validate))
             elif input == ord("q"):
                 running = False
 
@@ -82,6 +82,15 @@ class IdentiCurse(object):
             self.main_window.refresh()
 
         self.quit();
+
+    def validate(self, ch):
+        #curses.endwin()
+        #print ch
+
+        if ch == 127:
+            self.text_entry.do_command(263)
+        else:
+            return ch
 
     def parse_input(self, input):
         if len(input) > 0:      # don't do anything if the user didn't enter anything
