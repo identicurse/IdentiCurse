@@ -144,7 +144,7 @@ class IdentiCurse(object):
 
         y, x = self.main_window.getmaxyx()
         self.entry_window = self.main_window.subwin(1, x-10, 4, 5)
-        self.text_entry = textpad.Textbox(self.entry_window)
+        self.text_entry = textpad.Textbox(self.entry_window, insert_mode=True)
 
         self.notice_window = self.main_window.subwin(y-6, x-4, 7, 5)
         
@@ -256,7 +256,7 @@ class IdentiCurse(object):
 
         # Why doesn't textpad have a clear method!?
         self.entry_window.clear()
-        self.text_entry = textpad.Textbox(self.entry_window)
+        self.text_entry = textpad.Textbox(self.entry_window, insert_mode=True)
         self.update_tabs()
         self.display_current_tab()
         
