@@ -171,8 +171,10 @@ class StatusNet(object):
         params = {'id':id}
         return self.__makerequest("statuses/destroy", params)
 
-    def statuses_retweet(self, id):
+    def statuses_retweet(self, id, source=""):
         params = {'id':id}
+        if not (source == ""):
+            params['source'] = source
         return self.__makerequest("statuses/retweet", params)
 
 

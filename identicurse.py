@@ -233,7 +233,7 @@ class IdentiCurse(object):
                     self.conn.favorites_create(id)
                 elif tokens[0] == "/repeat" or tokens[0] == "/rt":
                     id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['id']
-                    self.conn.statuses_retweet(id)
+                    self.conn.statuses_retweet(id, source="IdentiCurse")
                 elif tokens[0] == "/direct" or tokens[0] == "/dm" or tokens[0] == "/d":
                     screen_name = tokens[1]
                     if screen_name[0] == "@":
