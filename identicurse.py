@@ -117,8 +117,6 @@ class IdentiCurse(object):
         self.update_tabs()
         self.display_current_tab()
 
-        self.tabs.append(Profile(self.conn, self.notice_window, 'reality'))
-
         self.loop()
 
     def update_tabs(self):
@@ -189,6 +187,17 @@ class IdentiCurse(object):
                 elif tokens[0] == "/delete" or tokens[0] == "/del":
                     id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['id']
                     self.conn.statuses_destroy(id)
+                elif tokens[0] == "/profile" or tokens[0] == "/p":
+                    # Yeuch
+                    try:
+                        float(tokens[1])
+                    except ValueError:
+                        user = tokens[1]
+                    else:
+                        user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
+
+                    self.tabs.append(Profile(self.conn, self.notice_window,user))
+                    self.current_tab = len(self.tabs) - 1
             else:
                 self.conn.statuses_update(input, source="IdentiCurse")
 
