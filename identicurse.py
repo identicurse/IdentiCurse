@@ -3,6 +3,7 @@
 import os
 import sys
 import json
+import re
 import curses
 from curses import textpad
 
@@ -19,6 +20,8 @@ class IdentiCurse(object):
 
         self.config = json.loads(open('config.json').read())
         self.conn = StatusNet(self.config['api_path'], self.config['username'], self.config['password'])
+        
+        self.html_regex = re.compile("<(.|\n)*?>")  # compile this here and store it so we don't need to compile the regex every time 'source' is used
 
         self.timelines = { 
             "home": [],
@@ -137,7 +140,8 @@ class IdentiCurse(object):
                 source_msg = "" # source parameter cannot be retrieved from a direct, wtf?
             else:
                 user = unicode(n["user"]["screen_name"])
-                source_msg = "from %s" % (n["source"])
+                raw_source_msg = "from %s" % (n["source"])
+                source_msg = self.html_regex.sub("", raw_source_msg)    # strip out the link tag that identi.ca adds to some clients' source info
             
             self.notice_window.addstr(y,0, str(c))
             self.notice_window.addstr(y,3, user)
