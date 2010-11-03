@@ -198,8 +198,12 @@ class StatusNet(object):
             params['cursor'] = cursor
         return self.__makerequest("statuses/followers", params)
 
-    def users_show(self, user_id, screen_name):
-        params = {'user_id':user_id, 'screen_name':screen_name}
+    def users_show(self, user_id=0, screen_name=""):
+        params = {}
+        if not (user_id == 0):
+            params['user_id'] = user_id
+        if not (screen_name == ""):
+            params['screen_name'] = screen_name
         return self.__makerequest("users/show", params)
 
 
