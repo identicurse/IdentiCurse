@@ -1,5 +1,9 @@
 {
 	"api_path": "https://identi.ca/api",
 	"username": "user",
-	"password": "test"
+	"password": "test",
+	"aliases":
+	{
+	    "/sayagain": "/repeat"
+	}
 }
