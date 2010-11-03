@@ -394,24 +394,100 @@ class StatusNet(object):
 
 ######## Group resources ########
 
-    # statusnet/groups/timeline
+    def statusnet_groups_timeline(self, group_id=0, nickname="", since_id=0, max_id=0, count=0, page=0):
+        params = {}
+        if not (group_id == 0):
+            params['id'] = group_id
+        if not (nickname == ""):
+            params['nickname'] = nickname
+        if not (since_id == 0):
+            params['since_id'] = since_id
+        if not (max_id == 0):
+            params['max_id'] = max_id
+        if not (count == 0):
+            params['count'] = count
+        if not (page == 0):
+            params['page'] = page
+        if 'id' in params:
+            return self.__makerequest("statusnet/groups/timeline/%d" % (group_id), params)
+        elif 'nickname' in params:
+            return self.__makerequest("statusnet/groups/timeline/%s" % (nickname), params)
+        else:
+            raise Exception
 
-    # statusnet/groups/show
+    def statusnet_groups_show(self, group_id=0, nickname=""):
+        params = {}
+        if not (group_id == 0):
+            params['id'] = group_id
+        if not (nickname == ""):
+            params['nickname'] = nickname
+        if 'id' in params:
+            return self.__makerequest("statusnet/groups/show/%d" % (group_id), params)
+        elif 'nickname' in params:
+            return self.__makerequest("statusnet/groups/show/%s" % (nickname), params)
+        else:
+            raise Exception
 
-    # statusnet/groups/create
+    # statusnet/groups/create -- does not seem to match the proposed API, will leave unimplemented for now
 
-    # statusnet/groups/join
+    def statusnet_groups_join(self, group_id=0, nickname=""):
+        params = {}
+        if not (group_id == 0):
+            params['id'] = group_id
+        if not (nickname == ""):
+            params['nickname'] = nickname
+        if 'id' in params:
+            return self.__makerequest("statusnet/groups/join/%d" % (group_id), params)
+        elif 'nickname' in params:
+            return self.__makerequest("statusnet/groups/join/%s" % (nickname), params)
+        else:
+            raise Exception
 
-    # statusnet/groups/leave
+    def statusnet_groups_leave(self, group_id=0, nickname=""):
+        params = {}
+        if not (group_id == 0):
+            params['id'] = group_id
+        if not (nickname == ""):
+            params['nickname'] = nickname
+        if 'id' in params:
+            return self.__makerequest("statusnet/groups/leave/%d" % (group_id), params)
+        elif 'nickname' in params:
+            return self.__makerequest("statusnet/groups/leave/%s" % (nickname), params)
+        else:
+            raise Exception
 
-    # statusnet/groups/list
+    def statusnet_groups_list(self, user_id=0, screen_name=""):
+        params = {}
+        if not (user_id == 0):
+            params['user_id'] = user_id
+        if not (screen_name == ""):
+            params['screen_name'] = screen_name
+        return self.__makerequest("statusnet/groups/list", params)
 
-    # statusnet/groups/list_all
+    def statusnet_groups_list_all(self, count=0, page=0):
+        params = {}
+        if not (count == 0):
+            params['count'] = count
+        if not (count == 0):
+            params['count'] = count
+        return self.__makerequest("statusnet/groups/list_all", params)
 
-    # statusnet/groups/membership
+    def statusnet_groups_membership(self, group_id=0, nickname=""):
+        params = {}
+        if not (group_id == 0):
+            params['id'] = group_id
+        if not (nickname == ""):
+            params['nickname'] = nickname
+        if 'id' in params:
+            return self.__makerequest("statusnet/groups/membership/%d" % (group_id), params)
+        elif 'nickname' in params:
+            return self.__makerequest("statusnet/groups/membership/%s" % (nickname), params)
+        else:
+            raise Exception
 
-    # statusnet/groups/is_member
-
+    def statusnet_groups_is_member(self, user_id, group_id):
+        params = {'user_id':user_id, 'group_id':group_id}
+        return self.__makerequest("statusnet/groups/is_member", params)['is_member']
 
 ######## Tag resources ########
 
