@@ -112,6 +112,9 @@ class IdentiCurse(object):
                     screen_name = tokens[1]
                     id = self.conn.users_show(screen_name=screen_name)['id']
                     self.conn.direct_messages_new(screen_name, id, " ".join(tokens[2:]), source="IdentiCurse")
+                elif tokens[0] == "/delete" or tokens[0] == "/del":
+                    id = self.timelines[self.current_timeline][int(tokens[1]) - 1]['id']
+                    self.conn.statuses_destroy(id)
             else:
                 self.conn.statuses_update(input, source="IdentiCurse")
 
