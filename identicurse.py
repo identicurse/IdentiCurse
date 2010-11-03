@@ -26,8 +26,21 @@ class Profile(object):
 
     def display(self):
         self.window.erase()
+        
         title = self.profile['screen_name'].capitalize().encode("utf-8") + "'s Profile"
         self.window.addstr(0, 4, title)
+       
+        if self.profile['name']:
+            real_name = "Real Name: " + self.profile['name']
+            self.window.addstr(2, 4, real_name)
+       
+        if self.profile['description']:
+            bio = "Bio: " + self.profile['description']
+            self.window.addstr(3, 4, bio)
+
+        if self.profile['statuses_count']:
+            notices_count = "Notices: " + str(self.profile['statuses_count'])
+            self.window.addstr(4, 4, notices_count)
 
 class Timeline(object):
     def __init__(self, conn, window, timeline):
