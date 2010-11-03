@@ -81,23 +81,24 @@ class IdentiCurse(object):
         self.quit();
 
     def parse_input(self, input):
-        if input[0] == "/":
-            tokens = input.split(" ")
-
-            if tokens[0] == "/reply" or tokens[0] == "/r":
-                id = self.timelines[self.current_timeline][int(tokens[1]) - 1]['id']
-                username = self.timelines[self.current_timeline][int(tokens[1]) - 1]["user"]["screen_name"]
-                status = "@" + username + " " + " ".join(tokens[2:])
-                self.conn.statuses_update(status, "IdentiCurse", int(id))
-            elif tokens[0] == "/fav" or tokens[0] == "/f":
-                id = self.timelines[self.current_timeline][int(tokens[1]) - 1]['id']
-                self.conn.favorites_create(id)
-            elif tokens[0] == "/repeat" or tokens[0] == "/rt":
-                id = self.timelines[self.current_timeline][int(tokens[1]) - 1]['id']
-                self.conn.statuses_retweet(id)
-
-        else:
-            self.conn.statuses_update(input, source="IdentiCurse")
+        if len(input) > 0:      # don't do anything if the user didn't enter anything
+            if input[0] == "/":
+                tokens = input.split(" ")
+                
+                if tokens[0] == "/reply" or tokens[0] == "/r":
+                    id = self.timelines[self.current_timeline][int(tokens[1]) - 1]['id']
+                    username = self.timelines[self.current_timeline][int(tokens[1]) - 1]["user"]["screen_name"]
+                    status = "@" + username + " " + " ".join(tokens[2:])
+                    self.conn.statuses_update(status, "IdentiCurse", int(id))
+                elif tokens[0] == "/fav" or tokens[0] == "/f":
+                    id = self.timelines[self.current_timeline][int(tokens[1]) - 1]['id']
+                    self.conn.favorites_create(id)
+                elif tokens[0] == "/repeat" or tokens[0] == "/rt":
+                    id = self.timelines[self.current_timeline][int(tokens[1]) - 1]['id']
+                    self.conn.statuses_retweet(id)
+    
+            else:
+                self.conn.statuses_update(input, source="IdentiCurse")
 
         # Why doesn't textpad have a clear method!?
         self.entry_window.clear()
