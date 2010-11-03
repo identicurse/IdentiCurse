@@ -1,0 +1,85 @@
+BASIC CONFIGURATION
+
+Before using IdentiCurse, you must configure it with your account login
+credentials. To do so, edit config.json in your favourite editor, changing
+"username": "user" and "password": "test" to appropriate values. You can also
+use IdentiCurse with other StatusNet instances by changing "api_path" to the
+API home for the instance you wish to use. However, this is not yet well
+tested, so expect breakages.
+
+
+USING IDENTICURSE
+
+Once you've configured IdentiCurse for your account, start it by running
+main.py. You will see a message, "Welcome to IdentiCurse!", and then after a
+short while, IdentiCurse itself will load (this delay is due to fetching all
+the initial dents). Once you are at this screen, you can do press various
+keys to do the following:
+    
+    KEY		ACTION
+    1		Switch to tab 1 (initially Personal Timeline).
+    2		Switch to tab 2 (initially Mentions).
+    3		Switch to tab 3 (initially Direct Message Inbox).
+    4		Switch to tab 4 (initially Public Timeline).
+    5		Switch to tab 5 (no initial tab).
+    6		Switch to tab 6 (no initial tab).
+    7		Switch to tab 7 (no initial tab).
+    8		Switch to tab 8 (no initial tab).
+    9		Switch to tab 9 (no initial tab).
+    x		Close the currently visible tab.
+    r		Refresh.
+    q		Quit IdentiCurse.
+    h		View a quick summary of this help.
+    i		Switch to text entry mode.
+
+In text entry mode, the above key shortcuts are not available. Instead, you
+type a message directly into the text entry field, and then press enter to
+submit. A plain message will simply be posted as a normal dent, but you can
+also use various commands by starting the message with a / (for example "/reply
+1 Hello!" would trigger the /reply command rather than post "/reply 1 Hello!"
+as a dent). Available commands are as follows:
+
+/reply [notice number] [message]		(aliases: /r)
+   This will create a reply to the notice in your current view with the notice
+   number specified.
+
+/reply [(@)username] [message]			(aliases: /r)
+   This will create a mention of the user specified. The username can be
+   entered with or without a @ at the beginning, either will work.
+
+/fav [notice number]	       	      		(aliases: /f)
+   This will add the notice with the notice number specified to your
+   favourites.
+
+/repeat [notice number]	       	      		(aliases: /rt)
+   This will create a repeat of the notice with the notice number specified.
+
+/direct [(@)username] [message]	    	   	(aliases: /dm /d)
+   This will send a direct message to the user specified. As with /reply, the
+   username will work with or without the @.
+
+/delete [notice number]				(aliases: /del)
+   This will delete the notice with the notice number specified. It will only
+   work for your notices, not those created by other users.
+
+/profile [notice number]      	    	       	(aliases: /p)
+   This will open a new tab showing the profile of the user who created the
+   notice with the notice number specified.
+
+/profile [(@)username]				(aliases: /p)
+   This will open a new tab showing the profile of the user specified.
+   As with /reply and /direct, the @ is optional.
+
+After submitting your message/command, you will be back in non-text entry mode
+until you next press i. You can submit an empty text field to leave text entry
+mode without performing any action.
+
+
+ADVANCED CONFIGURATION
+
+In addition to the preset aliases, it is possible to add your own custom
+aliases by editing the "aliases" record in config.json. An example is provided
+that makes /sayagain an alias for /repeat, however it is not recommended that
+you edit this section without a basic understanding of JSON syntax (for a good
+basic introduction, we recommend CouchDB's JSON Primer:
+< http://guide.couchdb.org/editions/1/en/json.html >).
