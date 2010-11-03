@@ -310,9 +310,9 @@ class StatusNet(object):
     def account_rate_limit_status(self):
         return self.__makerequest("account/rate_limit_status")
 
-    # account/update_profile_background_image - to be implemented when we have a helper function for multipart/form-data encoding
+    # account/update_profile_background_image - to be implemented if/when we have a helper function for multipart/form-data encoding
 
-    # account/update_profile_imagee - to be implemented when we have a helper function for multipart/form-data encoding
+    # account/update_profile_imagee - to be implemented if/when we have a helper function for multipart/form-data encoding
 
 
 ######## Favorite resources ########
@@ -491,16 +491,28 @@ class StatusNet(object):
 
 ######## Tag resources ########
 
-    # statusnet/groups/timeline
+    def statusnet_tags_timeline(self, tag, since_id=0, max_id=0, count=0, page=0):
+        params = {'tag':tag}
+        if not (since_id == 0):
+            params['since_id'] = since_id
+        if not (max_id == 0):
+            params['max_id'] = max_id
+        if not (count == 0):
+            params['count'] = count
+        if not (page == 0):
+            params['page'] = page
+        return self.__makerequest("statusnet/tags/timeline/%s" % (tag), params)
 
 
 ######## Media resources ########
 
-    # statusnet/groups/timeline
+    # statusnet/media/upload - to be implemented if/when we have a helper function for multipart/form-data encoding
 
 
 ######## Miscellanea ########
 
-    # statusnet/config
+    def statusnet_config(self):
+        return self.__makerequest("statusnet/config")
 
-    # statusnet/version
+    def statusnet_version(self):
+        return self.__makerequest("statusnet/version")
