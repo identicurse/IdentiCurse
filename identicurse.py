@@ -110,6 +110,8 @@ class IdentiCurse(object):
                     self.conn.statuses_retweet(id)
                 elif tokens[0] == "/direct" or tokens[0] == "/dm" or tokens[0] == "/d":
                     screen_name = tokens[1]
+                    if screen_name[0] == "@":
+                        screen_name = screen_name[1:]
                     id = self.conn.users_show(screen_name=screen_name)['id']
                     self.conn.direct_messages_new(screen_name, id, " ".join(tokens[2:]), source="IdentiCurse")
                 elif tokens[0] == "/delete" or tokens[0] == "/del":
