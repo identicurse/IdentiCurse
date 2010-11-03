@@ -206,6 +206,8 @@ class IdentiCurse(object):
                         float(tokens[1])
                     except ValueError:
                         user = tokens[1]
+                        if user[0] == "@":
+                        	user = user[1:]
                     else:
                         user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
 
