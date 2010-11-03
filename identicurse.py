@@ -128,15 +128,19 @@ class IdentiCurse(object):
         c = 1
 
         maxc = self.notice_window.getmaxyx()[0] / 3
+        maxx = self.notice_window.getmaxyx()[1]
 
         for n in tl:
             if self.current_timeline == "direct":
                 user = "none"
             else:
                 user = unicode(n["user"]["screen_name"])
+                
+            source_msg = "from %s" % (n["source"])
 
             self.notice_window.addstr(y,0, str(c))
             self.notice_window.addstr(y,3, user)
+            self.notice_window.addstr(y,maxx - (len(source_msg) + 1), source_msg)
             y += 1
             text = n["text"]
 
