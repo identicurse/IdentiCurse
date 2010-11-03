@@ -39,7 +39,7 @@ class IdentiCurse(object):
         self.main_window.box(0, 0)
 
         y, x = self.main_window.getmaxyx()
-        self.entry_window = self.main_window.subwin(1, 140, 4, 5)
+        self.entry_window = self.main_window.subwin(1, x-10, 4, 5)
         self.text_entry = textpad.Textbox(self.entry_window)
 
         self.notice_window = self.main_window.subwin(y-6, x-4, 7, 5)
