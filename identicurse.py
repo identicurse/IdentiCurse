@@ -141,7 +141,7 @@ class IdentiCurse(object):
             
             self.notice_window.addstr(y,0, str(c))
             self.notice_window.addstr(y,3, user)
-            self.notice_window.addstr(y,maxx - (len(source_msg) + 1), source_msg)
+            self.notice_window.addstr(y,maxx - (len(source_msg) + 2), source_msg)  # right margin of 2 to match the left indentation
             y += 1
             text = n["text"]
 
