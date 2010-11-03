@@ -2,4 +2,5 @@
 from identicurse import IdentiCurse
 
 # Innit.
+print "Welcome to IdentiCurse"
 IdentiCurse()

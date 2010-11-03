@@ -13,8 +13,6 @@ import locale
 locale.setlocale(locale.LC_ALL, '')
 code = locale.getpreferredencoding()
 
-# In The Future this can just inherit from a Tab object 
-# In fact eventually I'll just implement the tabs as Tab too
 class Profile(object):
     def __init__(self, conn, window, id):
         self.conn = conn
@@ -24,7 +22,6 @@ class Profile(object):
         self.update()
 
     def update(self):
-        # Note ID can accept screen name or ID in the API. Smart API. Good API.
         self.profile = self.conn.users_show(screen_name=self.id)
 
     def display(self):
