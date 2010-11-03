@@ -7,7 +7,7 @@ class StatusNet(object):
         self.api_path = api_path
         self.auth_string = base64.encodestring('%s:%s' % (username, password))[:-1]
         if not self.account_verify_credentials():
-            raise Exception
+            raise Exception("Invalid credentials")
     
     def __makerequest(self, resource_path, raw_params={}):
         params = urllib.urlencode(raw_params)
@@ -413,7 +413,7 @@ class StatusNet(object):
         elif 'nickname' in params:
             return self.__makerequest("statusnet/groups/timeline/%s" % (nickname), params)
         else:
-            raise Exception
+            raise Exception("At least one of group_id or nickname must be supplied")
 
     def statusnet_groups_show(self, group_id=0, nickname=""):
         params = {}
@@ -426,7 +426,7 @@ class StatusNet(object):
         elif 'nickname' in params:
             return self.__makerequest("statusnet/groups/show/%s" % (nickname), params)
         else:
-            raise Exception
+            raise Exception("At least one of group_id or nickname must be supplied")
 
     # statusnet/groups/create -- does not seem to match the proposed API, will leave unimplemented for now
 
@@ -441,7 +441,7 @@ class StatusNet(object):
         elif 'nickname' in params:
             return self.__makerequest("statusnet/groups/join/%s" % (nickname), params)
         else:
-            raise Exception
+            raise Exception("At least one of group_id or nickname must be supplied")
 
     def statusnet_groups_leave(self, group_id=0, nickname=""):
         params = {}
@@ -454,7 +454,7 @@ class StatusNet(object):
         elif 'nickname' in params:
             return self.__makerequest("statusnet/groups/leave/%s" % (nickname), params)
         else:
-            raise Exception
+            raise Exception("At least one of group_id or nickname must be supplied")
 
     def statusnet_groups_list(self, user_id=0, screen_name=""):
         params = {}
@@ -483,7 +483,7 @@ class StatusNet(object):
         elif 'nickname' in params:
             return self.__makerequest("statusnet/groups/membership/%s" % (nickname), params)
         else:
-            raise Exception
+            raise Exception("At least one of group_id or nickname must be supplied")
 
     def statusnet_groups_is_member(self, user_id, group_id):
         params = {'user_id':user_id, 'group_id':group_id}
