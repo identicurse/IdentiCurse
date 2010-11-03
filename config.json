@@ -1,1 +1,5 @@
-{"api_path": "http://identi.ca/api", "username": "test", "password": "test"}
+{
+	"api_path": "https://identi.ca/api",
+	"username": "user",
+	"password":pass"
+}
