@@ -213,7 +213,7 @@ class IdentiCurse(object):
 
                     self.tabs.append(Profile(self.conn, self.notice_window,user))
                     self.current_tab = len(self.tabs) - 1
-                elif tokens[0] == "/spamreport" or tokens[0] == "/sr" or tokens[0] == "/nuke":
+                elif tokens[0] == "/spamreport" or tokens[0] == "/sr" or tokens[0] == "/nuke" or tokens[0] == "/kill" or tokens[0] == "/burn":
                     id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['user']['id']
                     username = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
                     status = "@support !sr @%s UID %d %s" % (username, id, " ".join(tokens[2:]))
