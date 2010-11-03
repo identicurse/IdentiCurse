@@ -42,6 +42,35 @@ class Profile(object):
             notices_count = "Notices: " + str(self.profile['statuses_count'])
             self.window.addstr(4, 4, notices_count)
 
+class Help(object):
+    def __init__(self, window):
+        self.window = window
+
+    def update(self):
+        pass
+
+    def display(self):
+        self.window.erase()
+
+        self.window.addstr(0, 4, "IdentiCurse Help")
+
+        self.window.addstr(2, 4, "Keybindings")
+        self.window.addstr(4, 4, "1, 2, 3, 4 etc - Go to tab, initially open are 1. Home, 2. Replies, 3. Direct, 4. Public")
+        self.window.addstr(5, 4, "q - Quit")
+        self.window.addstr(6, 4, "r - Refresh timelines")
+        self.window.addstr(7, 4, "x - Close current tab")
+        self.window.addstr(8, 4, "i - Enter insert mode")
+
+        self.window.addstr(10, 4, "Commands (to be typed in insert mode)")
+        self.window.addstr(12, 4, "/reply [timeline item number] [message] - Reply to a notice (alias: /r)")
+        self.window.addstr(13, 4, "/reply [username] [message] - Mention a user (alias: /r)")
+        self.window.addstr(14, 4, "/fav [timeline item number] - Favourite a notice (alias: /f)")
+        self.window.addstr(15, 4, "/repeat [timeline item number] - Repeat a notice (alias: /rt)")
+        self.window.addstr(16, 4, "/direct [username] - Direct Message a user (alias: /dm)")
+        self.window.addstr(17, 4, "/delete [timeline item number] - Delete a notice (alias: /d, /del)")
+        self.window.addstr(18, 4, "/profile [timeline item number] - Open the profile of the notice's poster (alias: /p)")
+        self.window.addstr(19, 4, "/profile [username] - Open a user's profile (alias: /p)")
+
 class Timeline(object):
     def __init__(self, conn, window, timeline):
         self.conn = conn
@@ -159,6 +188,9 @@ class IdentiCurse(object):
                 running = False
             elif input == ord("x"):
                 self.close_current_tab()
+            elif input == ord("h"):
+                self.tabs.append(Help(self.notice_window))
+                self.current_tab = len(self.tabs) - 1
             
             for x in range(0, len(self.tabs)):
                 if input == ord(str(x+1)):
