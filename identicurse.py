@@ -211,11 +211,22 @@ class IdentiCurse(object):
         if len(input) > 0:      # don't do anything if the user didn't enter anything
             if input[0] == "/":
                 tokens = input.split(" ")
+                if tokens[0] in self.config["aliases"]:
+                    tokens[0] = self.config["aliases"][tokens[0]]
                 
                 if tokens[0] == "/reply" or tokens[0] == "/r":
-                    id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['id']
-                    username = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
-                    status = "@" + username + " " + " ".join(tokens[2:])
+                    # Yeuch
+                    try:
+                        float(tokens[1])
+                    except ValueError:
+                        user = tokens[1]
+                        if user[0] == "@":
+                        	user = user[1:]
+                        id = 0  # this is not a reply to a dent
+                    else:
+                        user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
+                        id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['id']
+                    status = "@" + user + " " + " ".join(tokens[2:])
                     self.conn.statuses_update(status, "IdentiCurse", int(id))
                 elif tokens[0] == "/fav" or tokens[0] == "/f":
                     id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['id']
