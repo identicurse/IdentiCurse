@@ -128,6 +128,12 @@ class IdentiCurse(object):
     def display_current_tab(self):
         self.tabs[self.current_tab].display()
 
+    def close_current_tab(self):
+        # This will die if on tab 0, obviously. TODO: Fix
+        del self.tabs[self.current_tab]
+        self.current_tab -= 1
+        self.display_current_tab()
+
     def loop(self):
         running = True
 
@@ -140,6 +146,8 @@ class IdentiCurse(object):
                 self.parse_input(self.text_entry.edit(self.validate))
             elif input == ord("q"):
                 running = False
+            elif input == ord("x"):
+                self.close_current_tab()
             
             for x in range(0, len(self.tabs)):
                 if input == ord(str(x+1)):
