@@ -54,7 +54,7 @@ as a dent). Available commands are as follows:
 /repeat [notice number]	       	      		(aliases: /rt)
    This will create a repeat of the notice with the notice number specified.
 
-/direct [(@)username] [message]	    	   	(aliases: /dm /d)
+/direct [(@)username] [message]	    	   	(aliases: /dm, /d)
    This will send a direct message to the user specified. As with /reply, the
    username will work with or without the @.
 
@@ -123,6 +123,10 @@ as a dent). Available commands are as follows:
 /favourites				  (aliases: /favorites, /favs, /fs)
    This will open a new tab showing the direct messages you have added to your
    favourites.
+
+/search	[query string]				(aliases: /find, /?, /s)
+   This will open a new tab showing notices that contain the query string
+   specified.
 
 /block [notice number]      	    	       	(aliases: /b)
    This will create a block against the user who created the notice with the

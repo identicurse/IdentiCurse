@@ -98,6 +98,12 @@ class Timeline(object):
             self.timeline = self.conn.statusnet_groups_timeline(group_id=self.type_params['group_id'], nickname=self.type_params['nickname'], count=25, page=0)
         elif self.timeline_type == "tag":
             self.timeline = self.conn.statusnet_tags_timeline(tag=self.type_params['tag'], count=25, page=0)
+        elif self.timeline_type == "sentdirect":
+            self.timeline = self.conn.direct_messages_sent(count=25, page=0)
+        elif self.timeline_type == "favourites":
+            self.timeline = self.conn.favorites(page=0)
+        elif self.timeline_type == "search":
+            self.timeline = self.conn.search(self.type_params['query'], page=0, standardise=True)
 
         self.update_buffer()
 
@@ -523,6 +529,10 @@ class IdentiCurse(object):
 
                 elif tokens[0] == "/favourites":
                     self.tabs.append(Timeline(self.conn, self.notice_window, "favourites"))
+                    self.current_tab = len(self.tabs) - 1
+                elif tokens[0] == "/search":
+                    query = " ".join(tokens[1:])
+                    self.tabs.append(Timeline(self.conn, self.notice_window, "search", {'query':query}))
                     self.current_tab = len(self.tabs) - 1
             else:
                 self.conn.statuses_update(input, source="IdentiCurse")
