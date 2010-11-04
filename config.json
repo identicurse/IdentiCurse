@@ -50,10 +50,10 @@
 		
 		"/favorites": "/favourites",
 		"/favs": "/favourites",
-		"/fs": "/favourites"
+		"/fs": "/favourites",
 		
-		"/find": "/search"
-		"/?": "/search"
+		"/find": "/search",
+		"/?": "/search",
 		"/s": "/search"
 	}
 }
