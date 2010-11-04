@@ -70,6 +70,14 @@ as a dent). Available commands are as follows:
    This will open a new tab showing the profile of the user specified.
    As with /reply and /direct, the @ is optional.
 
+/user [notice number]      	    	       	(aliases: /u)
+   This will open a new tab showing the timeline of the user who created the
+   notice with the notice number specified.
+
+/user [(@)username]				(aliases: /u)
+   This will open a new tab showing the timeline of the user specified.
+   As with /reply and /direct, the @ is optional.
+
 /block [notice number]      	    	       	(aliases: /b)
    This will create a block against the user who created the notice
    with the notice number specified.

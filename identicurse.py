@@ -72,10 +72,11 @@ class Help(object):
         self.window.addstr(19, 4, "/profile [username] - Open a user's profile (alias: /p)")
 
 class Timeline(object):
-    def __init__(self, conn, window, timeline):
+    def __init__(self, conn, window, timeline, type_params={}):
         self.conn = conn
         self.window = window
         self.timeline_type = timeline
+        self.type_params = type_params  # dictionary to hold special parameters unique to individual timeline types
 
         self.html_regex = re.compile("<(.|\n)*?>")  # compile this here and store it so we don't need to compile the regex every time 'source' is used
 
@@ -88,6 +89,8 @@ class Timeline(object):
             self.timeline = self.conn.direct_messages(count=25, page=0)
         elif self.timeline_type == "public":
             self.timeline = self.conn.statuses_public_timeline()
+        elif self.timeline_type == "user":
+            self.timeline = self.conn.statuses_user_timeline(user_id = self.type_params['user_id'], screen_name = self.type_params['screen_name'], count=25, page=0)
 
     def display(self):
         self.window.erase()
@@ -297,6 +300,21 @@ class IdentiCurse(object):
                         user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
                         id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['user']['id']
                     self.conn.blocks_destroy(user_id=id, screen_name=username)
+                elif tokens[0] == "/user" or tokens[0] == "/u":
+                    # Yeuch
+                    try:
+                        float(tokens[1])
+                    except ValueError:
+                        user = tokens[1]
+                        if user[0] == "@":
+                        	user = user[1:]
+                        id = self.conn.users_show(screen_name=user)['id']
+                    else:
+                        user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
+                        id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["id"]
+
+                    self.tabs.append(Timeline(self.conn, self.notice_window, "user", {'user_id':id, 'screen_name':user}))
+                    self.current_tab = len(self.tabs) - 1
             else:
                 self.conn.statuses_update(input, source="IdentiCurse")
 
