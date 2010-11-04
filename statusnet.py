@@ -8,6 +8,8 @@ class StatusNet(object):
         self.auth_string = base64.encodestring('%s:%s' % (username, password))[:-1]
         if not self.account_verify_credentials():
             raise Exception("Invalid credentials")
+        self.server_config = self.statusnet_config()
+        self.length_limit = int(self.server_config["site"]["textlimit"])
     
     def __makerequest(self, resource_path, raw_params={}):
         params = urllib.urlencode(raw_params)
@@ -152,6 +154,8 @@ class StatusNet(object):
         return self.__makerequest("statuses/show", params)
 
     def statuses_update(self, status, source="", in_reply_to_status_id=0, latitude=-200, longitude=-200, place_id="", display_coordinates=False):
+        if len(status) > self.length_limit:
+            raise Exception("Maximum status length exceeded")
         params = {'status':status}
         if not (source == ""):
             params['source'] = source
