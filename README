@@ -78,6 +78,11 @@ as a dent). Available commands are as follows:
    This will open a new tab showing the timeline of the user specified.
    As with /reply and /direct, the @ is optional.
 
+/context [notice number]      	    	       	(aliases: /c)
+   This will open a new tab showing the context of the notice with the notice
+   number specified. You can identify notices which have context by the fact
+   that their "from X" message has a [+] after it.
+
 /block [notice number]      	    	       	(aliases: /b)
    This will create a block against the user who created the notice
    with the notice number specified.
