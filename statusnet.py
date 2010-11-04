@@ -388,9 +388,21 @@ class StatusNet(object):
 
 ######## Search ########
 
-    def search(self, query):
+    def search(self, query, since_id=0, max_id=0, count=0, page=0, standardise=False):
         params = {'q':query}
-        return self.__makerequest("search", params)
+        if not (since_id == 0):
+            params['since_id'] = since_id
+        if not (max_id == 0):
+            params['max_id'] = max_id
+        if not (count == 0):
+            params['results_per_page'] = count
+        if not (page == 0):
+            params['page'] = page
+        if standardise:   # standardise is not part of the API, it is intended to make search results able to be handled as a standard timeline by replacing results with the actual notices as returned by statuses/show
+            results = [self.statuses_show(result['id']) for result in self.__makerequest("search", params)['results']]
+            return results
+        else:
+            return self.__makerequest("search", params)
 
 
 ##########################
