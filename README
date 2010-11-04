@@ -83,6 +83,20 @@ as a dent). Available commands are as follows:
    number specified. You can identify notices which have context by the fact
    that their "from X" message has a [+] after it.
 
+/subscribe [notice number]      	    	(aliases: /sub)
+   This will subscribe you to the user who created the notice with the
+   notice number specified.
+
+/subscribe [(@)username]			(aliases: /sub)
+   This will subscribe you to the user specified.  The @ is optional.
+
+/unsubscribe [notice number]      	    	(aliases: /unsub)
+   This will unsubscribe you from the user who created the notice with the
+   notice number specified.
+
+/unsubscribe [(@)username]			(aliases: /unsub)
+   This will unsubscribe you from the user specified.  The @ is optional.
+
 /block [notice number]      	    	       	(aliases: /b)
    This will create a block against the user who created the notice
    with the notice number specified.

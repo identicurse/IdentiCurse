@@ -371,6 +371,34 @@ class IdentiCurse(object):
 
                     self.tabs.append(Context(self.conn, self.notice_window, id))
                     self.current_tab = len(self.tabs) - 1
+                elif tokens[0] == "/subscribe" or tokens[0] == "/sub":
+                    # Yeuch
+                    try:
+                        float(tokens[1])
+                    except ValueError:
+                        user = tokens[1]
+                        if user[0] == "@":
+                        	user = user[1:]
+                        id = self.conn.users_show(screen_name=user)['id']
+                    else:
+                        user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
+                        id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["id"]
+
+                    self.conn.friendships_create(user_id=id, screen_name=user)
+                elif tokens[0] == "/unsubscribe" or tokens[0] == "/unsub":
+                    # Yeuch
+                    try:
+                        float(tokens[1])
+                    except ValueError:
+                        user = tokens[1]
+                        if user[0] == "@":
+                        	user = user[1:]
+                        id = self.conn.users_show(screen_name=user)['id']
+                    else:
+                        user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
+                        id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["id"]
+
+                    self.conn.friendships_destroy(user_id=id, screen_name=user)
             else:
                 self.conn.statuses_update(input, source="IdentiCurse")
 
