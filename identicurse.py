@@ -205,56 +205,6 @@ class Context(object):
             if c == maxc:
                 break
 
-
-class Context(object):
-    def __init__(self, conn, window, notice_id):
-        self.conn = conn
-        self.window = window
-        self.notice = notice_id
-        self.timeline = []
-
-        self.html_regex = re.compile("<(.|\n)*?>")  # compile this here and store it so we don't need to compile the regex every time 'source' is used
-
-    def update(self):
-        self.timeline = []
-        next_id = self.notice
-        while next_id is not None:
-            self.timeline += [self.conn.statuses_show(id=next_id)]
-            next_id = self.timeline[-1]['in_reply_to_status_id']
-
-    def display(self):
-        self.window.erase()
-
-        y = 0
-        c = 1
-
-        maxc = self.window.getmaxyx()[0] / 3
-        maxx = self.window.getmaxyx()[1]
-
-        for n in self.timeline:
-            user = unicode(n["user"]["screen_name"])
-            raw_source_msg = "from %s" % (n["source"])
-            source_msg = self.html_regex.sub("", raw_source_msg)    # strip out the link tag that identi.ca adds to some clients' source info
-            if n["in_reply_to_status_id"] is not None:
-                source_msg += " [+]"
-            
-            self.window.addstr(y, 0, str(c))
-            self.window.addstr(y, 3, user)
-            self.window.addstr(y, maxx - (len(source_msg) + 2), source_msg)  # right margin of 2 to match the left indentation
-            y += 1
-            text = n["text"]
-
-            try:
-                self.window.addstr(y, 4, text.encode("utf-8"))
-            except curses.error:
-                self.window.addstr(y, 4, str("Caution: Terminal too shit to display this notice."))
-            
-            y += 2
-            c += 1
-
-            if c == maxc:
-                break
-
 class IdentiCurse(object):
     """Contains Main IdentiCurse application"""
     
