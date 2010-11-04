@@ -97,6 +97,8 @@ class Timeline(object):
             self.timeline = self.conn.statusnet_tags_timeline(tag=self.type_params['tag'], count=25, page=0)
         elif self.timeline_type == "sentdirect":
             self.timeline = self.conn.direct_messages_sent(count=25, page=0)
+        elif self.timeline_type == "favourites":
+            self.timeline = self.conn.favorites(page=0)
 
     def display(self):
         self.window.erase()
@@ -288,7 +290,7 @@ class IdentiCurse(object):
                         id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['id']
                     status = "@" + user + " " + " ".join(tokens[2:])
                     self.conn.statuses_update(status, "IdentiCurse", int(id))
-                elif tokens[0] == "/fav" or tokens[0] == "/f":
+                elif tokens[0] == "/favourite" or tokens[0] == "/favorite" or tokens[0] == "/fav" or tokens[0] == "/f":
                     id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['id']
                     self.conn.favorites_create(id)
                 elif tokens[0] == "/repeat" or tokens[0] == "/rt":
@@ -436,6 +438,9 @@ class IdentiCurse(object):
                     self.current_tab = len(self.tabs) - 1
                 elif tokens[0] == "/sentdirects" or tokens[0] == "/outbox":
                     self.tabs.append(Timeline(self.conn, self.notice_window, "sentdirect"))
+                    self.current_tab = len(self.tabs) - 1
+                elif tokens[0] == "/favourites" or tokens[0] == "/favorites" or tokens[0] == "/favs" or tokens[0] == "/fs":
+                    self.tabs.append(Timeline(self.conn, self.notice_window, "favourites"))
                     self.current_tab = len(self.tabs) - 1
             else:
                 self.conn.statuses_update(input, source="IdentiCurse")

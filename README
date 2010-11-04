@@ -47,7 +47,7 @@ as a dent). Available commands are as follows:
    This will create a mention of the user specified. The username can be
    entered with or without a @ at the beginning, either will work.
 
-/fav [notice number]	       	      		(aliases: /f)
+/favourite [notice number]	       	(aliases: /favorite, /fav, /f)
    This will add the notice with the notice number specified to your
    favourites.
 
@@ -84,8 +84,8 @@ as a dent). Available commands are as follows:
    that their "from X" message has a [+] after it.
 
 /subscribe [notice number]      	    	(aliases: /sub)
-   This will subscribe you to the user who created the notice with the
-   notice number specified.
+   This will subscribe you to the user who created the notice with the notice
+   number specified.
 
 /subscribe [(@)username]			(aliases: /sub)
    This will subscribe you to the user specified.  The @ is optional.
@@ -106,36 +106,39 @@ as a dent). Available commands are as follows:
    Much like the @ in username-based commands, the ! is optional.
 
 /groupjoin [(!)group]				(aliases: /gjoin, /gj)
-   This will add you as a member of the group specified.  The ! is
-   optional.
+   This will add you as a member of the group specified.  The ! is optional.
 
 /groupleave [(!)group]				(aliases: /gleave, /gl)
-   This will remove you from membership of the group specified.  The !
-   is optional.
+   This will remove you from membership of the group specified.  The ! is
+   optional.
 
 /tag [(#)tag]					(aliases: /t)
-   This will open a new tab showing the timeline of the tag specified.
-   Like the @ or ! in username-/group-based commands, the # is optional.
+   This will open a new tab showing the timeline of the tag specified. Like
+   the @ or ! in username-/group-based commands, the # is optional.
 
 /sentdirects				    	(aliases: /outbox)
-   This will open a new tab showing the direct messages you have sent
-   to other users.
+   This will open a new tab showing the direct messages you have sent to other
+   users.
+
+/favourites				  (aliases: /favorites, /favs, /fs)
+   This will open a new tab showing the direct messages you have added to your
+   favourites.
 
 /block [notice number]      	    	       	(aliases: /b)
-   This will create a block against the user who created the notice
-   with the notice number specified.
+   This will create a block against the user who created the notice with the
+   notice number specified.
 
 /block [(@)username]				(aliases: /b)
-   This will create a block against of the user specified.  As usual,
-   the @ is optional.
+   This will create a block against of the user specified.  As usual, the @ is
+   optional.
 
 /unblock [notice number]      	    	       	(aliases: /unb)
-   This will remove a block against the user who created the notice
-   with the notice number specified.
+   This will remove a block against the user who created the notice with the
+   notice number specified.
 
 /unblock [(@)username]				(aliases: /unb)
-   This will remove a block against of the user specified.  As usual, the
-   @ is optional.
+   This will remove a block against of the user specified.  As usual, the @ is
+   optional.
 
 /spamreport [notice number] [reason]	(aliases: /sr, /nuke, /kill, /burn)
    This will submit a spam report dent in Identi.ca support's preferred format
