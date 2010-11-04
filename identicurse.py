@@ -45,31 +45,29 @@ class Profile(object):
 class Help(object):
     def __init__(self, window):
         self.window = window
+        self.buffer = []
+        self.start_line = 0
+        self.update_buffer()
+
+    def scrollup(self, n):
+        if self.start_line == 0:
+            pass
+        else:
+            self.start_line -= n
+
+    def scrolldown(self, n):
+        self.start_line += n
 
     def update(self):
         pass
 
+    def update_buffer(self):
+        self.buffer = open('README', 'r').read().split("\n")
+
     def display(self):
         self.window.erase()
-
-        self.window.addstr(0, 4, "IdentiCurse Help")
-
-        self.window.addstr(2, 4, "Keybindings")
-        self.window.addstr(4, 4, "1, 2, 3, 4 etc - Go to tab, initially open are 1. Home, 2. Replies, 3. Direct, 4. Public")
-        self.window.addstr(5, 4, "q - Quit")
-        self.window.addstr(6, 4, "r - Refresh timelines")
-        self.window.addstr(7, 4, "x - Close current tab")
-        self.window.addstr(8, 4, "i - Enter insert mode")
-
-        self.window.addstr(10, 4, "Commands (to be typed in insert mode)")
-        self.window.addstr(12, 4, "/reply [timeline item number] [message] - Reply to a notice (alias: /r)")
-        self.window.addstr(13, 4, "/reply [username] [message] - Mention a user (alias: /r)")
-        self.window.addstr(14, 4, "/fav [timeline item number] - Favourite a notice (alias: /f)")
-        self.window.addstr(15, 4, "/repeat [timeline item number] - Repeat a notice (alias: /rt)")
-        self.window.addstr(16, 4, "/direct [username] - Direct Message a user (alias: /dm, /d)")
-        self.window.addstr(17, 4, "/delete [timeline item number] - Delete a notice (alias: /del)")
-        self.window.addstr(18, 4, "/profile [timeline item number] - Open the profile of the notice's poster (alias: /p)")
-        self.window.addstr(19, 4, "/profile [username] - Open a user's profile (alias: /p)")
+        self.window.addstr("\n".join(self.buffer[self.start_line:self.window.getmaxyx()[0] - 3 + self.start_line]).encode("utf-8"))
+        self.window.refresh()
 
 class Timeline(object):
     def __init__(self, conn, window, timeline, type_params={}):
@@ -152,7 +150,6 @@ class Timeline(object):
 
     def display(self):
         self.window.erase()
-        open('debug.txt', 'a').write("Start line: " + str(self.start_line))
         self.window.addstr("\n".join(self.buffer[self.start_line:self.window.getmaxyx()[0] - 3 + self.start_line]).encode("utf-8"))
         self.window.refresh()
 
