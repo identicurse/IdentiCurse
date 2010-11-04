@@ -78,6 +78,9 @@ class Timeline(object):
         self.timeline_type = timeline
         self.type_params = type_params  # dictionary to hold special parameters unique to individual timeline types
 
+        self.buffer = []
+        self.start_line = 0
+
         self.html_regex = re.compile("<(.|\n)*?>")  # compile this here and store it so we don't need to compile the regex every time 'source' is used
 
     def update(self):
@@ -95,10 +98,73 @@ class Timeline(object):
             self.timeline = self.conn.statusnet_groups_timeline(group_id=self.type_params['group_id'], nickname=self.type_params['nickname'], count=25, page=0)
         elif self.timeline_type == "tag":
             self.timeline = self.conn.statusnet_tags_timeline(tag=self.type_params['tag'], count=25, page=0)
-        elif self.timeline_type == "sentdirect":
-            self.timeline = self.conn.direct_messages_sent(count=25, page=0)
-        elif self.timeline_type == "favourites":
-            self.timeline = self.conn.favorites(page=0)
+
+        self.update_buffer()
+
+    def update_buffer(self):
+        self.buffer = []
+
+        maxx = self.window.getmaxyx()[1]
+        c = 1
+
+        for n in self.timeline:
+            if self.timeline_type == "direct":
+                user = unicode(n["sender"]["screen_name"])
+                source_msg = "" # source parameter cannot be retrieved from a direct, wtf?
+            else:
+                user = unicode(n["user"]["screen_name"])
+                raw_source_msg = "from %s" % (n["source"])
+                source_msg = self.html_regex.sub("", raw_source_msg)    # strip out the link tag that identi.ca adds to some clients' source info
+                if n["in_reply_to_status_id"] is not None:
+                    source_msg += " [+]"
+            
+            self.buffer.append(str(c))
+            y = len(self.buffer) - 1
+            self.buffer[y] += ' ' * 3
+            self.buffer[y] += user
+            self.buffer[y] += ' ' * (maxx - ((len(source_msg) + (len(user)) + 6)))
+            self.buffer[y] += source_msg
+
+            try:
+                self.buffer.append(n['text'])
+            except UnicodeDecodeError:
+                self.buffer += "Caution: Terminal too shit to display this notice"
+
+            self.buffer.append("")
+            self.buffer.append("")
+
+            c += 1
+
+    def scrollup(self, n):
+        if self.start_line == 0:
+            pass
+        else:
+            self.start_line -= n
+
+    def scrolldown(self, n):
+        self.start_line += n
+
+    def display(self):
+        self.window.erase()
+        open('debug.txt', 'a').write("Start line: " + str(self.start_line))
+        self.window.addstr("\n".join(self.buffer[self.start_line:self.window.getmaxyx()[0] - 3 + self.start_line]).encode("utf-8"))
+        self.window.refresh()
+
+class Context(object):
+    def __init__(self, conn, window, notice_id):
+        self.conn = conn
+        self.window = window
+        self.notice = notice_id
+        self.timeline = []
+
+        self.html_regex = re.compile("<(.|\n)*?>")  # compile this here and store it so we don't need to compile the regex every time 'source' is used
+
+    def update(self):
+        self.timeline = []
+        next_id = self.notice
+        while next_id is not None:
+            self.timeline += [self.conn.statuses_show(id=next_id)]
+            next_id = self.timeline[-1]['in_reply_to_status_id']
 
     def display(self):
         self.window.erase()
@@ -110,23 +176,19 @@ class Timeline(object):
         maxx = self.window.getmaxyx()[1]
 
         for n in self.timeline:
-            if "direct" in self.timeline_type:
-                user = unicode("%s -> %s" % (n["sender"]["screen_name"], n["recipient"]["screen_name"]))
-                source_msg = "" # source parameter cannot be retrieved from a direct, wtf?
-            else:
-                user = unicode(n["user"]["screen_name"])
-                raw_source_msg = "from %s" % (n["source"])
-                source_msg = self.html_regex.sub("", raw_source_msg)    # strip out the link tag that identi.ca adds to some clients' source info
-                if n["in_reply_to_status_id"] is not None:
-                    source_msg += " [+]"
+            user = unicode(n["user"]["screen_name"])
+            raw_source_msg = "from %s" % (n["source"])
+            source_msg = self.html_regex.sub("", raw_source_msg)    # strip out the link tag that identi.ca adds to some clients' source info
+            if n["in_reply_to_status_id"] is not None:
+                source_msg += " [+]"
             
             self.window.addstr(y, 0, str(c))
             self.window.addstr(y, 3, user)
             self.window.addstr(y, maxx - (len(source_msg) + 2), source_msg)  # right margin of 2 to match the left indentation
             y += 1
-            text = n["text"]
 
             try:
+                text = self.html_regex.sub("", n["text"])
                 self.window.addstr(y, 4, text.encode("utf-8"))
             except curses.error:
                 self.window.addstr(y, 4, str("Caution: Terminal too shit to display this notice."))
@@ -136,6 +198,7 @@ class Timeline(object):
 
             if c == maxc:
                 break
+
 
 class Context(object):
     def __init__(self, conn, window, notice_id):
@@ -201,8 +264,7 @@ class IdentiCurse(object):
         y, x = screen.getmaxyx()
         self.main_window = screen.subwin(y-2, x-3, 2, 2)
         self.main_window.box(0, 0)
-        self.main_window.scrollok(1)
-        self.main_window.idlok(1)
+        self.main_window.keypad(1)
 
         y, x = self.main_window.getmaxyx()
         self.entry_window = self.main_window.subwin(1, x-10, 4, 5)
@@ -242,7 +304,13 @@ class IdentiCurse(object):
         while running:
             input = self.main_window.getch()
 
-            if input == ord("r"):
+            if input == curses.KEY_UP:
+                self.tabs[self.current_tab].scrollup(1)
+                self.display_current_tab()
+            elif input == curses.KEY_DOWN:
+                self.tabs[self.current_tab].scrolldown(1)
+                self.display_current_tab()
+            elif input == ord("r"):
                 self.update_tabs()
             elif input == ord("i"):
                 self.parse_input(self.text_entry.edit(self.validate))
