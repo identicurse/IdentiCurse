@@ -114,8 +114,8 @@ class Timeline(object):
         c = 1
 
         for n in self.timeline:
-            if self.timeline_type == "direct":
-                user = unicode(n["sender"]["screen_name"])
+            if "direct" in self.timeline_type:
+                user = unicode("%s -> %s" % (n["sender"]["screen_name"], n["recipient"]["screen_name"]))
                 source_msg = "" # source parameter cannot be retrieved from a direct, wtf?
             else:
                 user = unicode(n["user"]["screen_name"])
