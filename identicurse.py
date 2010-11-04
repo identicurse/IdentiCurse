@@ -90,7 +90,9 @@ class Timeline(object):
         elif self.timeline_type == "public":
             self.timeline = self.conn.statuses_public_timeline()
         elif self.timeline_type == "user":
-            self.timeline = self.conn.statuses_user_timeline(user_id = self.type_params['user_id'], screen_name = self.type_params['screen_name'], count=25, page=0)
+            self.timeline = self.conn.statuses_user_timeline(user_id=self.type_params['user_id'], screen_name=self.type_params['screen_name'], count=25, page=0)
+        elif self.timeline_type == "group":
+            self.timeline = self.conn.statusnet_groups_timeline(group_id=self.type_params['group_id'], nickname=self.type_params['nickname'], count=25, page=0)
 
     def display(self):
         self.window.erase()
@@ -399,6 +401,28 @@ class IdentiCurse(object):
                         id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["id"]
 
                     self.conn.friendships_destroy(user_id=id, screen_name=user)
+                elif tokens[0] == "/group" or tokens[0] == "/g":
+                    group = tokens[1]
+                    if group[0] == "!":
+                        group = group[1:]
+                    id = int(self.conn.statusnet_groups_show(nickname=group)['id'])
+
+                    self.tabs.append(Timeline(self.conn, self.notice_window, "group", {'group_id':id, 'nickname':group}))
+                    self.current_tab = len(self.tabs) - 1
+                elif tokens[0] == "/groupjoin" or tokens[0] == "/gjoin" or tokens[0] == "/gj":
+                    group = tokens[1]
+                    if group[0] == "!":
+                        group = group[1:]
+                    id = int(self.conn.statusnet_groups_show(nickname=group)['id'])
+
+                    self.conn.statusnet_groups_join(group_id=id, nickname=group)
+                elif tokens[0] == "/groupleave" or tokens[0] == "/gleave" or tokens[0] == "/gl":
+                    group = tokens[1]
+                    if group[0] == "!":
+                        group = group[1:]
+                    id = int(self.conn.statusnet_groups_show(nickname=group)['id'])
+
+                    self.conn.statusnet_groups_leave(group_id=id, nickname=group)
             else:
                 self.conn.statuses_update(input, source="IdentiCurse")
 

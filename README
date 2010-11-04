@@ -97,6 +97,22 @@ as a dent). Available commands are as follows:
 /unsubscribe [(@)username]			(aliases: /unsub)
    This will unsubscribe you from the user specified.  The @ is optional.
 
+/subscribe [notice number]      	    	(aliases: /sub)
+   This will subscribe you to the user who created the notice with the
+   notice number specified.
+
+/group [(!)group]				(aliases: /g)
+   This will open a new tab showing the timeline of the group specified.
+   Much like the @ in username-based commands, the ! is optional.
+
+/groupjoin [(!)group]				(aliases: /gjoin, /gj)
+   This will add you as a member of the group specified.  The ! is
+   optional.
+
+/groupleave [(!)group]				(aliases: /gleave, /gl)
+   This will remove you from membership of the group specified.  The !
+   is optional.
+
 /block [notice number]      	    	       	(aliases: /b)
    This will create a block against the user who created the notice
    with the notice number specified.
@@ -110,8 +126,8 @@ as a dent). Available commands are as follows:
    with the notice number specified.
 
 /unblock [(@)username]				(aliases: /unb)
-   This will removee a block against of the user specified.  As usual,
-   the @ is optional.
+   This will remove a block against of the user specified.  As usual, the
+   @ is optional.
 
 /spamreport [notice number] [reason]	(aliases: /sr, /nuke, /kill, /burn)
    This will submit a spam report dent in Identi.ca support's preferred format
