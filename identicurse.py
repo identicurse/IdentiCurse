@@ -95,6 +95,8 @@ class Timeline(object):
             self.timeline = self.conn.statusnet_groups_timeline(group_id=self.type_params['group_id'], nickname=self.type_params['nickname'], count=25, page=0)
         elif self.timeline_type == "tag":
             self.timeline = self.conn.statusnet_tags_timeline(tag=self.type_params['tag'], count=25, page=0)
+        elif self.timeline_type == "sentdirect":
+            self.timeline = self.conn.direct_messages_sent(count=25, page=0)
 
     def display(self):
         self.window.erase()
@@ -106,8 +108,8 @@ class Timeline(object):
         maxx = self.window.getmaxyx()[1]
 
         for n in self.timeline:
-            if self.timeline_type == "direct":
-                user = unicode(n["sender"]["screen_name"])
+            if "direct" in self.timeline_type:
+                user = unicode("%s -> %s" % (n["sender"]["screen_name"], n["recipient"]["screen_name"]))
                 source_msg = "" # source parameter cannot be retrieved from a direct, wtf?
             else:
                 user = unicode(n["user"]["screen_name"])
@@ -431,6 +433,9 @@ class IdentiCurse(object):
                         tag = tag[1:]
 
                     self.tabs.append(Timeline(self.conn, self.notice_window, "tag", {'tag':tag}))
+                    self.current_tab = len(self.tabs) - 1
+                elif tokens[0] == "/sentdirects" or tokens[0] == "/outbox":
+                    self.tabs.append(Timeline(self.conn, self.notice_window, "sentdirect"))
                     self.current_tab = len(self.tabs) - 1
             else:
                 self.conn.statuses_update(input, source="IdentiCurse")

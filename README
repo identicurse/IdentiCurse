@@ -117,6 +117,10 @@ as a dent). Available commands are as follows:
    This will open a new tab showing the timeline of the tag specified.
    Like the @ or ! in username-/group-based commands, the # is optional.
 
+/sentdirects				    	(aliases: /outbox)
+   This will open a new tab showing the direct messages you have sent
+   to other users.
+
 /block [notice number]      	    	       	(aliases: /b)
    This will create a block against the user who created the notice
    with the notice number specified.
