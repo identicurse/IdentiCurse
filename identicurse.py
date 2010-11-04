@@ -93,6 +93,8 @@ class Timeline(object):
             self.timeline = self.conn.statuses_user_timeline(user_id=self.type_params['user_id'], screen_name=self.type_params['screen_name'], count=25, page=0)
         elif self.timeline_type == "group":
             self.timeline = self.conn.statusnet_groups_timeline(group_id=self.type_params['group_id'], nickname=self.type_params['nickname'], count=25, page=0)
+        elif self.timeline_type == "tag":
+            self.timeline = self.conn.statusnet_tags_timeline(tag=self.type_params['tag'], count=25, page=0)
 
     def display(self):
         self.window.erase()
@@ -423,6 +425,13 @@ class IdentiCurse(object):
                     id = int(self.conn.statusnet_groups_show(nickname=group)['id'])
 
                     self.conn.statusnet_groups_leave(group_id=id, nickname=group)
+                elif tokens[0] == "/tag" or tokens[0] == "/t":
+                    tag = tokens[1]
+                    if tag[0] == "#":
+                        tag = tag[1:]
+
+                    self.tabs.append(Timeline(self.conn, self.notice_window, "tag", {'tag':tag}))
+                    self.current_tab = len(self.tabs) - 1
             else:
                 self.conn.statuses_update(input, source="IdentiCurse")
 
