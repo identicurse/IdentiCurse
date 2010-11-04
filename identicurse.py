@@ -66,8 +66,8 @@ class Help(object):
         self.window.addstr(13, 4, "/reply [username] [message] - Mention a user (alias: /r)")
         self.window.addstr(14, 4, "/fav [timeline item number] - Favourite a notice (alias: /f)")
         self.window.addstr(15, 4, "/repeat [timeline item number] - Repeat a notice (alias: /rt)")
-        self.window.addstr(16, 4, "/direct [username] - Direct Message a user (alias: /dm)")
-        self.window.addstr(17, 4, "/delete [timeline item number] - Delete a notice (alias: /d, /del)")
+        self.window.addstr(16, 4, "/direct [username] - Direct Message a user (alias: /dm, /d)")
+        self.window.addstr(17, 4, "/delete [timeline item number] - Delete a notice (alias: /del)")
         self.window.addstr(18, 4, "/profile [timeline item number] - Open the profile of the notice's poster (alias: /p)")
         self.window.addstr(19, 4, "/profile [username] - Open a user's profile (alias: /p)")
 
@@ -257,11 +257,46 @@ class IdentiCurse(object):
                     self.tabs.append(Profile(self.conn, self.notice_window,user))
                     self.current_tab = len(self.tabs) - 1
                 elif tokens[0] == "/spamreport" or tokens[0] == "/sr" or tokens[0] == "/nuke" or tokens[0] == "/kill" or tokens[0] == "/burn":
-                    id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['user']['id']
-                    username = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
+                    # Yeuch
+                    try:
+                        float(tokens[1])
+                    except ValueError:
+                        username = tokens[1]
+                        if username[0] == "@":
+                        	username = username[1:]
+                        id = self.conn.users_show(screen_name=username)['id']
+                    else:
+                        id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['user']['id']
+                        username = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
                     status = "@support !sr @%s UID %d %s" % (username, id, " ".join(tokens[2:]))
                     self.conn.statuses_update(status, "IdentiCurse")
                     self.conn.blocks_create(user_id=id, screen_name=username)
+                elif tokens[0] == "/block" or tokens[0] == "/b":
+                    # Yeuch
+                    try:
+                        float(tokens[1])
+                    except ValueError:
+                        user = tokens[1]
+                        if user[0] == "@":
+                        	user = user[1:]
+                        id = self.conn.users_show(screen_name=user)['id']
+                    else:
+                        user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
+                        id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['user']['id']
+                    self.conn.blocks_create(user_id=id, screen_name=username)
+                elif tokens[0] == "/unblock" or tokens[0] == "/unb":
+                    # Yeuch
+                    try:
+                        float(tokens[1])
+                    except ValueError:
+                        user = tokens[1]
+                        if user[0] == "@":
+                        	user = user[1:]
+                        id = self.conn.users_show(screen_name=user)['id']
+                    else:
+                        user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
+                        id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['user']['id']
+                    self.conn.blocks_destroy(user_id=id, screen_name=username)
             else:
                 self.conn.statuses_update(input, source="IdentiCurse")
 

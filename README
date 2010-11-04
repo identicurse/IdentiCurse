@@ -70,6 +70,31 @@ as a dent). Available commands are as follows:
    This will open a new tab showing the profile of the user specified.
    As with /reply and /direct, the @ is optional.
 
+/block [notice number]      	    	       	(aliases: /b)
+   This will create a block against the user who created the notice
+   with the notice number specified.
+
+/block [(@)username]				(aliases: /b)
+   This will create a block against of the user specified.  As usual,
+   the @ is optional.
+
+/unblock [notice number]      	    	       	(aliases: /unb)
+   This will remove a block against the user who created the notice
+   with the notice number specified.
+
+/unblock [(@)username]				(aliases: /unb)
+   This will removee a block against of the user specified.  As usual,
+   the @ is optional.
+
+/spamreport [notice number] [reason]	(aliases: /sr, /nuke, /kill, /burn)
+   This will submit a spam report dent in Identi.ca support's preferred format
+   and also create a block against the user who created the notice with the
+   notice number specified.
+
+/spamreport [(@)username] [reason]	(aliases: /sr, /nuke, /kill, /burn)
+   This will submit a spam report dent in Identi.ca support's preferred format
+   and also create a block against the user specified.
+
 After submitting your message/command, you will be back in non-text entry mode
 until you next press i. You can submit an empty text field to leave text entry
 mode without performing any action.
