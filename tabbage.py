@@ -168,6 +168,7 @@ class Profile(Tab):
         self.update_buffer()
 
     def update_buffer(self):
+        self.buffer = []
         self.buffer.append(self.profile['screen_name'].capitalize().encode("utf-8") + "'s Profile")
         self.buffer.append("")
         self.buffer.append("")
