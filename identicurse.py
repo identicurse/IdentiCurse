@@ -50,10 +50,9 @@ class Help(object):
         self.update_buffer()
 
     def scrollup(self, n):
-        if self.start_line == 0:
-            pass
-        else:
-            self.start_line -= n
+        self.start_line -= n
+        if self.start_line < 0:
+            self.start_line = 0
 
     def scrolldown(self, n):
         self.start_line += n
