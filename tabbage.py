@@ -15,6 +15,8 @@ class Tab(object):
 
     def scrolldown(self, n):
         self.start_line += n
+        if self.start_line > len(self.buffer) - (self.window.getmaxyx()[0] - 3):
+            self.start_line = len(self.buffer) - (self.window.getmaxyx()[0] - 3)
 
     def display(self):
         self.window.erase()
@@ -26,7 +28,7 @@ class Help(Tab):
         Tab.__init__(self, window) 
 
     def update(self):
-        pass
+        self.update_buffer()
 
     def update_buffer(self):
         self.buffer = open('README', 'r').read().split("\n")

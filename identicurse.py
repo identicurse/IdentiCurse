@@ -87,6 +87,7 @@ class IdentiCurse(object):
             elif input == ord("h"):
                 self.tabs.append(Help(self.notice_window))
                 self.current_tab = len(self.tabs) - 1
+                self.tabs[self.current_tab].update()
             
             for x in range(0, len(self.tabs)):
                 if input == ord(str(x+1)):
