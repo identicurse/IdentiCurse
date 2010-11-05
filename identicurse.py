@@ -247,7 +247,7 @@ class IdentiCurse(object):
                         id = self.conn.users_show(screen_name=user)['id']
                     else:
                         user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
-                        id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["id"]
+                        id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["id"]
 
                     self.tabs.append(Timeline(self.conn, self.notice_window, "user", {'user_id':id, 'screen_name':user}))
                     self.current_tab = len(self.tabs) - 1
