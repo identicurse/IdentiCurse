@@ -25,6 +25,7 @@ class Tab(object):
 
 class Help(Tab):
     def __init__(self, window):
+        self.name = "Help"
         Tab.__init__(self, window) 
 
     def update(self):
@@ -39,6 +40,8 @@ class Timeline(Tab):
         self.timeline = []
         self.timeline_type = timeline
         self.type_params = type_params
+
+        self.name = self.timeline_type.capitalize()
 
         Tab.__init__(self, window)
 
@@ -106,6 +109,8 @@ class Context(Tab):
         self.notice = notice_id
         self.timeline = []
 
+        self.name = "Context"
+
         Tab.__init__(self, window)
 
     def update(self):
@@ -153,6 +158,8 @@ class Profile(Tab):
     def __init__(self, conn, window, id):
         self.conn = conn
         self.id = id
+
+        self.name = "Profile"
 
         Tab.__init__(self, window)
 
