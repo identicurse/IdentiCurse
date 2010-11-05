@@ -25,8 +25,8 @@ class StatusBar(object):
 
     def update(self):
         self.window.erase()
-        self.window.addstr(0, 2, self.left_text)
-        right_x = self.window.getmaxyx()[1] - (len(self.left_text) + (len(self.right_text)) + 1)
+        self.window.addstr(0, 0, self.left_text)
+        right_x = self.window.getmaxyx()[1] - (len(self.right_text) + 2)
         self.window.addstr(0, right_x, self.right_text)
         self.window.refresh()
 
@@ -53,7 +53,7 @@ class IdentiCurse(object):
 
         self.notice_window = self.main_window.subwin(y-7, x-4, 6, 5)
 
-        self.status_window = self.main_window.subwin(1, x-4, y, 3)
+        self.status_window = self.main_window.subwin(1, x-3, y, 5)
         self.status_bar = StatusBar(self.status_window)
 
         self.status_bar.update_left("Welcome to IdentiCurse")
