@@ -9,7 +9,10 @@ slogans = [
             "@psquid can't spell hippy",
             "Stupid sexy Flanders",
             "curry in the i-webs",
-            "Got GNOME git commit access"
+            "Got GNOME git commit access",
+            "YOUR SOUL TO THE HOMOSEXUAL AGENDA",
+            "Bullshit Bingo",
+            "trying to do teh frees"
           ]
 
 # Innit.
