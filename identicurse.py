@@ -9,6 +9,27 @@ from tabbage import *
 locale.setlocale(locale.LC_ALL, '')
 code = locale.getpreferredencoding()
 
+class StatusBar(object):
+    def __init__(self, window):
+        self.window = window
+        self.left_text = ""
+        self.right_text = ""
+
+    def update_left(self, text):
+        self.left_text = text
+        self.update()
+    
+    def update_right(self, text):
+        self.right_text = text
+        self.update()
+
+    def update(self):
+        self.window.erase()
+        self.window.addstr(0, 2, self.left_text)
+        right_x = self.window.getmaxyx()[1] - (len(self.left_text) + (len(self.right_text)) + 1)
+        self.window.addstr(0, right_x, self.right_text)
+        self.window.refresh()
+
 class IdentiCurse(object):
     """Contains Main IdentiCurse application"""
     
@@ -30,7 +51,13 @@ class IdentiCurse(object):
         self.entry_window = self.main_window.subwin(1, x-10, 4, 5)
         self.text_entry = textpad.Textbox(self.entry_window, insert_mode=True)
 
-        self.notice_window = self.main_window.subwin(y-6, x-4, 7, 5)
+        self.notice_window = self.main_window.subwin(y-7, x-4, 6, 5)
+
+        self.status_window = self.main_window.subwin(1, x-4, y, 3)
+        self.status_bar = StatusBar(self.status_window)
+
+        self.status_bar.update_left("Welcome to IdentiCurse")
+
         
         self.tabs = [
             Timeline(self.conn, self.notice_window, "home"),
@@ -46,11 +73,14 @@ class IdentiCurse(object):
         self.loop()
 
     def update_tabs(self):
+        self.status_bar.update_left("Updating Timelines...")
         for tab in self.tabs:
             tab.update()
+        self.status_bar.update_left("Doing nothing.")
 
     def display_current_tab(self):
         self.tabs[self.current_tab].display()
+        self.status_bar.update_right("Tab " + str(self.current_tab + 1) + ": " + self.tabs[self.current_tab].name)
 
     def close_current_tab(self):
         # This will die if on tab 0, obviously. TODO: Fix
@@ -94,6 +124,7 @@ class IdentiCurse(object):
                     self.current_tab = x
 
             self.display_current_tab()
+            self.status_window.refresh()
             self.main_window.refresh()
 
         self.quit();
@@ -113,6 +144,8 @@ class IdentiCurse(object):
                     tokens[0] = self.config["aliases"][tokens[0]]
                 
                 if tokens[0] == "/reply":
+                    self.status_bar.update_left("Posting Reply...")
+
                     try:
                         float(tokens[1])
                     except ValueError:
@@ -124,6 +157,7 @@ class IdentiCurse(object):
                         user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
                         id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['id']
                     status = "@" + user + " " + " ".join(tokens[2:])
+
                     self.conn.statuses_update(status, "IdentiCurse", int(id))
 
                 elif tokens[0] == "/favourite":
@@ -295,7 +329,10 @@ class IdentiCurse(object):
                     query = " ".join(tokens[1:])
                     self.tabs.append(Timeline(self.conn, self.notice_window, "search", {'query':query}))
                     self.current_tab = len(self.tabs) - 1
+                
+                self.status_bar.update_left("Doing nothing.")
             else:
+                self.status_bar.update_left("Posting Notice...")
                 self.conn.statuses_update(input, source="IdentiCurse")
 
         # Why doesn't textpad have a clear method!?
