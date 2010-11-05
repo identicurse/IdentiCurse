@@ -7,6 +7,7 @@ slogans = [
             "we don't get OAuth either",
             "don't drink and dent",
             "@psquid can't spell hippy",
+            "Stupid sexy Flanders"
           ]
 
 # Innit.
