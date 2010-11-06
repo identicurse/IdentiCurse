@@ -26,7 +26,7 @@ class StatusBar(object):
     def update(self):
         self.window.erase()
         self.window.addstr(0, 0, self.left_text)
-        right_x = self.window.getmaxyx()[1] - (len(self.right_text) + 3)
+        right_x = self.window.getmaxyx()[1] - (len(self.right_text) + 1)
         self.window.addstr(0, right_x, self.right_text)
         self.window.refresh()
 
@@ -44,7 +44,6 @@ class IdentiCurse(object):
 
         y, x = screen.getmaxyx()
         self.main_window = screen.subwin(y-2, x-3, 2, 2)
-        self.main_window.box(0, 0)
         self.main_window.keypad(1)
 
         y, x = self.main_window.getmaxyx()
@@ -53,11 +52,12 @@ class IdentiCurse(object):
 
         self.notice_window = self.main_window.subwin(y-7, x-4, 6, 5)
 
-        self.status_window = self.main_window.subwin(1, x-3, y, 5)
+        self.status_window = self.main_window.subwin(1, x-4, y, 5)
         self.status_bar = StatusBar(self.status_window)
 
-        self.status_bar.update_left("Welcome to IdentiCurse")
+        self.main_window.box(0, 0)
 
+        self.status_bar.update_left("Welcome to IdentiCurse")
         
         self.tabs = [
             Timeline(self.conn, self.notice_window, "home"),
