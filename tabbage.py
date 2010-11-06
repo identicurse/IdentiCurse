@@ -1,6 +1,9 @@
 #!/usr/bin env python
 import re
 import threading
+import datetime
+import time_helper
+DATETIME_FORMAT = "%a %b %d %H:%M:%S +0000 %Y"
 
 class TabUpdater(threading.Thread):
     def __init__(self, tabs, callback_object, callback_function):
@@ -123,7 +126,8 @@ class Timeline(Tab):
                 source_msg = self.html_regex.sub("", raw_source_msg)
                 if n["in_reply_to_status_id"] is not None:
                     source_msg += " [+]"
-            time_msg = "(%s)" % (n['created_at'])
+            datetime_notice = datetime.datetime.strptime(n['created_at'], DATETIME_FORMAT)
+            time_msg = time_helper.time_since(datetime_notice)
             
             self.buffer.append(str(c))
             y = len(self.buffer) - 1
