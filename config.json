@@ -54,6 +54,13 @@
 		
 		"/find": "/search",
 		"/?": "/search",
-		"/s": "/search"
+		"/s": "/search",
+		
+		"/personal": "/home",
+		"/friends": "/home",
+		
+		"/replies": "/mentions",
+		
+		"/inbox": "/directs"
 	}
 }

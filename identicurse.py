@@ -360,6 +360,22 @@ class IdentiCurse(object):
                     self.tabs.append(Timeline(self.conn, self.notice_window, "search", {'query':query}))
                     self.current_tab = len(self.tabs) - 1
                 
+                elif tokens[0] == "/home":
+                    self.tabs.append(Timeline(self.conn, self.notice_window, "home"))
+                    self.current_tab = len(self.tabs) - 1
+                
+                elif tokens[0] == "/mentions":
+                    self.tabs.append(Timeline(self.conn, self.notice_window, "mentions"))
+                    self.current_tab = len(self.tabs) - 1
+                
+                elif tokens[0] == "/directs":
+                    self.tabs.append(Timeline(self.conn, self.notice_window, "direct"))
+                    self.current_tab = len(self.tabs) - 1
+                
+                elif tokens[0] == "/public":
+                    self.tabs.append(Timeline(self.conn, self.notice_window, "public"))
+                    self.current_tab = len(self.tabs) - 1
+                
                 self.status_bar.update_left("Doing nothing.")
             else:
                 self.status_bar.update_left("Posting Notice...")
