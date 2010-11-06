@@ -12,7 +12,8 @@ slogans = [
             "Got GNOME git commit access",
             "YOUR SOUL TO THE HOMOSEXUAL AGENDA",
             "Bullshit Bingo",
-            "trying to do teh frees"
+            "trying to do teh frees",
+            "coming and coming and coming and coming"
           ]
 
 # Innit.
