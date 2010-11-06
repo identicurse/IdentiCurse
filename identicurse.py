@@ -124,8 +124,10 @@ class IdentiCurse(object):
 
     def update_tabs(self):
         self.status_bar.update_left("Updating Timelines...")
-        for tab in self.tabs:
-            tab.update()
+        TabUpdater(self.tabs, self, 'end_update_tabs').start()
+
+    def end_update_tabs(self):
+        self.display_current_tab()
         self.status_bar.update_left("Doing nothing.")
 
     def update_tab_buffers(self):

@@ -1,5 +1,20 @@
 #!/usr/bin env python
 import re
+import threading
+
+class TabUpdater(threading.Thread):
+    def __init__(self, tabs, callback_object, callback_function):
+        threading.Thread.__init__(self)
+        self.tabs = tabs
+        self.callback_object = callback_object
+        self.callback_function = callback_function
+
+    def run (self):
+        for tab in self.tabs:
+            tab.update()
+
+        fun = getattr(self.callback_object, self.callback_function)
+        fun()
 
 class Tab(object):
     def __init__(self, window):
