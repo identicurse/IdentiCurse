@@ -1,66 +1,43 @@
 {
-	"api_path": "https://identi.ca/api",
-	"username": "test",
-	"password": "test",
-	"aliases":
-	{
-		"/sayagain": "/repeat",
-		
-		"/r": "/reply",
-		
-		"/favorite": "/favourite",
-		"/fav": "/favourite",
-		"/f": "/favourite",
-		
-		"/rt": "/repeat",
-		
-		"/dm" : "/direct",
-		"/d": "/direct",
-		
-		"/del": "/delete",
-		
-		"/p": "/profile",
-		
-		"/sr": "/spamreport",
-		"/nuke": "/spamreport",
-		
-		"/b": "/block",
-		
-		"/unb": "/unblock",
-		
-		"/u": "/user",
-		
-		"/c": "/context",
-		
-		"/sub": "/subscribe",
-		
-		"/unsub": "/unsubscribe",
-		
-		"/g": "/group",
-		
-		"/gjoin": "/groupjoin",
-		"/gj": "/groupjoin",
-		
-		"/gleave": "/groupleave",
-		"/gl": "/groupleave",
-		
-		"/t": "/tag",
-		
-		"/outbox": "/sentdirects",
-		
-		"/favorites": "/favourites",
-		"/favs": "/favourites",
-		"/fs": "/favourites",
-		
-		"/find": "/search",
-		"/?": "/search",
-		"/s": "/search",
-		
-		"/personal": "/home",
-		"/friends": "/home",
-		
-		"/replies": "/mentions",
-		
-		"/inbox": "/directs"
-	}
+    "aliases": {
+        "/?": "/search", 
+        "/b": "/block", 
+        "/c": "/context", 
+        "/d": "/direct", 
+        "/del": "/delete", 
+        "/dm": "/direct", 
+        "/f": "/favourite", 
+        "/fav": "/favourite", 
+        "/favorite": "/favourite", 
+        "/favorites": "/favourites", 
+        "/favs": "/favourites", 
+        "/find": "/search", 
+        "/friends": "/home", 
+        "/fs": "/favourites", 
+        "/g": "/group", 
+        "/gj": "/groupjoin", 
+        "/gjoin": "/groupjoin", 
+        "/gl": "/groupleave", 
+        "/gleave": "/groupleave", 
+        "/inbox": "/directs", 
+        "/nuke": "/spamreport", 
+        "/outbox": "/sentdirects", 
+        "/p": "/profile", 
+        "/personal": "/home", 
+        "/r": "/reply", 
+        "/replies": "/mentions", 
+        "/rt": "/repeat", 
+        "/s": "/search", 
+        "/sayagain": "/repeat", 
+        "/set": "/config", 
+        "/sr": "/spamreport", 
+        "/sub": "/subscribe", 
+        "/t": "/tag", 
+        "/u": "/user", 
+        "/unb": "/unblock", 
+        "/unsub": "/unsubscribe"
+    }, 
+    "api_path": "https://identi.ca/api", 
+    "password": "test", 
+    "username": "test"
 }
