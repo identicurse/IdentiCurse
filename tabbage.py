@@ -41,7 +41,18 @@ class Timeline(Tab):
         self.timeline_type = timeline
         self.type_params = type_params
 
-        self.name = self.timeline_type.capitalize()
+        if self.timeline_type == "user":
+            self.name = "User (%s)" % self.type_params['screen_name']
+        elif self.timeline_type == "tag":
+            self.name = "Tag (%s)" % self.type_params['tag']
+        elif self.timeline_type == "group":
+            self.name = "Group (%s)" % self.type_params['nickname']
+        elif self.timeline_type == "search":
+            self.name = "Search (%s)" % self.type_params['query']
+        elif self.timeline_type == "sentdirect":
+            self.name = "Sent Directs"
+        else:
+            self.name = self.timeline_type.capitalize()
 
         Tab.__init__(self, window)
 
