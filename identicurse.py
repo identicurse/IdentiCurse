@@ -120,10 +120,16 @@ class IdentiCurse(object):
         self.status_bar.update_right("Tab " + str(self.current_tab + 1) + ": " + self.tabs[self.current_tab].name)
 
     def close_current_tab(self):
-        # This will die if on tab 0, obviously. TODO: Fix
-        del self.tabs[self.current_tab]
-        self.current_tab -= 1
-        self.display_current_tab()
+        if len(self.tabs) == 1:
+            pass
+        else:
+            del self.tabs[self.current_tab]
+            if self.current_tab == 0:
+                self.current_tab += 1
+            else:
+                self.current_tab -= 1
+                
+            self.display_current_tab()
 
     def loop(self):
         running = True
