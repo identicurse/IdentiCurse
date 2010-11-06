@@ -168,6 +168,16 @@ class IdentiCurse(object):
             elif input == curses.KEY_NPAGE:
                 self.tabs[self.current_tab].scrolldown(self.main_window.getmaxyx()[0] - 11) # as above
                 self.display_current_tab()
+            if input == curses.KEY_LEFT:
+                if self.tabs[self.current_tab].prevpage():
+                    self.status_bar.update_left("Moving to newer page...")
+                    self.tabs[self.current_tab].update()
+                    self.status_bar.update_left("Doing nothing.")
+            if input == curses.KEY_RIGHT:
+                if self.tabs[self.current_tab].nextpage():
+                    self.status_bar.update_left("Moving to older page...")
+                    self.tabs[self.current_tab].update()
+                    self.status_bar.update_left("Doing nothing.")
             elif input == ord("r"):
                 self.update_tabs()
             elif input == ord("i"):
