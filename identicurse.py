@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os, sys, json, curses, locale
+from threading import Timer
 from curses import textpad
 
 from statusnet import StatusNet
@@ -120,6 +121,7 @@ class IdentiCurse(object):
         self.update_tabs()
         self.display_current_tab()
 
+        Timer(self.config['update_interval'], self.update_tabs).start()
         self.loop()
 
     def update_tabs(self):
@@ -129,6 +131,7 @@ class IdentiCurse(object):
     def end_update_tabs(self):
         self.display_current_tab()
         self.status_bar.update_left("Doing nothing.")
+        Timer(self.config['update_interval'], self.update_tabs).start()
 
     def update_tab_buffers(self):
         for tab in self.tabs:

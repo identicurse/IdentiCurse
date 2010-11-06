@@ -83,6 +83,9 @@ class Timeline(Tab):
 
         Tab.__init__(self, window)
 
+    def get_time(self, time):
+        timestamp = strptime(time)
+
     def update(self):
         if self.timeline_type == "home":
             self.timeline = self.conn.statuses_home_timeline(count=25, page=self.page)
