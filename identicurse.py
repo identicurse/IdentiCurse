@@ -38,13 +38,13 @@ class IdentiCurse(object):
         self.conn = StatusNet(self.config['api_path'], self.config['username'], self.config['password'])
         curses.wrapper(self.initialise)
 
-    def initialise(self, screen):
-        curses.noecho()
-        curses.cbreak()
+    def redraw(self):
+        self.screen.erase()
+        self.y, self.x = self.screen.getmaxyx()
 
-        y, x = screen.getmaxyx()
-        self.main_window = screen.subwin(y-2, x-3, 2, 2)
+        self.main_window = self.screen.subwin(self.y-2, self.x-3, 2, 2)
         self.main_window.keypad(1)
+        self.main_window.box(0, 0)
 
         y, x = self.main_window.getmaxyx()
         self.entry_window = self.main_window.subwin(1, x-10, 4, 5)
@@ -52,11 +52,24 @@ class IdentiCurse(object):
 
         self.notice_window = self.main_window.subwin(y-7, x-4, 6, 5)
 
+        # I don't like this, but it looks like it has to be done
+        if hasattr(self, 'tabs'):
+            for tab in self.tabs:
+                tab.window = self.notice_window
+
         self.status_window = self.main_window.subwin(1, x-4, y, 5)
+        if hasattr(self, 'status_bar'):
+            self.status_bar.window = self.status_window
+
+    def initialise(self, screen):
+        self.screen = screen
+
+        curses.noecho()
+        curses.cbreak()
+
+        self.redraw()
+
         self.status_bar = StatusBar(self.status_window)
-
-        self.main_window.box(0, 0)
-
         self.status_bar.update_left("Welcome to IdentiCurse")
         
         self.tabs = []
@@ -115,6 +128,10 @@ class IdentiCurse(object):
             tab.update()
         self.status_bar.update_left("Doing nothing.")
 
+    def update_tab_buffers(self):
+        for tab in self.tabs:
+            tab.update_buffer()
+
     def display_current_tab(self):
         self.tabs[self.current_tab].display()
         self.status_bar.update_right("Tab " + str(self.current_tab + 1) + ": " + self.tabs[self.current_tab].name)
@@ -165,6 +182,11 @@ class IdentiCurse(object):
             for x in range(0, len(self.tabs)):
                 if input == ord(str(x+1)):
                     self.current_tab = x
+
+            y, x = self.screen.getmaxyx()
+            if y != self.y or x != self.x:
+                self.redraw()
+                self.update_tab_buffers()
 
             self.display_current_tab()
             self.status_window.refresh()
