@@ -218,6 +218,8 @@ class IdentiCurse(object):
                 elif tokens[0] == "/block":
                     self.status_bar.update_left("Creating Block(s)...")
                     for token in tokens[1:]:
+                        if len(token) == 0:
+                            break
                         # Yeuch
                         try:
                             float(token)
@@ -229,11 +231,13 @@ class IdentiCurse(object):
                         else:
                             user = self.tabs[self.current_tab].timeline[int(token) - 1]["user"]["screen_name"]
                             id = self.tabs[self.current_tab].timeline[int(token) - 1]['user']['id']
-                        self.conn.blocks_create(user_id=id, screen_name=username)
+                        self.conn.blocks_create(user_id=id, screen_name=user)
 
                 elif tokens[0] == "/unblock":
                     self.status_bar.update_left("Removing Block(s)...")
                     for token in tokens[1:]:
+                        if len(token) == 0:
+                            break
                         # Yeuch
                         try:
                             float(token)
@@ -245,7 +249,7 @@ class IdentiCurse(object):
                         else:
                             user = self.tabs[self.current_tab].timeline[int(token) - 1]["user"]["screen_name"]
                             id = self.tabs[self.current_tab].timeline[int(token) - 1]['user']['id']
-                        self.conn.blocks_destroy(user_id=id, screen_name=username)
+                        self.conn.blocks_destroy(user_id=id, screen_name=user)
 
                 elif tokens[0] == "/user":
                     self.status_bar.update_left("Loading User Timeline...")
