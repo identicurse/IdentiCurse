@@ -1,6 +1,9 @@
 #!/usr/bin env python
 import re
 import threading
+import datetime
+import time_helper
+DATETIME_FORMAT = "%a %b %d %H:%M:%S +0000 %Y"
 
 class TabUpdater(threading.Thread):
     def __init__(self, tabs, callback_object, callback_function):
@@ -126,6 +129,8 @@ class Timeline(Tab):
                 source_msg = self.html_regex.sub("", raw_source_msg)
                 if n["in_reply_to_status_id"] is not None:
                     source_msg += " [+]"
+            datetime_notice = datetime.datetime.strptime(n['created_at'], DATETIME_FORMAT)
+            time_msg = time_helper.time_since(datetime_notice)
             
             self.buffer.append(str(c))
             y = len(self.buffer) - 1
@@ -139,6 +144,10 @@ class Timeline(Tab):
             except UnicodeDecodeError:
                 self.buffer += "Caution: Terminal too shit to display this notice"
 
+            self.buffer.append(" " * (maxx - (len(time_msg) + 2)))
+            y = len(self.buffer) - 1
+            self.buffer[y] += time_msg
+            
             self.buffer.append("")
             self.buffer.append("")
 
@@ -177,6 +186,8 @@ class Context(Tab):
             source_msg = self.html_regex.sub("", raw_source_msg)
             if n["in_reply_to_status_id"] is not None:
                 source_msg += " [+]"
+            datetime_notice = datetime.datetime.strptime(n['created_at'], DATETIME_FORMAT)
+            time_msg = time_helper.time_since(datetime_notice)
             
             self.buffer.append(str(c))
             y = len(self.buffer) - 1
@@ -190,6 +201,10 @@ class Context(Tab):
             except UnicodeDecodeError:
                 self.buffer += "Caution: Terminal too shit to display this notice"
 
+            self.buffer.append(" " * (maxx - (len(time_msg) + 2)))
+            y = len(self.buffer) - 1
+            self.buffer[y] += time_msg
+            
             self.buffer.append("")
             self.buffer.append("")
 

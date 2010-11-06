@@ -10,6 +10,7 @@ class StatusNet(object):
             raise Exception("Invalid credentials")
         self.server_config = self.statusnet_config()
         self.length_limit = int(self.server_config["site"]["textlimit"]) # this will be 0 on unlimited instances
+        self.tz = self.server_config["site"]["timezone"]
     
     def __makerequest(self, resource_path, raw_params={}):
         params = urllib.urlencode(raw_params)
