@@ -378,7 +378,7 @@ class IdentiCurse(object):
                         self.config[keys[0]][keys[1]] = value
                     else:
                         self.config[keys[0]] = value
-                    open('config.json', 'w').write(json.dumps(self.config, sort_keys=True, indent=4))
+                    open('config.json', 'w').write(json.dumps(self.config, indent=4))
                 
                 self.status_bar.update_left("Doing nothing.")
             else:
