@@ -216,34 +216,36 @@ class IdentiCurse(object):
                     self.conn.blocks_create(user_id=id, screen_name=username)
 
                 elif tokens[0] == "/block":
-                    self.status_bar.update_left("Creating Block...")
-                    # Yeuch
-                    try:
-                        float(tokens[1])
-                    except ValueError:
-                        user = tokens[1]
-                        if user[0] == "@":
-                        	user = user[1:]
-                        id = self.conn.users_show(screen_name=user)['id']
-                    else:
-                        user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
-                        id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['user']['id']
-                    self.conn.blocks_create(user_id=id, screen_name=username)
+                    self.status_bar.update_left("Creating Block(s)...")
+                    for token in tokens[1:]:
+                        # Yeuch
+                        try:
+                            float(token)
+                        except ValueError:
+                            user = token
+                            if user[0] == "@":
+                            	user = user[1:]
+                            id = self.conn.users_show(screen_name=user)['id']
+                        else:
+                            user = self.tabs[self.current_tab].timeline[int(token) - 1]["user"]["screen_name"]
+                            id = self.tabs[self.current_tab].timeline[int(token) - 1]['user']['id']
+                        self.conn.blocks_create(user_id=id, screen_name=username)
 
                 elif tokens[0] == "/unblock":
-                    self.status_bar.update_left("Removing Block...")
-                    # Yeuch
-                    try:
-                        float(tokens[1])
-                    except ValueError:
-                        user = tokens[1]
-                        if user[0] == "@":
-                        	user = user[1:]
-                        id = self.conn.users_show(screen_name=user)['id']
-                    else:
-                        user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
-                        id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['user']['id']
-                    self.conn.blocks_destroy(user_id=id, screen_name=username)
+                    self.status_bar.update_left("Removing Block(s)...")
+                    for token in tokens[1:]:
+                        # Yeuch
+                        try:
+                            float(token)
+                        except ValueError:
+                            user = token
+                            if user[0] == "@":
+                            	user = user[1:]
+                            id = self.conn.users_show(screen_name=user)['id']
+                        else:
+                            user = self.tabs[self.current_tab].timeline[int(token) - 1]["user"]["screen_name"]
+                            id = self.tabs[self.current_tab].timeline[int(token) - 1]['user']['id']
+                        self.conn.blocks_destroy(user_id=id, screen_name=username)
 
                 elif tokens[0] == "/user":
                     self.status_bar.update_left("Loading User Timeline...")
