@@ -26,7 +26,7 @@ class StatusBar(object):
     def update(self):
         self.window.erase()
         self.window.addstr(0, 0, self.left_text)
-        right_x = self.window.getmaxyx()[1] - (len(self.right_text) + 2)
+        right_x = self.window.getmaxyx()[1] - (len(self.right_text) + 3)
         self.window.addstr(0, right_x, self.right_text)
         self.window.refresh()
 
