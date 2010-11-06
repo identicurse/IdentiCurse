@@ -170,7 +170,7 @@ class Profile(Tab):
         self.conn = conn
         self.id = id
 
-        self.name = "Profile"
+        self.name = "Profile (%s)" % self.id
 
         Tab.__init__(self, window)
 
