@@ -123,6 +123,7 @@ class Timeline(Tab):
                 source_msg = self.html_regex.sub("", raw_source_msg)
                 if n["in_reply_to_status_id"] is not None:
                     source_msg += " [+]"
+            time_msg = "(%s)" % (n['created_at'])
             
             self.buffer.append(str(c))
             y = len(self.buffer) - 1
@@ -136,6 +137,10 @@ class Timeline(Tab):
             except UnicodeDecodeError:
                 self.buffer += "Caution: Terminal too shit to display this notice"
 
+            self.buffer.append(" " * (maxx - (len(time_msg) + 2)))
+            y = len(self.buffer) - 1
+            self.buffer[y] += time_msg
+            
             self.buffer.append("")
             self.buffer.append("")
 
