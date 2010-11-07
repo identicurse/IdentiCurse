@@ -129,7 +129,7 @@ class Timeline(Tab):
                 source_msg = self.html_regex.sub("", raw_source_msg)
                 if n["in_reply_to_status_id"] is not None:
                     source_msg += " [+]"
-            datetime_notice = datetime.datetime.strptime(n['created_at'], DATETIME_FORMAT)
+            datetime_notice = datetime.datetime.strptime(unicode(n['created_at']), DATETIME_FORMAT)
             time_msg = time_helper.time_since(datetime_notice)
             
             self.buffer.append(str(c))
@@ -186,7 +186,7 @@ class Context(Tab):
             source_msg = self.html_regex.sub("", raw_source_msg)
             if n["in_reply_to_status_id"] is not None:
                 source_msg += " [+]"
-            datetime_notice = datetime.datetime.strptime(n['created_at'], DATETIME_FORMAT)
+            datetime_notice = datetime.datetime.strptime(unicode(n['created_at']), DATETIME_FORMAT)
             time_msg = time_helper.time_since(datetime_notice)
             
             self.buffer.append(str(c))
