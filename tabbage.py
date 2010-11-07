@@ -1,7 +1,7 @@
 #!/usr/bin env python
 import re
 import threading
-import datetime
+import datetime, locale
 import time_helper
 DATETIME_FORMAT = "%a %b %d %H:%M:%S +0000 %Y"
 
@@ -129,7 +129,9 @@ class Timeline(Tab):
                 source_msg = self.html_regex.sub("", raw_source_msg)
                 if n["in_reply_to_status_id"] is not None:
                     source_msg += " [+]"
+            locale.setlocale(locale.LC_TIME, 'C')  # hacky fix because statusnet uses english timestrings regardless of locale
             datetime_notice = datetime.datetime.strptime(unicode(n['created_at']), DATETIME_FORMAT)
+            locale.setlocale(locale.LC_TIME, '') # other half of the hacky fix
             time_msg = time_helper.time_since(datetime_notice)
             
             self.buffer.append(str(c))
@@ -186,7 +188,9 @@ class Context(Tab):
             source_msg = self.html_regex.sub("", raw_source_msg)
             if n["in_reply_to_status_id"] is not None:
                 source_msg += " [+]"
+            locale.setlocale(locale.LC_TIME, 'C')  # hacky fix because statusnet uses english timestrings regardless of locale
             datetime_notice = datetime.datetime.strptime(unicode(n['created_at']), DATETIME_FORMAT)
+            locale.setlocale(locale.LC_TIME, '') # other half of the hacky fix
             time_msg = time_helper.time_since(datetime_notice)
             
             self.buffer.append(str(c))
