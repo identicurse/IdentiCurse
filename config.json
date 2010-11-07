@@ -40,5 +40,6 @@
         "/gjoin": "/groupjoin", 
         "/del": "/delete", 
         "/inbox": "/directs"
-    }
+    },
+    "update_interval": 60
 }
