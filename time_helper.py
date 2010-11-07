@@ -2,8 +2,7 @@
 import time, datetime
 
 def time_since(datetime_then):
-#    utc = TZ_UTC()
-    time_diff_raw = datetime.datetime.now() - datetime_then
+    time_diff_raw = datetime.datetime.utcnow() - datetime_then
     days_since = time_diff_raw.days
     seconds_since = time_diff_raw.seconds
     time_diff = {}
