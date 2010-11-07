@@ -255,7 +255,7 @@ class IdentiCurse(object):
                     else:
                         user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
                         id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['id']
-                    status = "@" + user + " " + " ".join(tokens[2:-1])
+                    status = "@" + user + " " + " ".join(tokens[2:])
 
                     self.conn.statuses_update(status, "IdentiCurse", int(id))
 
@@ -312,13 +312,13 @@ class IdentiCurse(object):
                     else:
                         id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['user']['id']
                         username = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
-                    status = "@support !sr @%s UID %d %s" % (username, id, " ".join(tokens[2:-1]))
+                    status = "@support !sr @%s UID %d %s" % (username, id, " ".join(tokens[2:]))
                     self.conn.statuses_update(status, "IdentiCurse")
                     self.conn.blocks_create(user_id=id, screen_name=username)
 
                 elif tokens[0] == "/block":
                     self.status_bar.update_left("Creating Block(s)...")
-                    for token in tokens[1:-1]:
+                    for token in tokens[1:]:
                         # Yeuch
                         try:
                             float(token)
@@ -334,7 +334,7 @@ class IdentiCurse(object):
 
                 elif tokens[0] == "/unblock":
                     self.status_bar.update_left("Removing Block(s)...")
-                    for token in tokens[1:-1]:
+                    for token in tokens[1:]:
                         # Yeuch
                         try:
                             float(token)
@@ -459,7 +459,7 @@ class IdentiCurse(object):
                     
                 elif tokens[0] == "/search":
                     self.status_bar.update_left("Searching...")
-                    query = " ".join(tokens[1:-1])
+                    query = " ".join(tokens[1:])
                     self.tabs.append(Timeline(self.conn, self.notice_window, "search", {'query':query}))
                     self.current_tab = len(self.tabs) - 1
                     self.tab_order.insert(0, self.current_tab)
@@ -485,7 +485,7 @@ class IdentiCurse(object):
                     self.tab_order.insert(0, self.current_tab)
                     
                 elif tokens[0] == "/config":
-                    keys, value = tokens[1].split('.'), " ".join(tokens[2:-1])
+                    keys, value = tokens[1].split('.'), " ".join(tokens[2:])
                     if len(keys) == 2:      # there has to be a clean way to avoid hardcoded len checks, but I can't think what right now, and technically it works for all currently valid config keys
                         self.config[keys[0]][keys[1]] = value
                     else:
