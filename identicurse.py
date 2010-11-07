@@ -48,10 +48,17 @@ class IdentiCurse(object):
         self.main_window.box(0, 0)
 
         y, x = self.main_window.getmaxyx()
-        self.entry_window = self.main_window.subwin(1, x-10, 4, 5)
-        self.text_entry = textpad.Textbox(self.entry_window, insert_mode=True)
 
-        self.notice_window = self.main_window.subwin(y-7, x-4, 6, 5)
+        if self.conn.length_limit == 0:
+            entry_lines = 3
+        else:
+            entry_lines = (self.conn.length_limit / x) + 1
+
+        self.entry_window = self.main_window.subwin(entry_lines, x-10, 4, 5)
+        self.text_entry = textpad.Textbox(self.entry_window, insert_mode=True)
+        self.text_entry.stripspaces = 1
+
+        self.notice_window = self.main_window.subwin(y-7, x-4, 5 + entry_lines, 5)
 
         # I don't like this, but it looks like it has to be done
         if hasattr(self, 'tabs'):
@@ -227,6 +234,8 @@ class IdentiCurse(object):
 
     def parse_input(self, input):
         if len(input) > 0:      # don't do anything if the user didn't enter anything
+            input = input.rstrip()
+
             if input[0] == "/":
                 tokens = input.split(" ")
 
@@ -490,6 +499,7 @@ class IdentiCurse(object):
 
         self.entry_window.clear()
         self.text_entry = textpad.Textbox(self.entry_window, insert_mode=True)
+        self.text_entry.stripspaces = 1
         self.update_tabs()
         self.display_current_tab()
         self.update_timer = Timer(self.config['update_interval'], self.update_tabs)
