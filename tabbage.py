@@ -130,7 +130,7 @@ class Timeline(Tab):
                 if n["in_reply_to_status_id"] is not None:
                     source_msg += " [+]"
             locale.setlocale(locale.LC_TIME, 'C')  # hacky fix because statusnet uses english timestrings regardless of locale
-            datetime_notice = datetime.datetime.strptime(unicode(n['created_at']), DATETIME_FORMAT)
+            datetime_notice = datetime.datetime.strptime(n['created_at'], DATETIME_FORMAT)
             locale.setlocale(locale.LC_TIME, '') # other half of the hacky fix
             time_msg = time_helper.time_since(datetime_notice)
             
@@ -189,7 +189,7 @@ class Context(Tab):
             if n["in_reply_to_status_id"] is not None:
                 source_msg += " [+]"
             locale.setlocale(locale.LC_TIME, 'C')  # hacky fix because statusnet uses english timestrings regardless of locale
-            datetime_notice = datetime.datetime.strptime(unicode(n['created_at']), DATETIME_FORMAT)
+            datetime_notice = datetime.datetime.strptime(n['created_at'], DATETIME_FORMAT)
             locale.setlocale(locale.LC_TIME, '') # other half of the hacky fix
             time_msg = time_helper.time_since(datetime_notice)
             
