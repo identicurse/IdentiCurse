@@ -116,22 +116,27 @@ class IdentiCurse(object):
                 self.tabs.append(Context(self.conn, self.notice_window, notice_id))
             if tab[0] == "help":
                 self.tabs.append(Help(self.notice_window))
+
+        self.update_timer = Timer(self.config['update_interval'], self.update_tabs)
+        self.update_timer.start()
+
         self.current_tab = 0
 
         self.update_tabs()
         self.display_current_tab()
 
-        Timer(self.config['update_interval'], self.update_tabs).start()
         self.loop()
 
     def update_tabs(self):
+        self.update_timer.cancel()
         self.status_bar.update_left("Updating Timelines...")
         TabUpdater(self.tabs, self, 'end_update_tabs').start()
 
     def end_update_tabs(self):
         self.display_current_tab()
         self.status_bar.update_left("Doing nothing.")
-        Timer(self.config['update_interval'], self.update_tabs).start()
+        self.update_timer = Timer(self.config['update_interval'], self.update_tabs)
+        self.update_timer.start()
 
     def update_tab_buffers(self):
         for tab in self.tabs:
@@ -184,6 +189,7 @@ class IdentiCurse(object):
             elif input == ord("r"):
                 self.update_tabs()
             elif input == ord("i"):
+                self.update_timer.cancel()
                 self.parse_input(self.text_entry.edit(self.validate))
             elif input == ord("q"):
                 running = False
@@ -465,12 +471,15 @@ class IdentiCurse(object):
                 self.status_bar.update_left("Posting Notice...")
                 self.conn.statuses_update(input, source="IdentiCurse")
 
-        # Why doesn't textpad have a clear method!?
         self.entry_window.clear()
         self.text_entry = textpad.Textbox(self.entry_window, insert_mode=True)
         self.update_tabs()
         self.display_current_tab()
-        
+        self.update_timer = Timer(self.config['update_interval'], self.update_tabs)
+        self.update_timer.start()
+
+
     def quit(self):
+        self.update_timer.cancel()
         curses.endwin()
         sys.exit()
