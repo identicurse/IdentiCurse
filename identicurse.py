@@ -121,6 +121,7 @@ class IdentiCurse(object):
         self.update_timer.start()
 
         self.current_tab = 0
+        self.tab_order = range(len(self.tabs))
 
         self.update_tabs()
         self.display_current_tab()
@@ -151,10 +152,11 @@ class IdentiCurse(object):
             pass
         else:
             del self.tabs[self.current_tab]
-            if self.current_tab == 0:
-                self.current_tab += 1
-            else:
-                self.current_tab -= 1
+            del self.tab_order[0]
+            for index in range(len(self.tab_order)):
+                if self.tab_order[index] > self.current_tab:
+                    self.tab_order[index] -= 1
+            self.current_tab = self.tab_order[0]
                 
             self.display_current_tab()
 
@@ -198,10 +200,12 @@ class IdentiCurse(object):
             elif input == ord("h"):
                 self.tabs.append(Help(self.notice_window))
                 self.current_tab = len(self.tabs) - 1
+                self.tab_order.insert(0, self.current_tab)
                 self.tabs[self.current_tab].update()
             
             for x in range(0, len(self.tabs)):
                 if input == ord(str(x+1)):
+                    self.tab_order.insert(0, self.tab_order.pop(self.tab_order.index(x)))
                     self.current_tab = x
 
             y, x = self.screen.getmaxyx()
@@ -283,6 +287,8 @@ class IdentiCurse(object):
 
                     self.tabs.append(Profile(self.conn, self.notice_window,user))
                     self.current_tab = len(self.tabs) - 1
+                    self.tab_order.insert(0, self.current_tab)
+
 
                 elif tokens[0] == "/spamreport":
                     self.status_bar.update_left("Firing Orbital Laser Cannon...")
@@ -349,6 +355,7 @@ class IdentiCurse(object):
 
                     self.tabs.append(Timeline(self.conn, self.notice_window, "user", {'user_id':id, 'screen_name':user}))
                     self.current_tab = len(self.tabs) - 1
+                    self.tab_order.insert(0, self.current_tab)
 
                 elif tokens[0] == "/context":
                     self.status_bar.update_left("Loading Context...")
@@ -356,6 +363,7 @@ class IdentiCurse(object):
 
                     self.tabs.append(Context(self.conn, self.notice_window, id))
                     self.current_tab = len(self.tabs) - 1
+                    self.tab_order.insert(0, self.current_tab)
 
                 elif tokens[0] == "/subscribe":
                     self.status_bar.update_left("Subscribing...")
@@ -398,6 +406,7 @@ class IdentiCurse(object):
 
                     self.tabs.append(Timeline(self.conn, self.notice_window, "group", {'group_id':id, 'nickname':group}))
                     self.current_tab = len(self.tabs) - 1
+                    self.tab_order.insert(0, self.current_tab)
 
                 elif tokens[0] == "/groupjoin":
                     self.status_bar.update_left("Joining Group...")
@@ -425,38 +434,46 @@ class IdentiCurse(object):
 
                     self.tabs.append(Timeline(self.conn, self.notice_window, "tag", {'tag':tag}))
                     self.current_tab = len(self.tabs) - 1
+                    self.tab_order.insert(0, self.current_tab)
 
                 elif tokens[0] == "/sentdirects":
                     self.status_bar.update_left("Loading Sent Directs...")
                     self.tabs.append(Timeline(self.conn, self.notice_window, "sentdirect"))
                     self.current_tab = len(self.tabs) - 1
+                    self.tab_order.insert(0, self.current_tab)
 
                 elif tokens[0] == "/favourites":
                     self.status_bar.update_left("Loading Favourites...")
                     self.tabs.append(Timeline(self.conn, self.notice_window, "favourites"))
                     self.current_tab = len(self.tabs) - 1
+                    self.tab_order.insert(0, self.current_tab)
                     
                 elif tokens[0] == "/search":
                     self.status_bar.update_left("Searching...")
                     query = " ".join(tokens[1:-1])
                     self.tabs.append(Timeline(self.conn, self.notice_window, "search", {'query':query}))
                     self.current_tab = len(self.tabs) - 1
+                    self.tab_order.insert(0, self.current_tab)
                 
                 elif tokens[0] == "/home":
                     self.tabs.append(Timeline(self.conn, self.notice_window, "home"))
                     self.current_tab = len(self.tabs) - 1
+                    self.tab_order.insert(0, self.current_tab)
                 
                 elif tokens[0] == "/mentions":
                     self.tabs.append(Timeline(self.conn, self.notice_window, "mentions"))
                     self.current_tab = len(self.tabs) - 1
+                    self.tab_order.insert(0, self.current_tab)
                 
                 elif tokens[0] == "/directs":
                     self.tabs.append(Timeline(self.conn, self.notice_window, "direct"))
                     self.current_tab = len(self.tabs) - 1
+                    self.tab_order.insert(0, self.current_tab)
                 
                 elif tokens[0] == "/public":
                     self.tabs.append(Timeline(self.conn, self.notice_window, "public"))
                     self.current_tab = len(self.tabs) - 1
+                    self.tab_order.insert(0, self.current_tab)
                     
                 elif tokens[0] == "/config":
                     keys, value = tokens[1].split('.'), " ".join(tokens[2:-1])
