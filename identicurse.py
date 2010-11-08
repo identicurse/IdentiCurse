@@ -511,9 +511,9 @@ class IdentiCurse(object):
         self.entry_window.clear()
         self.text_entry = textpad.Textbox(self.entry_window, insert_mode=True)
         self.text_entry.stripspaces = 1
+        self.insert_mode = False
         self.update_tabs()
         self.display_current_tab()
-        self.insert_mode = False
         self.update_timer = Timer(self.config['update_interval'], self.update_tabs)
         self.update_timer.start()
 
