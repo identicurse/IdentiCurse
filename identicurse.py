@@ -17,6 +17,7 @@ class IdentiCurse(object):
     def __init__(self):
         self.config = json.loads(open('config.json').read())
         self.conn = StatusNet(self.config['api_path'], self.config['username'], self.config['password'])
+        self.insert_mode = False
         curses.wrapper(self.initialise)
 
     def redraw(self):
@@ -118,8 +119,12 @@ class IdentiCurse(object):
 
     def update_tabs(self):
         self.update_timer.cancel()
-        self.status_bar.update_left("Updating Timelines...")
-        TabUpdater(self.tabs, self, 'end_update_tabs').start()
+        if self.insert_mode == False:
+            self.status_bar.update_left("Updating Timelines...")
+            TabUpdater(self.tabs, self, 'end_update_tabs').start()
+        else:
+            self.update_timer = Timer(self.config['update_interval'], self.update_tabs)
+
 
     def end_update_tabs(self):
         self.display_current_tab()
@@ -180,6 +185,7 @@ class IdentiCurse(object):
                 self.update_tabs()
             elif input == ord("i"):
                 self.update_timer.cancel()
+                self.insert_mode = True
                 self.parse_input(self.text_entry.edit(self.validate))
             elif input == ord("q"):
                 running = False
@@ -278,7 +284,6 @@ class IdentiCurse(object):
                     self.tabs.append(Profile(self.conn, self.notice_window,user))
                     self.current_tab = len(self.tabs) - 1
                     self.tab_order.insert(0, self.current_tab)
-
 
                 elif tokens[0] == "/spamreport":
                     self.status_bar.update_left("Firing Orbital Laser Cannon...")
@@ -483,9 +488,9 @@ class IdentiCurse(object):
         self.text_entry.stripspaces = 1
         self.update_tabs()
         self.display_current_tab()
+        self.insert_mode = False
         self.update_timer = Timer(self.config['update_interval'], self.update_tabs)
         self.update_timer.start()
-
 
     def quit(self):
         self.update_timer.cancel()
