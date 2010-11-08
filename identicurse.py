@@ -29,6 +29,7 @@ class IdentiCurse(object):
     def redraw(self):
         self.screen.erase()
         self.y, self.x = self.screen.getmaxyx()
+        self.last_char = ""
 
         self.main_window = self.screen.subwin(self.y-2, self.x-3, 2, 2)
         self.main_window.keypad(1)
@@ -47,7 +48,6 @@ class IdentiCurse(object):
 
         self.notice_window = self.main_window.subwin(y-7, x-4, 5 + entry_lines, 5)
 
-        # I don't like this, but it looks like it has to be done
         if hasattr(self, 'tabs'):
             for tab in self.tabs:
                 tab.window = self.notice_window
@@ -192,6 +192,7 @@ class IdentiCurse(object):
             elif input == ord("i"):
                 self.update_timer.cancel()
                 self.insert_mode = True
+                self.status_bar.update_left("Editing Dent: " + str(self.conn.length_limit) + " characters remaining")
                 self.parse_input(self.text_entry.edit(self.validate))
             elif input == ord("q"):
                 running = False
@@ -220,10 +221,25 @@ class IdentiCurse(object):
         self.quit();
 
     def validate(self, ch):
+        """ I hate ncurses so god damned much """
         if ch == 127:
             self.text_entry.do_command(263)
-        else:
-            return ch
+        
+        text = self.text_entry.gather().rstrip()
+        length = len(text) + 1
+
+        if self.last_char == ord(" "):
+            if ch == 22:
+                self.validate(ch)
+            else:
+                self.last_char = ""
+                self.text_entry.do_command(" ")
+                length += 1
+
+        self.status_bar.update_left("Editing Dent: " + str(self.conn.length_limit - length) + " characters remaining")
+
+        self.last_char = ch
+        return ch
 
     def parse_input(self, input):
         if len(input) > 0:      # don't do anything if the user didn't enter anything
@@ -506,6 +522,7 @@ class IdentiCurse(object):
         self.update_tabs()
         self.display_current_tab()
         self.insert_mode = False
+        self.status_bar.update_left("Doing nothing.")
         self.update_timer = Timer(self.config['update_interval'], self.update_tabs)
         self.update_timer.start()
 
