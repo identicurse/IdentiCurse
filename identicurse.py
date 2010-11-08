@@ -3,6 +3,7 @@
 import os, sys, json, curses, locale
 from threading import Timer
 from curses import textpad
+import urllib2
 
 from statusnet import StatusNet
 from tabbage import *
@@ -16,7 +17,10 @@ class IdentiCurse(object):
     
     def __init__(self):
         self.config = json.loads(open('config.json').read())
-        self.conn = StatusNet(self.config['api_path'], self.config['username'], self.config['password'])
+        try:
+            self.conn = StatusNet(self.config['api_path'], self.config['username'], self.config['password'])
+        except Exception as errmsg:
+            sys.exit("ERROR: Couldn't establish connection: %s" % (errmsg))
         curses.wrapper(self.initialise)
 
     def redraw(self):
@@ -238,7 +242,10 @@ class IdentiCurse(object):
                         id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['id']
                     status = "@" + user + " " + " ".join(tokens[2:])
 
-                    self.conn.statuses_update(status, "IdentiCurse", int(id))
+                    try:
+                        self.conn.statuses_update(status, "IdentiCurse", int(id))
+                    except Exception as errmsg:
+                        self.status_bar.timed_update_left("ERROR: Couldn't post status: %s" % (errmsg))
 
                 elif tokens[0] == "/favourite":
                     self.status_bar.update_left("Favouriting Notice...")
@@ -261,7 +268,11 @@ class IdentiCurse(object):
                 elif tokens[0] == "/delete":
                     self.status_bar.update_left("Deleting Notice...")
                     id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['id']
-                    self.conn.statuses_destroy(id)
+                    try:
+                        self.conn.statuses_destroy(id)
+                    except urllib2.HTTPError, e:
+                        if e.code == 403:
+                            self.status_bar.timed_update_left("ERROR: You cannot delete others' statuses.")
 
                 elif tokens[0] == "/profile":
                     self.status_bar.update_left("Loading Profile...")
@@ -331,21 +342,25 @@ class IdentiCurse(object):
 
                 elif tokens[0] == "/user":
                     self.status_bar.update_left("Loading User Timeline...")
-                    # Yeuch
                     try:
-                        float(tokens[1])
-                    except ValueError:
-                        user = tokens[1]
-                        if user[0] == "@":
+                        # Yeuch
+                        try:
+                            float(tokens[1])
+                        except ValueError:
+                            user = tokens[1]
+                            if user[0] == "@":
                         	user = user[1:]
-                        id = self.conn.users_show(screen_name=user)['id']
-                    else:
-                        user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
-                        id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["id"]
-
-                    self.tabs.append(Timeline(self.conn, self.notice_window, "user", {'user_id':id, 'screen_name':user}))
-                    self.current_tab = len(self.tabs) - 1
-                    self.tab_order.insert(0, self.current_tab)
+                            id = self.conn.users_show(screen_name=user)['id']
+                        else:
+                            user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
+                            id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["id"]
+                        
+                        self.tabs.append(Timeline(self.conn, self.notice_window, "user", {'user_id':id, 'screen_name':user}))
+                        self.current_tab = len(self.tabs) - 1
+                        self.tab_order.insert(0, self.current_tab)
+                    except urllib2.HTTPError, e:
+                        if e.code == 404:
+                            self.status_bar.timed_update_left("ERROR: Couldn't open timeline: No such user")
 
                 elif tokens[0] == "/context":
                     self.status_bar.update_left("Loading Context...")
