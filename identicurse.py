@@ -47,6 +47,8 @@ class IdentiCurse(object):
         self.main_window.keypad(1)
         self.main_window.box(0, 0)
 
+
+
         y, x = self.main_window.getmaxyx()
 
         if self.conn.length_limit == 0:
@@ -74,6 +76,7 @@ class IdentiCurse(object):
 
         curses.noecho()
         curses.cbreak()
+        curses.use_default_colors()
 
         self.redraw()
 
