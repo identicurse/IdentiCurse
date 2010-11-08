@@ -522,7 +522,11 @@ class IdentiCurse(object):
                 self.status_bar.update_left("Doing nothing.")
             else:
                 self.status_bar.update_left("Posting Notice...")
-                self.conn.statuses_update(input, source="IdentiCurse")
+                try:
+                    self.conn.statuses_update(input, source="IdentiCurse")
+                except Exception as errmsg:
+                    self.status_bar.timed_update_left("ERROR: Couldn't post status: %s" % (errmsg))
+
 
         self.entry_window.clear()
         self.text_entry = textpad.Textbox(self.entry_window, insert_mode=True)
