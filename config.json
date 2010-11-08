@@ -1,7 +1,7 @@
 {
-    "username": "reality", 
+    "username": "test", 
     "api_path": "https://identi.ca/api", 
-    "password": "cruzer92", 
+    "password": "test", 
     "initial_tabs": "home|mentions|direct|public", 
     "aliases": {
         "/rt": "/repeat", 
