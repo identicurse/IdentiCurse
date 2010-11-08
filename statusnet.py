@@ -157,7 +157,7 @@ class StatusNet(object):
     def statuses_update(self, status, source="", in_reply_to_status_id=0, latitude=-200, longitude=-200, place_id="", display_coordinates=False):
         status = "".join([s.strip(" ") for s in status.split("\n")])  # rejoin split lines back to 1 line
         if len(status) > self.length_limit and self.length_limit != 0:
-            raise Exception("Maximum status length exceeded")
+            raise Exception("Maximum status length exceeded by %d characters." % (len(status) - self.length_limit))
         params = {'status':status}
         if not (source == ""):
             params['source'] = source
