@@ -6,30 +6,10 @@ from curses import textpad
 
 from statusnet import StatusNet
 from tabbage import *
+from statusbar import StatusBar
 
 locale.setlocale(locale.LC_ALL, '')
 code = locale.getpreferredencoding()
-
-class StatusBar(object):
-    def __init__(self, window):
-        self.window = window
-        self.left_text = ""
-        self.right_text = ""
-
-    def update_left(self, text):
-        self.left_text = text
-        self.update()
-    
-    def update_right(self, text):
-        self.right_text = text
-        self.update()
-
-    def update(self):
-        self.window.erase()
-        self.window.addstr(0, 0, self.left_text)
-        right_x = self.window.getmaxyx()[1] - (len(self.right_text) + 2)
-        self.window.addstr(0, right_x, self.right_text)
-        self.window.refresh()
 
 class IdentiCurse(object):
     """Contains Main IdentiCurse application"""
@@ -46,8 +26,6 @@ class IdentiCurse(object):
         self.main_window = self.screen.subwin(self.y-2, self.x-3, 2, 2)
         self.main_window.keypad(1)
         self.main_window.box(0, 0)
-
-
 
         y, x = self.main_window.getmaxyx()
 
@@ -167,7 +145,7 @@ class IdentiCurse(object):
                 if self.tab_order[index] > self.current_tab:
                     self.tab_order[index] -= 1
             self.current_tab = self.tab_order[0]
-                
+            
             self.display_current_tab()
 
     def loop(self):
