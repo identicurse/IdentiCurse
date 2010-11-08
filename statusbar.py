@@ -14,10 +14,10 @@ class StatusBar(object):
         self.right_text = text
         self.update()
 
-    def timed_update_left(self, text, delay):
+    def timed_update_left(self, text, delay=10):
         TimedUpdate(self, 'left', text, delay).start()
 
-    def timed_update_right(self, text, delay):
+    def timed_update_right(self, text, delay=10):
         TimedUpdate(self, 'right', text, delay).start()
 
     def update(self):
