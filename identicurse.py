@@ -16,7 +16,15 @@ class IdentiCurse(object):
     """Contains Main IdentiCurse application"""
     
     def __init__(self):
-        self.config = json.loads(open('config.json').read())
+        config_file = os.path.join(os.path.expanduser("~") ,".identicurse")
+        try:
+            if os.path.exists(config_file):
+                self.config = json.loads(open(config_file).read())
+            else:
+                config_file = "config.json"
+                self.config = json.loads(open(config_file).read())
+        except:
+            sys.exit("ERROR: Couldn't read config file.")
 
         try:
             self.conn = StatusNet(self.config['api_path'], self.config['username'], self.config['password'])

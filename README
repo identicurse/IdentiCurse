@@ -1,7 +1,15 @@
 BASIC CONFIGURATION
 
+Important note:
+IdentiCurse looks for your config file in two locations. First it
+checks .identicurse in your home directory, and then it checks
+config.json in the current directory. It is highly recommended that
+you copy the supplied config.json to $HOME/.identicurse before
+modifying, as that way future updates will not erase any customisation
+you have made.
+
 Before using IdentiCurse, you must configure it with your account
-login credentials. To do so, edit config.json in your favourite
+login credentials. To do so, edit your config file in your favourite
 editor, changing "username": "user" and "password": "test" to
 appropriate values. You can also use IdentiCurse with other StatusNet
 instances by changing "api_path" to the API home for the instance you
@@ -231,10 +239,9 @@ separated by vertical bars (|). The valid tab names are as follows:
 
 Aliases:
 In addition to the preset aliases, it is possible to add your own
-custom aliases by editing the "aliases" record in config.json. The
-preset aliases are stored in this way. and they are good examples of
-how to correctly format an alias.
-It is not recommended that you edit this section without a basic
-understanding of JSON syntax (for a good basic introduction, we
-recommend CouchDB's JSON Primer: 
-< http://guide.couchdb.org/editions/1/en/json.html >).
+custom aliases by editing the "aliases" record in your config
+file. The preset aliases are stored in this way. and they are good
+examples of how to correctly format an alias.  It is not recommended
+that you edit this section without a basic understanding of JSON
+syntax (for a good basic introduction, we recommend CouchDB's JSON
+Primer: < http://guide.couchdb.org/editions/1/en/json.html >).
