@@ -231,7 +231,7 @@ class Profile(Tab):
 
     def update_buffer(self):
         self.buffer = []
-        self.buffer.append(self.profile['screen_name'].capitalize().encode("utf-8") + "'s Profile")
+        self.buffer.append("@" + self.profile['screen_name'].encode("utf-8") + "'s Profile")
         self.buffer.append("")
         self.buffer.append("")
 
@@ -241,7 +241,29 @@ class Profile(Tab):
        
         if self.profile['description']:
             self.buffer.append("Bio: " + self.profile['description'])
+        if self.profile['location']:
+            self.buffer.append("Location: " + str(self.profile['location']))
+        if self.profile['url']:
+            self.buffer.append("URL: " + str(self.profile['url']))
+        if self.profile['id']:
+            self.buffer.append("User ID: " + str(self.profile['id']))
+        if self.profile['created_at']:
+            self.buffer.append("Joined at: " + str(self.profile['created_at']))
+
+            self.buffer.append("")
+
+        if self.profile['followers_count']:
+            self.buffer.append("Followed by: " + str(self.profile['followers_count']))
+        if self.profile['friends_count']:
+            self.buffer.append("Following: " + str(self.profile['friends_count']))
+        if self.profile['following']:
+            self.buffer.append("Followed by you: Yes")
+        else:
+            self.buffer.append("Followed by you: No")
+
             self.buffer.append("")
 
         if self.profile['statuses_count']:
             self.buffer.append("Notices: " + str(self.profile['statuses_count']))
+        if self.profile['favourites_count']:
+            self.buffer.append("Favourites: " + str(self.profile['favourites_count']))
