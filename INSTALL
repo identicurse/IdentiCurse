@@ -3,7 +3,7 @@ INSTALLATION
 Installation is a simple two-step process:
 
   1. As root, run setup.py:
-     # pythin setup.py install
+     # python setup.py install
 
   2. Copy the example config file into your home directory as
      .identicurse:
