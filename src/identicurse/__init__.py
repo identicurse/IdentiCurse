@@ -1,7 +1,7 @@
-#!/usr/bin/env python
 from identicurse import IdentiCurse
 import random
-slogans = [
+
+SLOGANS = [
             "100% hippy-approved",
             "powered by hatred",
             "we don't get OAuth either",
@@ -16,6 +16,13 @@ slogans = [
             "coming and coming and coming and coming"
           ]
 
-# Innit.
-print "Welcome to IdentiCurse 0.3-dev - %s." % (random.choice(slogans))
-IdentiCurse()
+def main():
+    """
+    Innit.
+    """
+    print "Welcome to IdentiCurse 0.3-dev - %s." % (random.choice(SLOGANS))
+    IdentiCurse()
+
+
+if __name__ == '__main__':
+    main()
