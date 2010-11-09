@@ -18,13 +18,13 @@ class IdentiCurse(object):
     def __init__(self):
         self.path = os.path.dirname(os.path.realpath( __file__ ))
         
-        config_file = os.path.join(os.path.expanduser("~") ,".identicurse")
+        self.config_file = os.path.join(os.path.expanduser("~") ,".identicurse")
         try:
-            if os.path.exists(config_file):
-                self.config = json.loads(open(config_file).read())
+            if os.path.exists(self.config_file):
+                self.config = json.loads(open(self.config_file).read())
             else:
-                config_file = os.path.join(self.path, "config.json")
-                self.config = json.loads(open(config_file).read())
+                self.config_file = os.path.join(self.path, "config.json")
+                self.config = json.loads(open(self.config_file).read())
         except:
             sys.exit("ERROR: Couldn't read config file.")
         if not "long_dent" in self.config:
@@ -505,7 +505,7 @@ class IdentiCurse(object):
                         self.config[keys[0]][keys[1]] = value
                     else:
                         self.config[keys[0]] = value
-                    open('config.json', 'w').write(json.dumps(self.config, indent=4))
+                    open(self.config_file, 'w').write(json.dumps(self.config, indent=4))
                 
                 self.status_bar.update_left("Doing nothing.")
             else:
