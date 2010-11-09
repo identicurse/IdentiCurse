@@ -17,5 +17,5 @@ slogans = [
           ]
 
 # Innit.
-print "Welcome to IdentiCurse 0.2-dev - %s." % (random.choice(slogans))
+print "Welcome to IdentiCurse 0.3-dev - %s." % (random.choice(slogans))
 IdentiCurse()
