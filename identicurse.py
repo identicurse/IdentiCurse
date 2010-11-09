@@ -25,7 +25,7 @@ class IdentiCurse(object):
                 self.config = json.loads(open(config_file).read())
         except:
             sys.exit("ERROR: Couldn't read config file.")
-        if not long_dent in self.config:
+        if not "long_dent" in self.config:
             self.config['long_dent'] = "truncate"
 
         try:
