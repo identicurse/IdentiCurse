@@ -28,7 +28,7 @@ class IdentiCurse(object):
         except:
             sys.exit("ERROR: Couldn't read config file.")
         if not "long_dent" in self.config:
-            self.config['long_dent'] = "truncate"
+            self.config['long_dent'] = "split"
 
         try:
             self.conn = StatusNet(self.config['api_path'], self.config['username'], self.config['password'])
