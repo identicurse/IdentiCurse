@@ -1,6 +1,7 @@
 INSTALLATION
 
-Installation is a simple two-step process:
+If you already have setuptools installed, installation is a simple
+two-step process:
 
   1. As root, run setup.py:
      # python setup.py install
@@ -11,3 +12,20 @@ Installation is a simple two-step process:
 
 And you're done! Read the README to get up to speed on configuring
 IdentiCurse to your liking, then just run "identicurse" to get going.
+
+
+If you do not have setuptools installed, you will need to either
+install your distribution's package for it, or manually install it if
+your distribution does not provide a package (instructions for which
+will not be given here).  The package name for setuptools in various
+distributions is known to be:
+
+	python-setuptools   in	Fedora, Ubuntu, Debian, openSUSE
+	python2-distribute  in	Arch
+	setuptools	    in	Slackware
+	
+	(if your distribution of choice is not in this list yet,
+	feel free to inform us of the correct package name)
+
+Once you have setuptools installed, you can proceed with the install
+as above.
