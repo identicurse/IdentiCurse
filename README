@@ -245,3 +245,25 @@ examples of how to correctly format an alias.  It is not recommended
 that you edit this section without a basic understanding of JSON
 syntax (for a good basic introduction, we recommend CouchDB's JSON
 Primer: < http://guide.couchdb.org/editions/1/en/json.html >).
+
+Long notice handling:
+
+When IdentiCurse encounters a notice that is too long to send to the
+current instance, there are three paths it can take, based on the
+current value of the long_dent config key:
+
+	1 - It simply does not send the notice, instead giving an
+	    error indicating how many characters the maximum length
+	    was exceeded by. This option is not recommended, as it
+	    discards the original message, which must therefore be
+	    rewritten from scratch. This will be chosen if long_dent
+	    is set to "drop".
+
+	2 - The notice is semi-intelligently split into 2 or more
+	    notices of sendable length. This will be chosen if
+	    long_dent is set to "split".
+	
+	3 - The notice is truncated, stopping immediately after the
+	    last character that fits into the sendable length. This
+	    will be chosen if long_dent is set to "truncate".
+

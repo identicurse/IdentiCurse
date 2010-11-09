@@ -41,5 +41,6 @@
         "/del": "/delete", 
         "/inbox": "/directs"
     },
-    "update_interval": 60
+    "update_interval": 60,
+    "long_dent": "split"
 }

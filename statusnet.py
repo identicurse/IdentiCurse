@@ -154,10 +154,8 @@ class StatusNet(object):
         params = {'id':id}
         return self.__makerequest("statuses/show", params)
 
-    def statuses_update(self, status, source="", in_reply_to_status_id=0, latitude=-200, longitude=-200, place_id="", display_coordinates=False):
+    def statuses_update(self, status, source="", in_reply_to_status_id=0, latitude=-200, longitude=-200, place_id="", display_coordinates=False, long_dent="truncate"):
         status = "".join([s.strip(" ") for s in status.split("\n")])  # rejoin split lines back to 1 line
-        if len(status) > self.length_limit and self.length_limit != 0:
-            raise Exception("Maximum status length exceeded by %d characters." % (len(status) - self.length_limit))
         params = {'status':status}
         if not (source == ""):
             params['source'] = source
@@ -171,6 +169,30 @@ class StatusNet(object):
             params['place_id'] = place_id
         if display_coordinates:
             params['display_coordinates'] = "true"
+        if len(status) > self.length_limit and self.length_limit != 0:
+            if long_dent=="truncate":
+                params['status'] = status[:self.length_limit]
+            elif long_dent=="split":
+                status_next = status[self.length_limit - 5:]
+                status = status[:self.length_limit-5]
+                while True:
+                    if len(status) == 0:
+                        raise Exception("Maximum status length exceeded by %d characters, and no split point could be found." % (len(status) - self.length_limit))
+                    elif status[-1] in [" ", "-"]:
+                        status = status + "(...)"
+                        break # split point found
+                    else:
+                        status_next = status[-1] + status_next
+                        status = status[:-1]
+                if not (in_reply_to_status_id == 0):
+                    status_next = status.split(" ")[0] + " (...) " + status_next
+                else:
+                    status_next = "(...) " + status_next
+                params['status'] = status
+                first_dent = self.__makerequest("statuses/update", params) # post the first piece as normal
+                return self.statuses_update(status_next, source=source, in_reply_to_status_id=in_reply_to_status_id, latitude=latitude, longitude=longitude, place_id=place_id, display_coordinates=display_coordinates, long_dent=long_dent) # then hand the rest of for potential further splitting
+            else:
+                raise Exception("Maximum status length exceeded by %d characters." % (len(status) - self.length_limit))
         return self.__makerequest("statuses/update", params)
     
     def statuses_destroy(self, id):

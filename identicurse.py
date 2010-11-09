@@ -25,6 +25,8 @@ class IdentiCurse(object):
                 self.config = json.loads(open(config_file).read())
         except:
             sys.exit("ERROR: Couldn't read config file.")
+        if not long_dent in self.config:
+            self.config['long_dent'] = "truncate"
 
         try:
             self.conn = StatusNet(self.config['api_path'], self.config['username'], self.config['password'])
@@ -259,7 +261,7 @@ class IdentiCurse(object):
                     status = "@" + user + " " + " ".join(tokens[2:])
 
                     try:
-                        self.conn.statuses_update(status, "IdentiCurse", int(id))
+                        self.conn.statuses_update(status, "IdentiCurse", int(id), long_dent=self.config['long_dent'])
                     except Exception as errmsg:
                         self.status_bar.timed_update_left("ERROR: Couldn't post status: %s" % (errmsg))
 
@@ -507,7 +509,7 @@ class IdentiCurse(object):
             else:
                 self.status_bar.update_left("Posting Notice...")
                 try:
-                    self.conn.statuses_update(input, source="IdentiCurse")
+                    self.conn.statuses_update(input, source="IdentiCurse", long_dent=self.config['long_dent'])
                 except Exception as errmsg:
                     self.status_bar.timed_update_left("ERROR: Couldn't post status: %s" % (errmsg))
 
