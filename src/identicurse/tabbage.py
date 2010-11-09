@@ -131,6 +131,8 @@ class Timeline(Tab):
                 source_msg = self.html_regex.sub("", raw_source_msg)
                 if n["in_reply_to_status_id"] is not None:
                     source_msg += " [+]"
+                elif "retweeted_status" in n:
+                    source_msg += " [~]"
             locale.setlocale(locale.LC_TIME, 'C')  # hacky fix because statusnet uses english timestrings regardless of locale
             datetime_notice = datetime.datetime.strptime(n['created_at'], DATETIME_FORMAT)
             locale.setlocale(locale.LC_TIME, '') # other half of the hacky fix
@@ -173,7 +175,10 @@ class Context(Tab):
 
         while next_id is not None:
             self.timeline += [self.conn.statuses_show(id=next_id)]
-            next_id = self.timeline[-1]['in_reply_to_status_id']
+            if "retweeted_status" in self.timeline[-1]:
+                next_id = self.timeline[-1]['retweeted_status']['id']
+            else:
+                next_id = self.timeline[-1]['in_reply_to_status_id']
 
         self.update_buffer()
 
@@ -190,6 +195,8 @@ class Context(Tab):
             source_msg = self.html_regex.sub("", raw_source_msg)
             if n["in_reply_to_status_id"] is not None:
                 source_msg += " [+]"
+            elif "retweeted_status" in n:
+                source_msg += " [~]"
             locale.setlocale(locale.LC_TIME, 'C')  # hacky fix because statusnet uses english timestrings regardless of locale
             datetime_notice = datetime.datetime.strptime(n['created_at'], DATETIME_FORMAT)
             locale.setlocale(locale.LC_TIME, '') # other half of the hacky fix
