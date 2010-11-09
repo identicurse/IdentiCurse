@@ -16,12 +16,14 @@ class IdentiCurse(object):
     """Contains Main IdentiCurse application"""
     
     def __init__(self):
+        self.path = os.path.dirname(os.path.realpath( __file__ ))
+        
         config_file = os.path.join(os.path.expanduser("~") ,".identicurse")
         try:
             if os.path.exists(config_file):
                 self.config = json.loads(open(config_file).read())
             else:
-                config_file = "config.json"
+                config_file = os.path.join(self.path, "config.json")
                 self.config = json.loads(open(config_file).read())
         except:
             sys.exit("ERROR: Couldn't read config file.")
@@ -120,7 +122,7 @@ class IdentiCurse(object):
                 notice_id = int(tab[1])
                 self.tabs.append(Context(self.conn, self.notice_window, notice_id))
             if tab[0] == "help":
-                self.tabs.append(Help(self.notice_window))
+                self.tabs.append(Help(self.notice_window, self.path))
 
         self.update_timer = Timer(self.config['update_interval'], self.update_tabs)
         self.update_timer.start()
@@ -208,7 +210,7 @@ class IdentiCurse(object):
             elif input == ord("x"):
                 self.close_current_tab()
             elif input == ord("h"):
-                self.tabs.append(Help(self.notice_window))
+                self.tabs.append(Help(self.notice_window, self.path))
                 self.current_tab = len(self.tabs) - 1
                 self.tab_order.insert(0, self.current_tab)
                 self.tabs[self.current_tab].update()

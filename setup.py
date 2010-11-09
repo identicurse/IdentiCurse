@@ -23,6 +23,7 @@ setup(
 
     license="GPLv3+",
 
+    data_files=[('identicurse',['README'])],
     packages=find_packages('src'),
     package_dir={'': 'src'},
     include_package_data=True,

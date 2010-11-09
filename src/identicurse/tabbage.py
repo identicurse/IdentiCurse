@@ -1,4 +1,5 @@
 #!/usr/bin env python
+import os.path
 import re
 import threading
 import datetime, locale
@@ -54,15 +55,16 @@ class Tab(object):
         self.window.refresh()
 
 class Help(Tab):
-    def __init__(self, window):
+    def __init__(self, window, identicurse_path):
         self.name = "Help"
+        self.path = os.path.join(identicurse_path, "README")
         Tab.__init__(self, window) 
 
     def update(self):
         self.update_buffer()
 
     def update_buffer(self):
-        self.buffer = open('README', 'r').read().split("\n")
+        self.buffer = open(self.path, 'r').read().split("\n")
 
 class Timeline(Tab):
     def __init__(self, conn, window, timeline, type_params={}):
