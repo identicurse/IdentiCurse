@@ -519,7 +519,10 @@ class IdentiCurse(object):
 
 
         self.entry_window.clear()
-        self.text_entry = Textbox(self.entry_window, insert_mode=True)
+        try:
+            self.text_entry = Textbox(self.entry_window, insert_mode=True)
+        except TypeError:  # python 2.5 didn't support insert_mode
+            self.text_entry = Textbox(self.entry_window)
         self.text_entry.stripspaces = 1
         self.insert_mode = False
         self.update_tabs()
