@@ -2,7 +2,7 @@
 
 import os, sys, json, curses, locale
 from threading import Timer
-from curses import textpad
+from textbox import Textbox
 import urllib2
 
 from statusnet import StatusNet
@@ -54,7 +54,7 @@ class IdentiCurse(object):
             entry_lines = (self.conn.length_limit / x) + 1
 
         self.entry_window = self.main_window.subwin(entry_lines, x-10, 4, 5)
-        self.text_entry = textpad.Textbox(self.entry_window, insert_mode=True)
+        self.text_entry = Textbox(self.entry_window, insert_mode=True)
         self.text_entry.stripspaces = 1
 
         self.notice_window = self.main_window.subwin(y-7, x-4, 5 + entry_lines, 5)
@@ -204,7 +204,7 @@ class IdentiCurse(object):
             elif input == ord("i"):
                 self.update_timer.cancel()
                 self.insert_mode = True
-                self.parse_input(self.text_entry.edit(self.validate))
+                self.parse_input(self.text_entry.edit())
             elif input == ord("q"):
                 running = False
             elif input == ord("x"):
@@ -230,12 +230,6 @@ class IdentiCurse(object):
             self.main_window.refresh()
 
         self.quit();
-
-    def validate(self, ch):
-        if ch == 127:
-            self.text_entry.do_command(263)
-        else:
-            return ch
 
     def parse_input(self, input):
         if len(input) > 0:      # don't do anything if the user didn't enter anything
@@ -517,7 +511,7 @@ class IdentiCurse(object):
 
 
         self.entry_window.clear()
-        self.text_entry = textpad.Textbox(self.entry_window, insert_mode=True)
+        self.text_entry = Textbox(self.entry_window, insert_mode=True)
         self.text_entry.stripspaces = 1
         self.insert_mode = False
         self.update_tabs()
