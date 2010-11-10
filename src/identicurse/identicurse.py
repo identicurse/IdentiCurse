@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 
-import os, sys, json, curses, locale
+import os, sys, curses, locale
+try:
+    import json
+except ImportError:
+    import simplejson as json
 from threading import Timer
 from curses import textpad
 import urllib2
@@ -54,7 +58,10 @@ class IdentiCurse(object):
             entry_lines = (self.conn.length_limit / x) + 1
 
         self.entry_window = self.main_window.subwin(entry_lines, x-10, 4, 5)
-        self.text_entry = textpad.Textbox(self.entry_window, insert_mode=True)
+        try:
+            self.text_entry = textpad.Textbox(self.entry_window, insert_mode=True)
+        except TypeError:  # python 2.5 didn't support insert_mode
+            self.text_entry = textpad.Textbox(self.entry_window)
         self.text_entry.stripspaces = 1
 
         self.notice_window = self.main_window.subwin(y-7, x-4, 5 + entry_lines, 5)
