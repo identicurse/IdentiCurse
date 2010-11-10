@@ -224,7 +224,7 @@ separated by vertical bars (|). The valid tab names are as follows:
 	  mentions    	   The mentions tab.
 	  direct	   The received direct messages tab.
 	  sentdirect	   The sent direct messages tab.
-	  pyblic	   The public timeline tab.
+	  public	   The public timeline tab.
 	  user:NAME	   A user timeline tab for the user with
 	  		   username @NAME.
 	  tag:TAG	   A tag timeline tab for the #TAG tag.

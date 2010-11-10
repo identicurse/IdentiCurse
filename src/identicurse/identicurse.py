@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 
-import os, sys, json, curses, locale
+import os, sys, curses, locale
+try:
+    import json
+except ImportError:
+    import simplejson as json
 from threading import Timer
 from textbox import Textbox
 import urllib2
@@ -28,11 +32,11 @@ class IdentiCurse(object):
         except:
             sys.exit("ERROR: Couldn't read config file.")
         if not "long_dent" in self.config:
-            self.config['long_dent'] = "truncate"
+            self.config['long_dent'] = "split"
 
         try:
             self.conn = StatusNet(self.config['api_path'], self.config['username'], self.config['password'])
-        except Exception as errmsg:
+        except Exception, (errmsg):
             sys.exit("ERROR: Couldn't establish connection: %s" % (errmsg))
 
         self.insert_mode = False
@@ -54,9 +58,13 @@ class IdentiCurse(object):
             entry_lines = (self.conn.length_limit / x) + 1
 
         self.entry_window = self.main_window.subwin(entry_lines, x-10, 4, 5)
-        self.text_entry = Textbox(self.entry_window, insert_mode=True)
-        self.text_entry.stripspaces = 1
 
+        try:
+            self.text_entry = Textbox(self.entry_window, insert_mode=True)
+        except TypeError:  # python 2.5 didn't support insert_mode
+            self.text_entry = Textbox(self.entry_window)
+
+        self.text_entry.stripspaces = 1
         self.notice_window = self.main_window.subwin(y-7, x-4, 5 + entry_lines, 5)
 
         # I don't like this, but it looks like it has to be done
@@ -258,7 +266,7 @@ class IdentiCurse(object):
 
                     try:
                         self.conn.statuses_update(status, "IdentiCurse", int(id), long_dent=self.config['long_dent'])
-                    except Exception as errmsg:
+                    except Exception, (errmsg):
                         self.status_bar.timed_update_left("ERROR: Couldn't post status: %s" % (errmsg))
 
                 elif tokens[0] == "/favourite":
@@ -506,7 +514,7 @@ class IdentiCurse(object):
                 self.status_bar.update_left("Posting Notice...")
                 try:
                     self.conn.statuses_update(input, source="IdentiCurse", long_dent=self.config['long_dent'])
-                except Exception as errmsg:
+                except Exception, (errmsg):
                     self.status_bar.timed_update_left("ERROR: Couldn't post status: %s" % (errmsg))
 
 

@@ -13,14 +13,16 @@ SLOGANS = [
             "YOUR SOUL TO THE HOMOSEXUAL AGENDA",
             "Bullshit Bingo",
             "trying to do teh frees",
-            "coming and coming and coming and coming"
+            "coming and coming and coming and coming",
+            "Do you store your passwords in the back yard?",
+            "Let's neuter this bullshit!"
           ]
 
 def main():
     """
     Innit.
     """
-    print "Welcome to IdentiCurse 0.3-dev - %s." % (random.choice(SLOGANS))
+    print "Welcome to IdentiCurse 0.3-dev - %s" % (random.choice(SLOGANS))
     IdentiCurse()
 
 
