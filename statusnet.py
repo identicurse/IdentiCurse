@@ -1,5 +1,9 @@
 #!/usr/bin/env python
-import urllib, urllib2, json
+import urllib, urllib2
+try:
+    import json
+except ImportError:
+    import simplejson as json
 
 class StatusNet(object):
     def __init__(self, api_path, username, password):

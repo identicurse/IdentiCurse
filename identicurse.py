@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 
-import os, sys, json, curses, locale
+import os, sys, curses, locale
+try:
+    import json
+except ImportError:
+    import simplejson as json
 from threading import Timer
 from curses import textpad
 import urllib2
