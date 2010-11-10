@@ -32,7 +32,7 @@ class IdentiCurse(object):
 
         try:
             self.conn = StatusNet(self.config['api_path'], self.config['username'], self.config['password'])
-        except Exception as errmsg:
+        except Exception, (errmsg):
             sys.exit("ERROR: Couldn't establish connection: %s" % (errmsg))
 
         self.insert_mode = False
@@ -264,7 +264,7 @@ class IdentiCurse(object):
 
                     try:
                         self.conn.statuses_update(status, "IdentiCurse", int(id), long_dent=self.config['long_dent'])
-                    except Exception as errmsg:
+                    except Exception, (errmsg):
                         self.status_bar.timed_update_left("ERROR: Couldn't post status: %s" % (errmsg))
 
                 elif tokens[0] == "/favourite":
@@ -512,7 +512,7 @@ class IdentiCurse(object):
                 self.status_bar.update_left("Posting Notice...")
                 try:
                     self.conn.statuses_update(input, source="IdentiCurse", long_dent=self.config['long_dent'])
-                except Exception as errmsg:
+                except Exception, (errmsg):
                     self.status_bar.timed_update_left("ERROR: Couldn't post status: %s" % (errmsg))
 
 
