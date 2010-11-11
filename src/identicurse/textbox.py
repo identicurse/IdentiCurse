@@ -3,7 +3,10 @@ from curses import textpad
 
 class Textbox(textpad.Textbox):
     def __init__(self, win, insert_mode=False):
-        textpad.Textbox.__init__(self, win, insert_mode)
+        try:
+            textpad.Textbox.__init__(self, win, insert_mode)
+        except TypeError:  # python 2.5 didn't support insert_mode
+            textpad.Textbox.__init__(self, win)
 
     def edit(self):
         while 1:

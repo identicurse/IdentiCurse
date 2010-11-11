@@ -59,10 +59,7 @@ class IdentiCurse(object):
 
         self.entry_window = self.main_window.subwin(entry_lines, x-10, 4, 5)
 
-        try:
-            self.text_entry = Textbox(self.entry_window, insert_mode=True)
-        except TypeError:  # python 2.5 didn't support insert_mode
-            self.text_entry = Textbox(self.entry_window)
+        self.text_entry = Textbox(self.entry_window, insert_mode=True)
 
         self.text_entry.stripspaces = 1
         self.notice_window = self.main_window.subwin(y-7, x-4, 5 + entry_lines, 5)
@@ -519,10 +516,7 @@ class IdentiCurse(object):
 
 
         self.entry_window.clear()
-        try:
-            self.text_entry = Textbox(self.entry_window, insert_mode=True)
-        except TypeError:  # python 2.5 didn't support insert_mode
-            self.text_entry = Textbox(self.entry_window)
+        self.text_entry = Textbox(self.entry_window, insert_mode=True)
         self.text_entry.stripspaces = 1
         self.insert_mode = False
         self.update_tabs()
