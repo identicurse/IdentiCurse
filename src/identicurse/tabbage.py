@@ -4,6 +4,7 @@ import re
 import threading
 import datetime, locale
 import time_helper
+import curses
 DATETIME_FORMAT = "%a %b %d %H:%M:%S +0000 %Y"
 
 class TabUpdater(threading.Thread):
@@ -51,7 +52,24 @@ class Tab(object):
 
     def display(self):
         self.window.erase()
-        self.window.addstr("\n".join(self.buffer[self.start_line:self.window.getmaxyx()[0] - 3 + self.start_line]).encode("utf-8"))
+        
+        ## this version is fine, but does not lend itself well to debugging where issues are - will be restored in final release
+        # self.window.addstr("\n".join(self.buffer[self.start_line:self.window.getmaxyx()[0] - 3 + self.start_line]).encode("utf-8"))
+        
+        # this version is messier and less efficient, but aids debugging
+        for index in range(self.start_line, (self.window.getmaxyx()[0] - 3) + self.start_line):
+            try:
+                out_line = self.buffer[index]
+            except IndexError:  # we ran out of lines to add
+                return
+            if index != self.start_line:
+                out_line = "\n" + out_line
+            out_line = out_line.encode("utf-8")
+            try:
+                self.window.addstr(out_line)
+            except curses.error:
+                raise Exception("curses choked on the following line: %s" % (out_line))
+        
         self.window.refresh()
 
 class Help(Tab):

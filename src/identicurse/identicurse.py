@@ -160,7 +160,10 @@ class IdentiCurse(object):
             tab.update_buffer()
 
     def display_current_tab(self):
-        self.tabs[self.current_tab].display()
+        try:
+            self.tabs[self.current_tab].display()
+        except Exception, errmsg:
+            sys.exit(errmsg)
         self.status_bar.update_right("Tab " + str(self.current_tab + 1) + ": " + self.tabs[self.current_tab].name)
 
     def close_current_tab(self):
