@@ -68,7 +68,7 @@ class Tab(object):
             try:
                 self.window.addstr(out_line)
             except curses.error:
-                raise Exception("curses choked on the following line: %s" % (out_line))
+                raise Exception("curses choked on the following line, which was line number %d: %s" % ((index - self.start_line), out_line))
         
         self.window.refresh()
 
