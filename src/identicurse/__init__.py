@@ -16,7 +16,8 @@ SLOGANS = [
             "coming and coming and coming and coming",
             "Do you store your passwords in the back yard?",
             "Let's neuter this bullshit!",
-            "it's probably just recycled bullshit."
+            "it's probably just recycled bullshit.",
+            "I'm on a rampage and kill everyone."
           ]
 
 def main():
