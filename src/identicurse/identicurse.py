@@ -244,7 +244,7 @@ class IdentiCurse(object):
             input = input.rstrip()
 
             if input[0] == "/":
-                tokens = input.split(" ")
+                tokens = [token for token in input.split(" ") if token != ""]
 
                 if tokens[0] in self.config["aliases"]:
                     tokens[0] = self.config["aliases"][tokens[0]]
