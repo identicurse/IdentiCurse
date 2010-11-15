@@ -206,7 +206,7 @@ class IdentiCurse(object):
             elif input == ord("i"):
                 self.update_timer.cancel()
                 self.insert_mode = True
-                self.parse_input(self.text_entry.edit(self.validate))
+                self.parse_input(self.text_entry.edit())
             elif input == ord("q"):
                 running = False
             elif input == ord("x"):
@@ -232,12 +232,6 @@ class IdentiCurse(object):
             self.main_window.refresh()
 
         self.quit();
-
-    def validate(self, ch):
-        if ch == 127:
-            self.text_entry.do_command(263)
-        else:
-            return ch
 
     def parse_input(self, input):
         if len(input) > 0:      # don't do anything if the user didn't enter anything
