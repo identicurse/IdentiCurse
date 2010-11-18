@@ -244,7 +244,7 @@ class IdentiCurse(object):
                 tokens = [token for token in input.split(" ") if token != ""]
 
                 if tokens[0] in self.config["aliases"]:
-                    tokens[0] = self.config["aliases"][tokens[0]]
+                    tokens = self.config["aliases"][tokens[0]].split(" ") + tokens[1:]
                 
                 if tokens[0] == "/reply":
                     self.status_bar.update_left("Posting Reply...")
