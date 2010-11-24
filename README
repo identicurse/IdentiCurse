@@ -25,21 +25,21 @@ and then after a short while, IdentiCurse itself will load (this delay
 is due to fetching all the initial dents). Once you are at this
 screen, you can do press various keys to do the following:
     
-    KEY		ACTION
-    1		Switch to tab 1 (initial default: Personal Timeline).
-    2		Switch to tab 2 (initial default: Mentions).
-    3		Switch to tab 3 (initial default: Direct Message Inbox).
-    4		Switch to tab 4 (initial default: Public Timeline).
-    5		Switch to tab 5 (no initial tab).
-    6		Switch to tab 6 (no initial tab).
-    7		Switch to tab 7 (no initial tab).
-    8		Switch to tab 8 (no initial tab).
-    9		Switch to tab 9 (no initial tab).
-    x		Close the currently visible tab.
-    r		Refresh.
-    q		Quit IdentiCurse.
-    h		Open a tab that displays this README.
-    i		Switch to text entry mode.
+    KEY         ACTION
+    1           Switch to tab 1 (initial default: Personal Timeline).
+    2           Switch to tab 2 (initial default: Mentions).
+    3           Switch to tab 3 (initial default: Direct Message Inbox).
+    4           Switch to tab 4 (initial default: Public Timeline).
+    5           Switch to tab 5 (no initial tab).
+    6           Switch to tab 6 (no initial tab).
+    7           Switch to tab 7 (no initial tab).
+    8           Switch to tab 8 (no initial tab).
+    9           Switch to tab 9 (no initial tab).
+    x           Close the currently visible tab.
+    r           Refresh.
+    q           Quit IdentiCurse.
+    h           Open a tab that displays this README.
+    i           Switch to text entry mode.
 
 You can also use the arrow keys to navigate within the current tab:
 UP and DOWN scroll up and down the tab's content, and LEFT and RIGHT
@@ -54,94 +54,94 @@ starting the message with a / (for example "/reply 1 Hello!" would
 trigger the /reply command rather than post "/reply 1 Hello!"  as a
 dent). Available commands are as follows:
 
-/reply [notice number] [message]		(aliases: /r)
+/reply [notice number] [message]                (aliases: /r)
    This will create a reply to the notice in your current view with
    the notice number specified.
 
-/reply [(@)username] [message]			(aliases: /r)
+/reply [(@)username] [message]                  (aliases: /r)
    This will create a mention of the user specified. The username can
    be entered with or without a @ at the beginning, either will work.
 
-/favourite [notice number]	      (aliases: /favorite, /fav, /f)
+/favourite [notice number]            (aliases: /favorite, /fav, /f)
    This will add the notice with the notice number specified to your
    favourites.
 
-/repeat [notice number]	       	      		(aliases: /rt)
+/repeat [notice number]                         (aliases: /rt)
    This will create a repeat of the notice with the notice number
    specified.
 
-/direct [(@)username] [message]	    	   	(aliases: /dm, /d)
+/direct [(@)username] [message]                 (aliases: /dm, /d)
    This will send a direct message to the user specified. As with
    /reply, the username will work with or without the @.
 
-/delete [notice number]				(aliases: /del)
+/delete [notice number]                         (aliases: /del)
    This will delete the notice with the notice number specified. It
    will only work for your notices, not those created by other users.
 
-/profile [notice number]      	    	       	(aliases: /p)
+/profile [notice number]                        (aliases: /p)
    This will open a new tab showing the profile of the user who
    created the notice with the notice number specified.
 
-/profile [(@)username]				(aliases: /p)
+/profile [(@)username]                          (aliases: /p)
    This will open a new tab showing the profile of the user specified.
    As with /reply and /direct, the @ is optional.
 
-/user [notice number]      	    	       	(aliases: /u)
+/user [notice number]                           (aliases: /u)
    This will open a new tab showing the timeline of the user who
    created the notice with the notice number specified.
 
-/user [(@)username]				(aliases: /u)
+/user [(@)username]                             (aliases: /u)
    This will open a new tab showing the timeline of the user
    specified. As with /reply and /direct, the @ is optional.
 
-/context [notice number]      	    	       	(aliases: /c)
+/context [notice number]                        (aliases: /c)
    This will open a new tab showing the context of the notice with the
    notice number specified. You can identify notices which have
    context by the fact that their "from X" message has a [+] after it.
 
-/subscribe [notice number]      	    	(aliases: /sub)
+/subscribe [notice number]                      (aliases: /sub)
    This will subscribe you to the user who created the notice with the
    notice number specified.
 
-/subscribe [(@)username]			(aliases: /sub)
+/subscribe [(@)username]                        (aliases: /sub)
    This will subscribe you to the user specified.  The @ is optional.
 
-/unsubscribe [notice number]      	    	(aliases: /unsub)
+/unsubscribe [notice number]                    (aliases: /unsub)
    This will unsubscribe you from the user who created the notice with
    the notice number specified.
 
-/unsubscribe [(@)username]			(aliases: /unsub)
+/unsubscribe [(@)username]                      (aliases: /unsub)
    This will unsubscribe you from the user specified.  The @ is
    optional.
 
-/subscribe [notice number]      	    	(aliases: /sub)
+/subscribe [notice number]                      (aliases: /sub)
    This will subscribe you to the user who created the notice with the
    notice number specified.
 
-/group [(!)group]				(aliases: /g)
+/group [(!)group]                               (aliases: /g)
    This will open a new tab showing the timeline of the group
    specified.  Much like the @ in username-based commands, the ! is
    optional.
 
-/groupjoin [(!)group]				(aliases: /gjoin, /gj)
+/groupjoin [(!)group]                           (aliases: /gjoin, /gj)
    This will add you as a member of the group specified.  The ! is
    optional.
 
-/groupleave [(!)group]				(aliases: /gleave, /gl)
+/groupleave [(!)group]                          (aliases: /gleave, /gl)
    This will remove you from membership of the group specified.  The !
    is optional.
 
-/tag [(#)tag]					(aliases: /t)
+/tag [(#)tag]                                   (aliases: /t)
    This will open a new tab showing the timeline of the tag
    specified. Like the @ or ! in username-/group-based commands, the #
    is optional.
 
-/home						(aliases: /personal)
+/home                                           (aliases: /personal)
    This will open a new tab showing your Home (a.k.a., Personal)
    timeline: that is, notices only from you and people/groups
    you follow.
    
-/mentions					(aliases: /replies)
+/mentions                                       (aliases: /replies)
    This will open a new tab showing notices that mention you.
    
 /public
@@ -149,65 +149,65 @@ dent). Available commands are as follows:
    contains the 20 most recent notices from anyone on identi.ca (or
    whichever instance you are using).
 
-/directs					(aliases: /inbox)
+/directs                                        (aliases: /inbox)
    This will open a new tab showing the direct messages other users
    have sent to you.
 
-/sentdirects				    	(aliases: /outbox)
+/sentdirects                                    (aliases: /outbox)
    This will open a new tab showing the direct messages you have sent
    to other users.
 
-/favourites		             (aliases: /favorites, /favs, /fs)
+/favourites                          (aliases: /favorites, /favs, /fs)
    This will open a new tab showing the direct messages you have added
    to your favourites.
 
-/search	[query string]				(aliases: /find, /?, /s)
+/search [query string]                          (aliases: /find, /?, /s)
    This will open a new tab showing notices that contain the query
    string specified.
 
-/block [notice number]      	    	       	(aliases: /b)
+/block [notice number]                          (aliases: /b)
    This will create a block against the user who created the notice
    with the notice number specified. You can also add additional
    notice numbers to block the users who created all of them.
 
-/block [(@)username]				(aliases: /b)
+/block [(@)username]                            (aliases: /b)
    This will create a block against of the user specified.  As usual,
    the @ is optional. You can also add additional usernames to block
    all of them.
 
-/unblock [notice number]      	    	       	(aliases: /unb)
+/unblock [notice number]                        (aliases: /unb)
    This will remove a block against the user who created the notice
    with the notice number specified. You can also add additional
    notice numbers to unblock the users who created all of them.
 
-/unblock [(@)username]				(aliases: /unb)
+/unblock [(@)username]                          (aliases: /unb)
    This will remove a block against of the user specified.  As usual,
    the @ is optional. You can also add additional usernames to
    unblock all of them.
 
-/spamreport [notice number] [reason]	  (aliases: /sr, /nuke)
+/spamreport [notice number] [reason]      (aliases: /sr, /nuke)
    This will submit a spam report dent in Identi.ca support's
    preferred format and also create a block against the user who
    created the notice with the notice number specified.
 
-/spamreport [(@)username] [reason]	  (aliases: /sr, /nuke)
+/spamreport [(@)username] [reason]        (aliases: /sr, /nuke)
    This will submit a spam report dent in Identi.ca support's
    preferred format and also create a block against the user
    specified.
 
-/config [key] [value]				(aliases: /set)
+/config [key] [value]                           (aliases: /set)
    This will set the config item with the specified key to the
    specified value. The key can also contain .s to indicate subkeys,
    though so far only aliases require subkeys to configure.
    Since this isn't such an intuitive command, here are some simple
    examples:
-	/config aliases./x /delete
-	This would make /x an alias for the /delete command.
+        /config aliases./x /delete
+        This would make /x an alias for the /delete command.
 
-	/config username test
-	This would set your logon username to "test". Note that this
-	particular key is only read in on startup, so changing
-	credentials this way would require a restart of IdentiCurse.
+        /config username test
+        This would set your logon username to "test". Note that this
+        particular key is only read in on startup, so changing
+        credentials this way would require a restart of IdentiCurse.
 
 After submitting your message/command, you will be back in non-text
 entry mode until you next press i. You can submit an empty text field
@@ -220,22 +220,22 @@ Initial tabs:
 The tabs that are automatically loaded on startup can be configured by
 editing the initial_tabs key. This key should contain tab names,
 separated by vertical bars (|). The valid tab names are as follows:
-	  home	      	   The personal timeline tab.
-	  mentions    	   The mentions tab.
-	  direct	   The received direct messages tab.
-	  sentdirect	   The sent direct messages tab.
-	  public	   The public timeline tab.
-	  user:NAME	   A user timeline tab for the user with
-	  		   username @NAME.
-	  tag:TAG	   A tag timeline tab for the #TAG tag.
-	  group:GROUP	   A group timeline tab for the !GROUP group.
-	  help		   A help tab, the same as is opened when h
-	  		   is pressed during use.
-	  profile:NAME	   A user profile tab for the user with
-	  		   username @NAME.
-	  search:QUERY	   A search tab with results from searching
-	  		   for QUERY.
-	  context:ID	   A context tab for the notice with id of ID.
+          home             The personal timeline tab.
+          mentions         The mentions tab.
+          direct           The received direct messages tab.
+          sentdirect       The sent direct messages tab.
+          public           The public timeline tab.
+          user:NAME        A user timeline tab for the user with
+                           username @NAME.
+          tag:TAG          A tag timeline tab for the #TAG tag.
+          group:GROUP      A group timeline tab for the !GROUP group.
+          help             A help tab, the same as is opened when h
+                           is pressed during use.
+          profile:NAME     A user profile tab for the user with
+                           username @NAME.
+          search:QUERY     A search tab with results from searching
+                           for QUERY.
+          context:ID       A context tab for the notice with id of ID.
 
 Aliases:
 In addition to the preset aliases, it is possible to add your own
@@ -252,18 +252,18 @@ When IdentiCurse encounters a notice that is too long to send to the
 current instance, there are three paths it can take, based on the
 current value of the long_dent config key:
 
-	1 - It simply does not send the notice, instead giving an
-	    error indicating how many characters the maximum length
-	    was exceeded by. This option is not recommended, as it
-	    discards the original message, which must therefore be
-	    rewritten from scratch. This will be chosen if long_dent
-	    is set to "drop".
+        1 - It simply does not send the notice, instead giving an
+            error indicating how many characters the maximum length
+            was exceeded by. This option is not recommended, as it
+            discards the original message, which must therefore be
+            rewritten from scratch. This will be chosen if long_dent
+            is set to "drop".
 
-	2 - The notice is semi-intelligently split into 2 or more
-	    notices of sendable length. This will be chosen if
-	    long_dent is set to "split".
-	
-	3 - The notice is truncated, stopping immediately after the
-	    last character that fits into the sendable length. This
-	    will be chosen if long_dent is set to "truncate".
+        2 - The notice is semi-intelligently split into 2 or more
+            notices of sendable length. This will be chosen if
+            long_dent is set to "split".
+        
+        3 - The notice is truncated, stopping immediately after the
+            last character that fits into the sendable length. This
+            will be chosen if long_dent is set to "truncate".
 
