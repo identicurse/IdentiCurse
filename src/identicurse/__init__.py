@@ -18,7 +18,9 @@ SLOGANS = [
             "Let's neuter this bullshit!",
             "it's probably just recycled bullshit.",
             "I'm on a rampage and kill everyone.",
-            "a Tragedie in three parts."
+            "a Tragedie in three parts.",
+            "#metamicroblogging",
+            "#metametamicroblogging"
           ]
 
 def main():
