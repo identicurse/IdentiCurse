@@ -30,4 +30,4 @@ New for 0.2:
  - Correctly handles unlimited-length StatusNet instances.
  - Bugfixes for:
       - User timelines could not be viewed with /user [notice number] syntax.
-      - Fixed bug where Profile pages get duplicate information on refresh.
+      - Profile pages get duplicate information on refresh.
