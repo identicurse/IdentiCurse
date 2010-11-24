@@ -124,38 +124,37 @@ class Timeline(Tab):
         timestamp = strptime(time)
 
     def update(self):
-        if not self.timeline_type in ["public", "favourites", "search"]:
-            self.timeline = []
-            get_count = self.notice_limit - len(self.timeline)
-            if self.timeline_type == "home":
-                raw_timeline = self.conn.statuses_home_timeline(count=get_count, page=self.page)
-            elif self.timeline_type == "mentions":
-                raw_timeline = self.conn.statuses_mentions(count=get_count, page=self.page)
-            elif self.timeline_type == "direct":
-                raw_timeline = self.conn.direct_messages(count=get_count, page=self.page)
-            elif self.timeline_type == "user":
-                raw_timeline = self.conn.statuses_user_timeline(user_id=self.type_params['user_id'], screen_name=self.type_params['screen_name'], count=get_count, page=self.page)
-            elif self.timeline_type == "group":
-                raw_timeline = self.conn.statusnet_groups_timeline(group_id=self.type_params['group_id'], nickname=self.type_params['nickname'], count=get_count, page=self.page)
-            elif self.timeline_type == "tag":
-                raw_timeline = self.conn.statusnet_tags_timeline(tag=self.type_params['tag'], count=get_count, page=self.page)
-            elif self.timeline_type == "sentdirect":
-                raw_timeline = self.conn.direct_messages_sent(count=get_count, page=self.page)
-            for notice in raw_timeline:
-                passes_filters = True
-                for filter_item in self.filters:
-                    if filter_item.lower() in notice['text'].lower():
-                        passes_filters = False
-                        break
-                if passes_filters:
-                    self.timeline.append(notice)
-        else:
-            if self.timeline_type == "public":
-                self.timeline = self.conn.statuses_public_timeline()
-            elif self.timeline_type == "favourites":
-                self.timeline = self.conn.favorites(page=self.page)
-            elif self.timeline_type == "search":
-                self.timeline = self.conn.search(self.type_params['query'], page=self.page, standardise=True)
+        self.timeline = []
+        get_count = self.notice_limit - len(self.timeline)
+        if self.timeline_type == "home":
+            raw_timeline = self.conn.statuses_home_timeline(count=get_count, page=self.page)
+        elif self.timeline_type == "mentions":
+            raw_timeline = self.conn.statuses_mentions(count=get_count, page=self.page)
+        elif self.timeline_type == "direct":
+            raw_timeline = self.conn.direct_messages(count=get_count, page=self.page)
+        elif self.timeline_type == "user":
+            raw_timeline = self.conn.statuses_user_timeline(user_id=self.type_params['user_id'], screen_name=self.type_params['screen_name'], count=get_count, page=self.page)
+        elif self.timeline_type == "group":
+            raw_timeline = self.conn.statusnet_groups_timeline(group_id=self.type_params['group_id'], nickname=self.type_params['nickname'], count=get_count, page=self.page)
+        elif self.timeline_type == "tag":
+            raw_timeline = self.conn.statusnet_tags_timeline(tag=self.type_params['tag'], count=get_count, page=self.page)
+        elif self.timeline_type == "sentdirect":
+            raw_timeline = self.conn.direct_messages_sent(count=get_count, page=self.page)
+        elif self.timeline_type == "public":
+            raw_timeline = self.conn.statuses_public_timeline()
+        elif self.timeline_type == "favourites":
+            raw_timeline = self.conn.favorites(page=self.page)
+        elif self.timeline_type == "search":
+            raw_timeline = self.conn.search(self.type_params['query'], page=self.page, standardise=True)
+
+        for notice in raw_timeline:
+            passes_filters = True
+            for filter_item in self.filters:
+                if filter_item.lower() in notice['text'].lower():
+                    passes_filters = False
+                    break
+            if passes_filters:
+                self.timeline.append(notice)
 
         self.update_buffer()
 
