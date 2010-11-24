@@ -27,6 +27,7 @@ class Buffer(list):
             while len(line) >= width:
                 reflowed_buffer.append(line[:width])
                 line = line[width:]
+            reflowed_buffer.append(line) # append whatever part of the line wasn't already added
         return reflowed_buffer
 
 class TabUpdater(threading.Thread):
@@ -69,12 +70,12 @@ class Tab(object):
 
     def scrolldown(self, n):
         self.start_line += n
-        if self.start_line > len(self.buffer) - (self.window.getmaxyx()[0] - 3):
-            self.start_line = len(self.buffer) - (self.window.getmaxyx()[0] - 3)
+        if self.start_line > len(self.buffer.reflowed(40)) - (self.window.getmaxyx()[0] - 3):
+            self.start_line = len(self.buffer.reflowed(40)) - (self.window.getmaxyx()[0] - 3)
 
     def display(self):
         self.window.erase()
-        self.window.addstr("\n".join(self.buffer[self.start_line:self.window.getmaxyx()[0] - 3 + self.start_line]).encode("utf-8"))
+        self.window.addstr("\n".join(self.buffer.reflowed(40)[self.start_line:self.window.getmaxyx()[0] - 3 + self.start_line]).encode("utf-8"))
         self.window.refresh()
 
 class Help(Tab):
