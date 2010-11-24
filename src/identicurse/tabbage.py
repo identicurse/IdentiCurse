@@ -170,7 +170,7 @@ class Timeline(Tab):
             y = len(self.buffer) - 1
             self.buffer[y] += ' ' * 3
             self.buffer[y] += user
-            self.buffer[y] += ' ' * (maxx - ((len(source_msg) + (len(user)) + 6)))
+            self.buffer[y] += ' ' * (maxx - ((len(source_msg) + len(user) + 6)))
             self.buffer[y] += source_msg
 
             try:
@@ -234,7 +234,7 @@ class Context(Tab):
             y = len(self.buffer) - 1
             self.buffer[y] += ' ' * 3
             self.buffer[y] += user
-            self.buffer[y] += ' ' * (maxx - ((len(source_msg) + (len(user)) + 6)))
+            self.buffer[y] += ' ' * (maxx - ((len(source_msg) + len(user) + 6)))
             self.buffer[y] += source_msg
 
             try:
