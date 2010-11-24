@@ -21,10 +21,11 @@ class Textbox(textpad.Textbox):
             elif ch == 9 or ch == 27:
                 abort = True
                 break
+            elif ch == curses.KEY_DC:
+                self.win.delch()
             elif not ch:
                 continue
-
-            if not self.do_command(ch):
+            elif not self.do_command(ch):
                 break
 
             self.win.refresh()
