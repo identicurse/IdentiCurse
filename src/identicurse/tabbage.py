@@ -11,7 +11,7 @@ class Buffer(list):
         list.__init__(self)
 
     def append(self, item):
-        if "\n" in item:
+        if "\n" in item:  # sometimes there are newlines in the buffer's input, even when it's a dent. we need to remove them.
             for line in item.split("\n"):
                 list.append(self, line)
         else:
@@ -19,6 +19,15 @@ class Buffer(list):
     
     def clear(self):
         self[:] = []
+
+    def reflowed(self, width):
+        """return a reflowed-for-width copy of the buffer as a list"""
+        reflowed_buffer = []
+        for line in self:
+            while len(line) >= width:
+                reflowed_buffer.append(line[:width])
+                line = line[width:]
+        return reflowed_buffer
 
 class TabUpdater(threading.Thread):
     def __init__(self, tabs, callback_object, callback_function):
