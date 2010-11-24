@@ -6,6 +6,20 @@ import datetime, locale
 import time_helper
 DATETIME_FORMAT = "%a %b %d %H:%M:%S +0000 %Y"
 
+class Buffer(list):
+    def __init__(self):
+        list.__init__(self)
+
+    def append(self, item):
+        if "\n" in item:
+            for line in item.split("\n"):
+                list.append(self, line)
+        else:
+            list.append(self, item)
+    
+    def clear(self):
+        self[:] = []
+
 class TabUpdater(threading.Thread):
     def __init__(self, tabs, callback_object, callback_function):
         threading.Thread.__init__(self)
@@ -23,7 +37,7 @@ class TabUpdater(threading.Thread):
 class Tab(object):
     def __init__(self, window):
         self.window = window
-        self.buffer = []
+        self.buffer = Buffer()
         self.start_line = 0
         self.html_regex = re.compile("<(.|\n)*?>")
         self.page = 1
@@ -64,7 +78,7 @@ class Help(Tab):
         self.update_buffer()
 
     def update_buffer(self):
-        self.buffer = open(self.path, 'r').read().split("\n")
+        self.buffer.append(open(self.path, 'r').read())
 
 class Timeline(Tab):
     def __init__(self, conn, window, timeline, type_params={}):
@@ -116,7 +130,7 @@ class Timeline(Tab):
         self.update_buffer()
 
     def update_buffer(self):
-        self.buffer = []
+        self.buffer.clear()
 
         maxx = self.window.getmaxyx()[1]
         c = 1
@@ -183,7 +197,7 @@ class Context(Tab):
         self.update_buffer()
 
     def update_buffer(self):
-        self.buffer = [] 
+        self.buffer.clear() 
 
         c = 1
 
@@ -237,7 +251,7 @@ class Profile(Tab):
         self.update_buffer()
 
     def update_buffer(self):
-        self.buffer = []
+        self.buffer.clear()
         self.buffer.append("@" + self.profile['screen_name'].encode("utf-8") + "'s Profile")
         self.buffer.append("")
         self.buffer.append("")
