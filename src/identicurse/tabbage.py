@@ -78,6 +78,7 @@ class Help(Tab):
         self.update_buffer()
 
     def update_buffer(self):
+        self.buffer.clear()
         self.buffer.append(open(self.path, 'r').read())
 
 class Timeline(Tab):
