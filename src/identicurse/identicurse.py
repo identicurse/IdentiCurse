@@ -194,12 +194,12 @@ class IdentiCurse(object):
             elif input == curses.KEY_NPAGE:
                 self.tabs[self.current_tab].scrolldown(self.main_window.getmaxyx()[0] - 11) # as above
                 self.display_current_tab()
-            if input == curses.KEY_LEFT:
+            elif input == curses.KEY_LEFT:
                 if self.tabs[self.current_tab].prevpage():
                     self.status_bar.update_left("Moving to newer page...")
                     self.tabs[self.current_tab].update()
                     self.status_bar.update_left("Doing nothing.")
-            if input == curses.KEY_RIGHT:
+            elif input == curses.KEY_RIGHT:
                 if self.tabs[self.current_tab].nextpage():
                     self.status_bar.update_left("Moving to older page...")
                     self.tabs[self.current_tab].update()
@@ -220,10 +220,20 @@ class IdentiCurse(object):
                 self.tab_order.insert(0, self.current_tab)
                 self.tabs[self.current_tab].update()
             
+            switch_to_tab = None
             for x in range(0, len(self.tabs)):
                 if input == ord(str(x+1)):
-                    self.tab_order.insert(0, self.tab_order.pop(self.tab_order.index(x)))
-                    self.current_tab = x
+                    switch_to_tab = x
+            if input == ord("n"):
+                if self.current_tab < (len(self.tabs) - 1):
+                    switch_to_tab = self.current_tab + 1
+            elif input == ord("p"):
+                if self.current_tab >= 1:
+                    switch_to_tab = self.current_tab - 1
+            
+            if switch_to_tab is not None:
+                self.tab_order.insert(0, self.tab_order.pop(self.tab_order.index(switch_to_tab)))
+                self.current_tab = switch_to_tab
 
             y, x = self.screen.getmaxyx()
             if y != self.y or x != self.x:
