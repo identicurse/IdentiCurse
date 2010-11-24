@@ -27,7 +27,7 @@ class Buffer(list):
         """return a reflowed-for-width copy of the buffer as a list"""
         reflowed_buffer = []
         for line in self:
-            while len(line) >= width:
+            while len(line) > width:
                 reflowed_buffer.append(line[:width])
                 line = line[width:]
             reflowed_buffer.append(line) # append whatever part of the line wasn't already added
