@@ -35,6 +35,8 @@ screen, you can do press various keys to do the following:
     7           Switch to tab 7 (no initial tab).
     8           Switch to tab 8 (no initial tab).
     9           Switch to tab 9 (no initial tab).
+    p           Switch to the previous tab.
+    n           Switch to the next tab.
     x           Close the currently visible tab.
     r           Refresh.
     q           Quit IdentiCurse.
