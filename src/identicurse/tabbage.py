@@ -13,10 +13,13 @@ class Buffer(list):
     def append(self, item):
         if "\n" in item:  # sometimes there are newlines in the buffer's input, even when it's a dent. we need to remove them.
             for line in item.split("\n"):
-                list.append(self, line)
-        else:
+                self.append(line)  # pass the line back in for further checking
+        elif "\t" in item:  # if there are tabs in the input, it will display wider than the expected number of characters. convert them to spaces.
+            item = "    ".join(item.split("\t"))
+            self.append(item)  # pass the result back in for further checking
+        else:  # we should only get here when we have a completely clean line
             list.append(self, item)
-    
+        
     def clear(self):
         self[:] = []
 
