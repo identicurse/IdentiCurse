@@ -9,16 +9,19 @@ class Textbox(textpad.Textbox):
             textpad.Textbox.__init__(self, win)
 
     def edit(self):
+        abort = False
+
         while 1:
             ch = self.win.getch()
 
             if ch == 127:
                 self.do_command(263)
-
-            if ch == curses.KEY_ENTER or ch == 10:
+            elif ch == curses.KEY_ENTER or ch == 10:
                 break
-
-            if not ch:
+            elif ch == 9 or ch == 27:
+                abort = True
+                break
+            elif not ch:
                 continue
 
             if not self.do_command(ch):
@@ -26,4 +29,7 @@ class Textbox(textpad.Textbox):
 
             self.win.refresh()
 
-        return self.gather()
+        if abort == False:
+            return self.gather()
+        else:
+            return ""
