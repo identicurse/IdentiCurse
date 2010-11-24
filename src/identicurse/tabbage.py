@@ -73,12 +73,14 @@ class Tab(object):
 
     def scrolldown(self, n):
         self.start_line += n
-        if self.start_line > len(self.buffer.reflowed(40)) - (self.window.getmaxyx()[0] - 3):
-            self.start_line = len(self.buffer.reflowed(40)) - (self.window.getmaxyx()[0] - 3)
+        maxy, maxx = self.window.getmaxyx()[0], self.window.getmaxyx()[1]
+        if self.start_line > len(self.buffer.reflowed(maxx - 2)) - (maxy - 3):
+            self.start_line = len(self.buffer.reflowed(maxx - 2)) - (maxy - 3)
 
     def display(self):
+        maxy, maxx = self.window.getmaxyx()[0], self.window.getmaxyx()[1]
         self.window.erase()
-        self.window.addstr("\n".join(self.buffer.reflowed(40)[self.start_line:self.window.getmaxyx()[0] - 3 + self.start_line]).encode("utf-8"))
+        self.window.addstr("\n".join(self.buffer.reflowed(maxx - 2)[self.start_line:maxy - 3 + self.start_line]).encode("utf-8"))
         self.window.refresh()
 
 class Help(Tab):
