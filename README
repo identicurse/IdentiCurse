@@ -42,11 +42,10 @@ screen, you can do press various keys to do the following:
     q           Quit IdentiCurse.
     h           Open a tab that displays this README.
     i           Switch to text entry mode.
-
-You can also use the arrow keys to navigate within the current tab:
-UP and DOWN scroll up and down the tab's content, and LEFT and RIGHT
-move to newer and older pages, respectively, for all tabs that support
-multiple pages (all timelines except public, at the time of writing).
+    UP or K     Scroll up (n the current tab).
+    DOWN or J   Scroll down (in the current tab).
+    LEFT        Move to a newer page (in the current tab, timelines only).
+    RIGHT       Move to an older page (in the current tab, timelines only).
 
 In text entry mode, the above key shortcuts are not available.
 Instead, you type a message directly into the text entry field,
@@ -213,7 +212,7 @@ dent). Available commands are as follows:
 
 After submitting your message/command, you will be back in non-text
 entry mode until you next press i. You can submit an empty text field
-to leave text entry mode without performing any action.
+or press ESC to leave text entry mode without performing any action.
 
 
 ADVANCED CONFIGURATION
