@@ -98,11 +98,13 @@ class Help(Tab):
         self.buffer.append(open(self.path, 'r').read())
 
 class Timeline(Tab):
-    def __init__(self, conn, window, timeline, type_params={}):
+    def __init__(self, conn, window, timeline, type_params={}, notice_limit=25, filters=[]):
         self.conn = conn
         self.timeline = []
         self.timeline_type = timeline
         self.type_params = type_params
+        self.notice_limit = notice_limit
+        self.filters = filters
 
         if self.timeline_type == "user":
             self.name = "User (%s)" % self.type_params['screen_name']
@@ -123,26 +125,37 @@ class Timeline(Tab):
         timestamp = strptime(time)
 
     def update(self):
+        self.timeline = []
+        get_count = self.notice_limit - len(self.timeline)
         if self.timeline_type == "home":
-            self.timeline = self.conn.statuses_home_timeline(count=25, page=self.page)
+            raw_timeline = self.conn.statuses_home_timeline(count=get_count, page=self.page)
         elif self.timeline_type == "mentions":
-            self.timeline  = self.conn.statuses_mentions(count=25, page=self.page)
+            raw_timeline = self.conn.statuses_mentions(count=get_count, page=self.page)
         elif self.timeline_type == "direct":
-            self.timeline = self.conn.direct_messages(count=25, page=self.page)
-        elif self.timeline_type == "public":
-            self.timeline = self.conn.statuses_public_timeline()
+            raw_timeline = self.conn.direct_messages(count=get_count, page=self.page)
         elif self.timeline_type == "user":
-            self.timeline = self.conn.statuses_user_timeline(user_id=self.type_params['user_id'], screen_name=self.type_params['screen_name'], count=25, page=self.page)
+            raw_timeline = self.conn.statuses_user_timeline(user_id=self.type_params['user_id'], screen_name=self.type_params['screen_name'], count=get_count, page=self.page)
         elif self.timeline_type == "group":
-            self.timeline = self.conn.statusnet_groups_timeline(group_id=self.type_params['group_id'], nickname=self.type_params['nickname'], count=25, page=self.page)
+            raw_timeline = self.conn.statusnet_groups_timeline(group_id=self.type_params['group_id'], nickname=self.type_params['nickname'], count=get_count, page=self.page)
         elif self.timeline_type == "tag":
-            self.timeline = self.conn.statusnet_tags_timeline(tag=self.type_params['tag'], count=25, page=self.page)
+            raw_timeline = self.conn.statusnet_tags_timeline(tag=self.type_params['tag'], count=get_count, page=self.page)
         elif self.timeline_type == "sentdirect":
-            self.timeline = self.conn.direct_messages_sent(count=25, page=self.page)
+            raw_timeline = self.conn.direct_messages_sent(count=get_count, page=self.page)
+        elif self.timeline_type == "public":
+            raw_timeline = self.conn.statuses_public_timeline()
         elif self.timeline_type == "favourites":
-            self.timeline = self.conn.favorites(page=self.page)
+            raw_timeline = self.conn.favorites(page=self.page)
         elif self.timeline_type == "search":
-            self.timeline = self.conn.search(self.type_params['query'], page=self.page, standardise=True)
+            raw_timeline = self.conn.search(self.type_params['query'], page=self.page, standardise=True)
+
+        for notice in raw_timeline:
+            passes_filters = True
+            for filter_item in self.filters:
+                if filter_item.lower() in notice['text'].lower():
+                    passes_filters = False
+                    break
+            if passes_filters:
+                self.timeline.append(notice)
 
         self.update_buffer()
 

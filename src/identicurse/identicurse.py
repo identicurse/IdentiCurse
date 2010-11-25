@@ -31,8 +31,14 @@ class IdentiCurse(object):
                 self.config = json.loads(open(self.config_file).read())
         except:
             sys.exit("ERROR: Couldn't read config file.")
+
+        # set some defaults for configs that we will always need to use, but that are optional
         if not "long_dent" in self.config:
             self.config['long_dent'] = "split"
+        if not "filters" in self.config:
+            self.config['filters'] = []
+        if not "notice_limit" in self.config:
+            self.config['notice_limit'] = 25
 
         try:
             self.conn = StatusNet(self.config['api_path'], self.config['username'], self.config['password'])
@@ -89,39 +95,39 @@ class IdentiCurse(object):
         for tabspec in self.config['initial_tabs'].split("|"):
             tab = tabspec.split(':')
             if tab[0] == "home":
-                self.tabs.append(Timeline(self.conn, self.notice_window, "home"))
+                self.tabs.append(Timeline(self.conn, self.notice_window, "home", notice_limit=self.config['notice_limit'], filters=self.config['filters']))
             if tab[0] == "mentions":
-                self.tabs.append(Timeline(self.conn, self.notice_window, "mentions"))
+                self.tabs.append(Timeline(self.conn, self.notice_window, "mentions", notice_limit=self.config['notice_limit'], filters=self.config['filters']))
             if tab[0] == "direct":
-                self.tabs.append(Timeline(self.conn, self.notice_window, "direct"))
+                self.tabs.append(Timeline(self.conn, self.notice_window, "direct", notice_limit=self.config['notice_limit'], filters=self.config['filters']))
             if tab[0] == "public":
-                self.tabs.append(Timeline(self.conn, self.notice_window, "public"))
+                self.tabs.append(Timeline(self.conn, self.notice_window, "public", filters=self.config['filters']))
             if tab[0] == "profile":
                 screen_name = tab[1]
                 if screen_name[0] == "@":
                     screen_name = screen_name[1:]
                 self.tabs.append(Profile(self.conn, self.notice_window, screen_name))
             if tab[0] == "sentdirect":
-                self.tabs.append(Timeline(self.conn, self.notice_window, "sentdirect"))
+                self.tabs.append(Timeline(self.conn, self.notice_window, "sentdirect", notice_limit=self.config['notice_limit'], filters=self.config['filters']))
             if tab[0] == "user":
                 screen_name = tab[1]
                 if screen_name[0] == "@":
                     screen_name = screen_name[1:]
                 user_id = self.conn.users_show(screen_name=screen_name)['id']
-                self.tabs.append(Timeline(self.conn, self.notice_window, "user", {'screen_name':screen_name, 'user_id':user_id}))
+                self.tabs.append(Timeline(self.conn, self.notice_window, "user", {'screen_name':screen_name, 'user_id':user_id}, notice_limit=self.config['notice_limit'], filters=self.config['filters']))
             if tab[0] == "group":
                 nickname = tab[1]
                 if nickname[0] == "!":
                     nickname = nickname[1:]
                 group_id = int(self.conn.statusnet_groups_show(nickname=nickname)['id'])
-                self.tabs.append(Timeline(self.conn, self.notice_window, "group", {'nickname':nickname, 'group_id':group_id}))
+                self.tabs.append(Timeline(self.conn, self.notice_window, "group", {'nickname':nickname, 'group_id':group_id}, notice_limit=self.config['notice_limit'], filters=self.config['filters']))
             if tab[0] == "tag":
                 tag = tab[1]
                 if tag[0] == "#":
                     tag = tag[1:]
-                self.tabs.append(Timeline(self.conn, self.notice_window, "tag", {'tag':tag}))
+                self.tabs.append(Timeline(self.conn, self.notice_window, "tag", {'tag':tag}, notice_limit=self.config['notice_limit'], filters=self.config['filters']))
             if tab[0] == "search":
-                self.tabs.append(Timeline(self.conn, self.notice_window, "search", {'query':tab[1]}))
+                self.tabs.append(Timeline(self.conn, self.notice_window, "search", {'query':tab[1]}, filters=self.config['filters']))
             #not too sure why anyone would need to auto-open these last two, but it couldn't hurt to add them
             if tab[0] == "context":
                 notice_id = int(tab[1])
@@ -284,7 +290,11 @@ class IdentiCurse(object):
                 elif tokens[0] == "/repeat":
                     self.status_bar.update_left("Repeating Notice...")
                     id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['id']
-                    self.conn.statuses_retweet(id, source="IdentiCurse")
+                    try:
+                        self.conn.statuses_retweet(id, source="IdentiCurse")
+                    except urllib2.HTTPError, e:
+                        err_details = json.loads(e.read())['error']
+                        raise Exception("HTTP Error %d: %s" % (e.code, err_details))
 
                 elif tokens[0] == "/direct":
                     self.status_bar.update_left("Sending Direct...")
@@ -383,7 +393,7 @@ class IdentiCurse(object):
                             user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
                             id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["id"]
                         
-                        self.tabs.append(Timeline(self.conn, self.notice_window, "user", {'user_id':id, 'screen_name':user}))
+                        self.tabs.append(Timeline(self.conn, self.notice_window, "user", {'user_id':id, 'screen_name':user}, notice_limit=self.config['notice_limit'], filters=self.config['filters']))
                         self.current_tab = len(self.tabs) - 1
                         self.tab_order.insert(0, self.current_tab)
                     except urllib2.HTTPError, e:
@@ -437,7 +447,7 @@ class IdentiCurse(object):
                         group = group[1:]
                     id = int(self.conn.statusnet_groups_show(nickname=group)['id'])
 
-                    self.tabs.append(Timeline(self.conn, self.notice_window, "group", {'group_id':id, 'nickname':group}))
+                    self.tabs.append(Timeline(self.conn, self.notice_window, "group", {'group_id':id, 'nickname':group}, notice_limit=self.config['notice_limit'], filters=self.config['filters']))
                     self.current_tab = len(self.tabs) - 1
                     self.tab_order.insert(0, self.current_tab)
 
@@ -465,46 +475,46 @@ class IdentiCurse(object):
                     if tag[0] == "#":
                         tag = tag[1:]
 
-                    self.tabs.append(Timeline(self.conn, self.notice_window, "tag", {'tag':tag}))
+                    self.tabs.append(Timeline(self.conn, self.notice_window, "tag", {'tag':tag}, notice_limit=self.config['notice_limit'], filters=self.config['filters']))
                     self.current_tab = len(self.tabs) - 1
                     self.tab_order.insert(0, self.current_tab)
 
                 elif tokens[0] == "/sentdirects":
                     self.status_bar.update_left("Loading Sent Directs...")
-                    self.tabs.append(Timeline(self.conn, self.notice_window, "sentdirect"))
+                    self.tabs.append(Timeline(self.conn, self.notice_window, "sentdirect", notice_limit=self.config['notice_limit'], filters=self.config['filters']))
                     self.current_tab = len(self.tabs) - 1
                     self.tab_order.insert(0, self.current_tab)
 
                 elif tokens[0] == "/favourites":
                     self.status_bar.update_left("Loading Favourites...")
-                    self.tabs.append(Timeline(self.conn, self.notice_window, "favourites"))
+                    self.tabs.append(Timeline(self.conn, self.notice_window, "favourites", notice_limit=self.config['notice_limit'], filters=self.config['filters']))
                     self.current_tab = len(self.tabs) - 1
                     self.tab_order.insert(0, self.current_tab)
                     
                 elif tokens[0] == "/search":
                     self.status_bar.update_left("Searching...")
                     query = " ".join(tokens[1:])
-                    self.tabs.append(Timeline(self.conn, self.notice_window, "search", {'query':query}))
+                    self.tabs.append(Timeline(self.conn, self.notice_window, "search", {'query':query}, filters=self.config['filters']))
                     self.current_tab = len(self.tabs) - 1
                     self.tab_order.insert(0, self.current_tab)
                 
                 elif tokens[0] == "/home":
-                    self.tabs.append(Timeline(self.conn, self.notice_window, "home"))
+                    self.tabs.append(Timeline(self.conn, self.notice_window, "home", notice_limit=self.config['notice_limit'], filters=self.config['filters']))
                     self.current_tab = len(self.tabs) - 1
                     self.tab_order.insert(0, self.current_tab)
                 
                 elif tokens[0] == "/mentions":
-                    self.tabs.append(Timeline(self.conn, self.notice_window, "mentions"))
+                    self.tabs.append(Timeline(self.conn, self.notice_window, "mentions", notice_limit=self.config['notice_limit'], filters=self.config['filters']))
                     self.current_tab = len(self.tabs) - 1
                     self.tab_order.insert(0, self.current_tab)
                 
                 elif tokens[0] == "/directs":
-                    self.tabs.append(Timeline(self.conn, self.notice_window, "direct"))
+                    self.tabs.append(Timeline(self.conn, self.notice_window, "direct", notice_limit=self.config['notice_limit'], filters=self.config['filters']))
                     self.current_tab = len(self.tabs) - 1
                     self.tab_order.insert(0, self.current_tab)
                 
                 elif tokens[0] == "/public":
-                    self.tabs.append(Timeline(self.conn, self.notice_window, "public"))
+                    self.tabs.append(Timeline(self.conn, self.notice_window, "public", notice_limit=self.config['notice_limit'], filters=self.config['filters']))
                     self.current_tab = len(self.tabs) - 1
                     self.tab_order.insert(0, self.current_tab)
                     

@@ -1,0 +1,33 @@
+New for 0.3:
+ - Scrolling with j/k.
+ - Leaving insert mode with ESC.
+ - DEL now functions correctly in insert mode.
+ - Tab switching with n/p.
+ - New slogans.
+ - Clean reflowing of buffers to prevent overflowing the screen and causing crashes.
+ - Aliases can alias to commands with parameters included, instead of just bare commands.
+ - Commands can now contain an arbitrary number of spaces between parameters.
+ - Python 2.5 compatibility. (also backported to 0.2 as of 0.2.1)
+ - Enter now works to submit in multiline text-boxes. (also backported to 0.2 as of 0.2.1)
+ - Long dent handling now defaults to splitting.
+ - Context view now follows repeats back to the original notice, as if they were a reply - repeats that can be followed this way are denoted by [~].
+ - Expanded profile pages.
+ - As of this version, IdentiCurse is distributed as an installable package, using setuptools.
+
+New for 0.2:
+ - Long dent handling, default behaviour is to truncate.
+ - IdentiCurse now looks for config in ~/.identicurse before trying ./config.json.
+ - IdentiCurse inherits terminal colours (previously defaulted to an ugly grey on some terms).
+ - Multiline input, requires CTRL+G to submit. (CTRL+G no longer required as of 0.2.1)
+ - Stacked tab order, so you return to the last tab you were on when closing another.
+ - Timelines auto-update, except while in insert mode.
+ - Dents have timestamps.
+ - Paged timelines.
+ - Automatic resizing of windows now results in IdentiCurse also resizing.
+ - Initial tabset is now configurable.
+ - /config command.
+ - /home, /mentions, /direct, and /public commands.
+ - Correctly handles unlimited-length StatusNet instances.
+ - Bugfixes for:
+      - User timelines could not be viewed with /user [notice number] syntax.
+      - Profile pages get duplicate information on refresh.
