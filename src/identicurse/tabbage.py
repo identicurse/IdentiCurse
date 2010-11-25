@@ -36,6 +36,7 @@ class Buffer(list):
 class TabUpdater(threading.Thread):
     def __init__(self, tabs, callback_object, callback_function):
         threading.Thread.__init__(self)
+        self.daemon = True
         self.tabs = tabs
         self.callback_object = callback_object
         self.callback_function = callback_function
