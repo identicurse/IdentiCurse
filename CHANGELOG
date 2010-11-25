@@ -1,4 +1,6 @@
 New for 0.3:
+ - Filters
+ - Adjust number of notices fetched per page (all timelines excluding Public, Search, Favourites)
  - Scrolling with j/k.
  - Leaving insert mode with ESC.
  - DEL now functions correctly in insert mode.
