@@ -533,12 +533,20 @@ class IdentiCurse(object):
                 except Exception, (errmsg):
                     self.status_bar.timed_update_left("ERROR: Couldn't post status: %s" % (errmsg))
 
-        if update != False and (self.tabs[self.current_tab].timeline_type == 'home' or self.tabs[self.current_tab].timeline_type == 'mentions'):
+        if hasattr(self.tabs[self.current_tab], 'timeline_type'):
+            if update != False and (self.tabs[self.current_tab].timeline_type == 'home' or self.tabs[self.current_tab].timeline_type == 'mentions'):
+                self.tabs[self.current_tab].timeline.insert(0, update)
+                self.tabs[self.current_tab].update_buffer()
+                self.status_bar.update_left("Doing nothing.")
+            else:
+                self.tabs[self.current_tab].update()
+        elif update != False and self.tabs[self.current_tab].name == "Context":
             self.tabs[self.current_tab].timeline.insert(0, update)
             self.tabs[self.current_tab].update_buffer()
             self.status_bar.update_left("Doing nothing.")
         else:
             self.tabs[self.current_tab].update()
+          
 
         self.entry_window.clear()
         self.text_entry = Textbox(self.entry_window, insert_mode=True)
