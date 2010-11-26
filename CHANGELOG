@@ -1,4 +1,6 @@
 New for 0.3:
+ - Filters
+ - Adjust number of notices fetched per page (all timelines excluding Public, Search, Favourites)
  - Scrolling with j/k.
  - Leaving insert mode with ESC.
  - DEL now functions correctly in insert mode.
@@ -13,6 +15,8 @@ New for 0.3:
  - Context view now follows repeats back to the original notice, as if they were a reply - repeats that can be followed this way are denoted by [~].
  - Expanded profile pages.
  - As of this version, IdentiCurse is distributed as an installable package, using setuptools.
+ - Bugfixes for:
+      - Exceptions occurred when ending, even on clean quit.
 
 New for 0.2:
  - Long dent handling, default behaviour is to truncate.
