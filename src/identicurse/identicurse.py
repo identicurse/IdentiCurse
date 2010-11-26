@@ -537,7 +537,7 @@ class IdentiCurse(object):
                     self.status_bar.timed_update_left("ERROR: Couldn't post status: %s" % (errmsg))
 
         # Uch
-        if update != False and (self.tabs[self.current_tab].timeline_type == 'home' or self.tabs[self.current_tab].timeline_type == 'replies'):
+        if update != False and (self.tabs[self.current_tab].timeline_type == 'home' or self.tabs[self.current_tab].timeline_type == 'mentions'):
             self.tabs[self.current_tab].timeline.insert(0, update)
             self.tabs[self.current_tab].update_buffer()
 
