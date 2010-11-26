@@ -253,6 +253,8 @@ class IdentiCurse(object):
         self.quit();
 
     def parse_input(self, input):
+        update = False
+
         if len(input) > 0:      # don't do anything if the user didn't enter anything
             input = input.rstrip()
 
@@ -278,7 +280,7 @@ class IdentiCurse(object):
                     status = "@" + user + " " + " ".join(tokens[2:])
 
                     try:
-                        self.conn.statuses_update(status, "IdentiCurse", int(id), long_dent=self.config['long_dent'])
+                        update = self.conn.statuses_update(status, "IdentiCurse", int(id), long_dent=self.config['long_dent'])
                     except Exception, (errmsg):
                         self.status_bar.timed_update_left("ERROR: Couldn't post status: %s" % (errmsg))
 
@@ -291,7 +293,7 @@ class IdentiCurse(object):
                     self.status_bar.update_left("Repeating Notice...")
                     id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['id']
                     try:
-                        self.conn.statuses_retweet(id, source="IdentiCurse")
+                        update = self.conn.statuses_retweet(id, source="IdentiCurse")
                     except urllib2.HTTPError, e:
                         err_details = json.loads(e.read())['error']
                         raise Exception("HTTP Error %d: %s" % (e.code, err_details))
@@ -308,7 +310,7 @@ class IdentiCurse(object):
                     self.status_bar.update_left("Deleting Notice...")
                     id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['id']
                     try:
-                        self.conn.statuses_destroy(id)
+                        update = self.conn.statuses_destroy(id)
                     except urllib2.HTTPError, e:
                         if e.code == 403:
                             self.status_bar.timed_update_left("ERROR: You cannot delete others' statuses.")
@@ -343,7 +345,7 @@ class IdentiCurse(object):
                         id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['user']['id']
                         username = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
                     status = "@support !sr @%s UID %d %s" % (username, id, " ".join(tokens[2:]))
-                    self.conn.statuses_update(status, "IdentiCurse")
+                    update = self.conn.statuses_update(status, "IdentiCurse")
                     self.conn.blocks_create(user_id=id, screen_name=username)
 
                 elif tokens[0] == "/block":
@@ -530,17 +532,21 @@ class IdentiCurse(object):
             else:
                 self.status_bar.update_left("Posting Notice...")
                 try:
-                    self.conn.statuses_update(input, source="IdentiCurse", long_dent=self.config['long_dent'])
+                    update = self.conn.statuses_update(input, source="IdentiCurse", long_dent=self.config['long_dent'])
                 except Exception, (errmsg):
                     self.status_bar.timed_update_left("ERROR: Couldn't post status: %s" % (errmsg))
 
+        # Uch
+        if update != False and (self.tabs[self.current_tab].timeline_type == 'home' or self.tabs[self.current_tab].timeline_type == 'replies'):
+            self.tabs[self.current_tab].timeline.insert(0, update)
+            self.tabs[self.current_tab].update_buffer()
 
         self.entry_window.clear()
         self.text_entry = Textbox(self.entry_window, insert_mode=True)
         self.text_entry.stripspaces = 1
         self.insert_mode = False
-        self.update_tabs()
         self.display_current_tab()
+        self.status_bar.update_left("Doing nothing.")
         self.insert_mode = False
         self.update_timer = Timer(self.config['update_interval'], self.update_tabs)
         self.update_timer.start()
