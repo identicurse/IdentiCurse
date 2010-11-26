@@ -15,6 +15,7 @@ New for 0.3:
  - Context view now follows repeats back to the original notice, as if they were a reply - repeats that can be followed this way are denoted by [~].
  - Expanded profile pages.
  - As of this version, IdentiCurse is distributed as an installable package, using setuptools.
+ - Notices posted are now automatically shown on the timeline without refreshing every time (faster)
  - Bugfixes for:
       - Exceptions occurred when ending, even on clean quit.
 
