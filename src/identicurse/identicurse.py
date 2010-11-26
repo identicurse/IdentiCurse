@@ -154,7 +154,6 @@ class IdentiCurse(object):
         else:
             self.update_timer = Timer(self.config['update_interval'], self.update_tabs)
 
-
     def end_update_tabs(self):
         self.display_current_tab()
         self.status_bar.update_left("Doing nothing.")
@@ -527,8 +526,6 @@ class IdentiCurse(object):
                     else:
                         self.config[keys[0]] = value
                     open(self.config_file, 'w').write(json.dumps(self.config, indent=4))
-                
-                self.status_bar.update_left("Doing nothing.")
             else:
                 self.status_bar.update_left("Posting Notice...")
                 try:
@@ -536,15 +533,16 @@ class IdentiCurse(object):
                 except Exception, (errmsg):
                     self.status_bar.timed_update_left("ERROR: Couldn't post status: %s" % (errmsg))
 
-        # Uch
         if update != False and (self.tabs[self.current_tab].timeline_type == 'home' or self.tabs[self.current_tab].timeline_type == 'mentions'):
             self.tabs[self.current_tab].timeline.insert(0, update)
             self.tabs[self.current_tab].update_buffer()
+            self.status_bar.update_left("Doing nothing.")
+        else:
+            self.tabs[self.current_tab].update()
 
         self.entry_window.clear()
         self.text_entry = Textbox(self.entry_window, insert_mode=True)
         self.text_entry.stripspaces = 1
-        self.insert_mode = False
         self.display_current_tab()
         self.status_bar.update_left("Doing nothing.")
         self.insert_mode = False
