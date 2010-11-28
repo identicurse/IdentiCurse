@@ -16,6 +16,7 @@ New for 0.3:
  - Expanded profile pages.
  - As of this version, IdentiCurse is distributed as an installable package, using setuptools.
  - Notices posted are now automatically shown on the timeline without refreshing every time (faster)
+ - More detail in StatusNet error messages.
  - Bugfixes for:
       - Exceptions occurred when ending, even on clean quit.
 
