@@ -5,6 +5,12 @@ try:
 except ImportError:
     import simplejson as json
 
+class StatusNetError(Exception):
+    def __init__(self, errcode, details):
+        self.errcode = errcode
+        self.details = details
+        Exception.__init__(self, "Error %d: %s" % (self.errcode, self.details))
+
 class StatusNet(object):
     def __init__(self, api_path, username, password):
         import base64
@@ -25,7 +31,11 @@ class StatusNet(object):
             request = urllib2.Request("%s/%s.json" % (self.api_path, resource_path))
         request.add_header("Authorization", "Basic %s" % (self.auth_string))
         
-        response = urllib2.urlopen(request)
+        try:
+            response = urllib2.urlopen(request)
+        except urllib2.HTTPError, e:
+            err_details = json.loads(e.read())['error']
+            raise StatusNetError(e.code, err_details)
         content = response.read()
         
         return json.loads(content)

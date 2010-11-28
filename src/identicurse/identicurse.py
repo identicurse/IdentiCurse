@@ -291,12 +291,8 @@ class IdentiCurse(object):
                 elif tokens[0] == "/repeat":
                     self.status_bar.update_left("Repeating Notice...")
                     id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['id']
-                    try:
-                        update = self.conn.statuses_retweet(id, source="IdentiCurse")
-                    except urllib2.HTTPError, e:
-                        err_details = json.loads(e.read())['error']
-                        raise Exception("HTTP Error %d: %s" % (e.code, err_details))
-
+                    update = self.conn.statuses_retweet(id, source="IdentiCurse")
+                    
                 elif tokens[0] == "/direct":
                     self.status_bar.update_left("Sending Direct...")
                     screen_name = tokens[1]
