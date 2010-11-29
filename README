@@ -196,6 +196,14 @@ dent). Available commands are as follows:
    preferred format and also create a block against the user
    specified.
 
+/link [link number] [notice number]
+   This will open the specified link (numbered starting from 1) from
+   the specified notice in your preferred browser, set in the config
+   file, falling back to xdg-open (which should open your default
+   browser) if you haven't got one specified in the config. You can
+   also use * as the link number to open all links in the notice.
+   There is also an alias for this: "/links [notice number]".
+
 /config [key] [value]                           (aliases: /set)
    This will set the config item with the specified key to the
    specified value. The key can also contain .s to indicate subkeys,
@@ -248,7 +256,6 @@ syntax (for a good basic introduction, we recommend CouchDB's JSON
 Primer: < http://guide.couchdb.org/editions/1/en/json.html >).
 
 Long notice handling:
-
 When IdentiCurse encounters a notice that is too long to send to the
 current instance, there are three paths it can take, based on the
 current value of the long_dent config key:
@@ -268,3 +275,12 @@ current value of the long_dent config key:
             last character that fits into the sendable length. This
             will be chosen if long_dent is set to "truncate".
 
+Link opening:
+
+When opening a link, IdentiCurse will attempt to use your choice of
+browser. This is set in the "browser" config key, and should be set as
+the command to open a URL in the chosen browser, with '%s' instead of
+the URL, for example:
+
+    "firefox '%s'"
+    (which would open URLs in Firefox)
