@@ -203,8 +203,13 @@ class StatusNet(object):
                 else:
                     status_next = "(...) " + status_next
                 params['status'] = status
-                first_dent = self.__makerequest("statuses/update", params) # post the first piece as normal
-                return self.statuses_update(status_next, source=source, in_reply_to_status_id=in_reply_to_status_id, latitude=latitude, longitude=longitude, place_id=place_id, display_coordinates=display_coordinates, long_dent=long_dent) # then hand the rest off for potential further splitting
+                dents = [self.__makerequest("statuses/update", params)] # post the first piece as normal
+                next_dent = self.statuses_update(status_next, source=source, in_reply_to_status_id=in_reply_to_status_id, latitude=latitude, longitude=longitude, place_id=place_id, display_coordinates=display_coordinates, long_dent=long_dent) # then hand the rest off for potential further splitting
+                if isinstance(next_dent, list):
+                    for dent in next_dent:
+                        dents.append(dent)
+                else:
+                    dents.append(next_dent)
             else:
                 raise Exception("Maximum status length exceeded by %d characters." % (len(status) - self.length_limit))
         return self.__makerequest("statuses/update", params)

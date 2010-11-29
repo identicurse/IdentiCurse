@@ -531,7 +531,11 @@ class IdentiCurse(object):
 
         if hasattr(self.tabs[self.current_tab], 'timeline_type'):
             if update != False and (self.tabs[self.current_tab].timeline_type == 'home' or self.tabs[self.current_tab].timeline_type == 'mentions'):
-                self.tabs[self.current_tab].timeline.insert(0, update)
+                if isinstance(update, list):
+                    for notice in update:
+                        self.tabs[self.current_tab].timeline.insert(0, notice)
+                else:
+                    self.tabs[self.current_tab].timeline.insert(0, update)
                 self.tabs[self.current_tab].update_buffer()
                 self.status_bar.update_left("Doing nothing.")
             else:
