@@ -139,6 +139,7 @@ class IdentiCurse(object):
         self.update_timer.start()
 
         self.current_tab = 0
+        self.tabs[self.current_tab].active = True
         self.tab_order = range(len(self.tabs))
 
         self.update_tabs()
@@ -178,6 +179,7 @@ class IdentiCurse(object):
                 if self.tab_order[index] > self.current_tab:
                     self.tab_order[index] -= 1
             self.current_tab = self.tab_order[0]
+            self.tabs[self.current_tab].active = True
             
             self.display_current_tab()
 
@@ -221,7 +223,9 @@ class IdentiCurse(object):
                 self.close_current_tab()
             elif input == ord("h"):
                 self.tabs.append(Help(self.notice_window, self.path))
+                self.tabs[self.current_tab].active = False
                 self.current_tab = len(self.tabs) - 1
+                self.tabs[self.current_tab].active = True
                 self.tab_order.insert(0, self.current_tab)
                 self.tabs[self.current_tab].update()
             
@@ -238,7 +242,9 @@ class IdentiCurse(object):
             
             if switch_to_tab is not None:
                 self.tab_order.insert(0, self.tab_order.pop(self.tab_order.index(switch_to_tab)))
+                self.tabs[self.current_tab].active = False
                 self.current_tab = switch_to_tab
+                self.tabs[self.current_tab].active = True
 
             y, x = self.screen.getmaxyx()
             if y != self.y or x != self.x:
@@ -323,7 +329,9 @@ class IdentiCurse(object):
                         user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
 
                     self.tabs.append(Profile(self.conn, self.notice_window,user))
+                    self.tabs[self.current_tab].active = False
                     self.current_tab = len(self.tabs) - 1
+                    self.tabs[self.current_tab].active = True
                     self.tab_order.insert(0, self.current_tab)
 
                 elif tokens[0] == "/spamreport":
@@ -391,7 +399,9 @@ class IdentiCurse(object):
                             id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["id"]
                         
                         self.tabs.append(Timeline(self.conn, self.notice_window, "user", {'user_id':id, 'screen_name':user}, notice_limit=self.config['notice_limit'], filters=self.config['filters']))
+                        self.tabs[self.current_tab].active = False
                         self.current_tab = len(self.tabs) - 1
+                        self.tabs[self.current_tab].active = True
                         self.tab_order.insert(0, self.current_tab)
                     except urllib2.HTTPError, e:
                         if e.code == 404:
@@ -402,7 +412,9 @@ class IdentiCurse(object):
                     id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["id"]
 
                     self.tabs.append(Context(self.conn, self.notice_window, id))
+                    self.tabs[self.current_tab].active = False
                     self.current_tab = len(self.tabs) - 1
+                    self.tabs[self.current_tab].active = True
                     self.tab_order.insert(0, self.current_tab)
 
                 elif tokens[0] == "/subscribe":
@@ -445,7 +457,9 @@ class IdentiCurse(object):
                     id = int(self.conn.statusnet_groups_show(nickname=group)['id'])
 
                     self.tabs.append(Timeline(self.conn, self.notice_window, "group", {'group_id':id, 'nickname':group}, notice_limit=self.config['notice_limit'], filters=self.config['filters']))
+                    self.tabs[self.current_tab].active = False
                     self.current_tab = len(self.tabs) - 1
+                    self.tabs[self.current_tab].active = True
                     self.tab_order.insert(0, self.current_tab)
 
                 elif tokens[0] == "/groupjoin":
@@ -473,46 +487,62 @@ class IdentiCurse(object):
                         tag = tag[1:]
 
                     self.tabs.append(Timeline(self.conn, self.notice_window, "tag", {'tag':tag}, notice_limit=self.config['notice_limit'], filters=self.config['filters']))
+                    self.tabs[self.current_tab].active = False
                     self.current_tab = len(self.tabs) - 1
+                    self.tabs[self.current_tab].active = True
                     self.tab_order.insert(0, self.current_tab)
 
                 elif tokens[0] == "/sentdirects":
                     self.status_bar.update_left("Loading Sent Directs...")
                     self.tabs.append(Timeline(self.conn, self.notice_window, "sentdirect", notice_limit=self.config['notice_limit'], filters=self.config['filters']))
+                    self.tabs[self.current_tab].active = False
                     self.current_tab = len(self.tabs) - 1
+                    self.tabs[self.current_tab].active = True
                     self.tab_order.insert(0, self.current_tab)
 
                 elif tokens[0] == "/favourites":
                     self.status_bar.update_left("Loading Favourites...")
                     self.tabs.append(Timeline(self.conn, self.notice_window, "favourites", notice_limit=self.config['notice_limit'], filters=self.config['filters']))
+                    self.tabs[self.current_tab].active = False
                     self.current_tab = len(self.tabs) - 1
+                    self.tabs[self.current_tab].active = True
                     self.tab_order.insert(0, self.current_tab)
                     
                 elif tokens[0] == "/search":
                     self.status_bar.update_left("Searching...")
                     query = " ".join(tokens[1:])
                     self.tabs.append(Timeline(self.conn, self.notice_window, "search", {'query':query}, filters=self.config['filters']))
+                    self.tabs[self.current_tab].active = False
                     self.current_tab = len(self.tabs) - 1
+                    self.tabs[self.current_tab].active = True
                     self.tab_order.insert(0, self.current_tab)
                 
                 elif tokens[0] == "/home":
                     self.tabs.append(Timeline(self.conn, self.notice_window, "home", notice_limit=self.config['notice_limit'], filters=self.config['filters']))
+                    self.tabs[self.current_tab].active = False
                     self.current_tab = len(self.tabs) - 1
+                    self.tabs[self.current_tab].active = True
                     self.tab_order.insert(0, self.current_tab)
                 
                 elif tokens[0] == "/mentions":
                     self.tabs.append(Timeline(self.conn, self.notice_window, "mentions", notice_limit=self.config['notice_limit'], filters=self.config['filters']))
+                    self.tabs[self.current_tab].active = False
                     self.current_tab = len(self.tabs) - 1
+                    self.tabs[self.current_tab].active = True
                     self.tab_order.insert(0, self.current_tab)
                 
                 elif tokens[0] == "/directs":
                     self.tabs.append(Timeline(self.conn, self.notice_window, "direct", notice_limit=self.config['notice_limit'], filters=self.config['filters']))
+                    self.tabs[self.current_tab].active = False
                     self.current_tab = len(self.tabs) - 1
+                    self.tabs[self.current_tab].active = True
                     self.tab_order.insert(0, self.current_tab)
                 
                 elif tokens[0] == "/public":
                     self.tabs.append(Timeline(self.conn, self.notice_window, "public", notice_limit=self.config['notice_limit'], filters=self.config['filters']))
+                    self.tabs[self.current_tab].active = False
                     self.current_tab = len(self.tabs) - 1
+                    self.tabs[self.current_tab].active = True
                     self.tab_order.insert(0, self.current_tab)
                     
                 elif tokens[0] == "/config":

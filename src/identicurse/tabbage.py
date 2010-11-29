@@ -44,6 +44,8 @@ class TabUpdater(threading.Thread):
     def run (self):
         for tab in self.tabs:
             tab.update()
+            if tab.active:
+                tab.display()  # update the display of the tab if it's the foreground one
 
         fun = getattr(self.callback_object, self.callback_function)
         fun()
@@ -55,6 +57,7 @@ class Tab(object):
         self.start_line = 0
         self.html_regex = re.compile("<(.|\n)*?>")
         self.page = 1
+        self.active = False
         
     def prevpage(self):
         self.page -= 1
