@@ -197,7 +197,7 @@ class StatusNet(object):
                 while True:
                     if len(status) == 0:
                         raise Exception("Maximum status length exceeded by %d characters, and no split point could be found." % (len(status) - self.length_limit))
-                    elif status[-1] in [" ", "-"]:
+                    elif status[-1] in [" "]:
                         status = status + "(...)"
                         break # split point found
                     else:
