@@ -12,12 +12,16 @@ class StatusNetError(Exception):
         Exception.__init__(self, "Error %d: %s" % (self.errcode, self.details))
 
 class StatusNet(object):
-    def __init__(self, api_path, username, password):
+    def __init__(self, api_path, username="", password="", use_auth=True):
         import base64
         self.api_path = api_path
-        self.auth_string = base64.encodestring('%s:%s' % (username, password))[:-1]
-        if not self.account_verify_credentials():
-            raise Exception("Invalid credentials")
+        self.use_auth = use_auth
+        if self.use_auth:
+            self.auth_string = base64.encodestring('%s:%s' % (username, password))[:-1]
+            if not self.account_verify_credentials():
+                raise Exception("Invalid credentials")
+        else:
+            self.auth_string = None
         self.server_config = self.statusnet_config()
         self.length_limit = int(self.server_config["site"]["textlimit"]) # this will be 0 on unlimited instances
         self.tz = self.server_config["site"]["timezone"]
@@ -29,7 +33,8 @@ class StatusNet(object):
             request = urllib2.Request("%s/%s.json" % (self.api_path, resource_path), params)
         else:
             request = urllib2.Request("%s/%s.json" % (self.api_path, resource_path))
-        request.add_header("Authorization", "Basic %s" % (self.auth_string))
+        if self.auth_string is not None:
+            request.add_header("Authorization", "Basic %s" % (self.auth_string))
         
         try:
             response = urllib2.urlopen(request)
