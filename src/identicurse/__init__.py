@@ -20,7 +20,8 @@ SLOGANS = [
             "I'm on a rampage and kill everyone.",
             "a Tragedie in three parts.",
             "#metamicroblogging",
-            "#metametamicroblogging"
+            "#metametamicroblogging",
+            "EXCEPT IN NEBRASKA"
           ]
 
 def main():
