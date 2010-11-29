@@ -39,8 +39,10 @@
         "/?": "/search", 
         "/gjoin": "/groupjoin", 
         "/del": "/delete", 
-        "/inbox": "/directs"
+        "/inbox": "/directs",
+	"/links": "/link *"
     },
     "update_interval": 60,
-    "long_dent": "split"
+    "long_dent": "split",
+    "browser": "xdg-open '%s'"
 }

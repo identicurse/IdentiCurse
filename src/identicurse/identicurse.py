@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os, sys, curses, locale
+import os, sys, curses, locale, re, subprocess
 try:
     import json
 except ImportError:
@@ -39,6 +39,10 @@ class IdentiCurse(object):
             self.config['filters'] = []
         if not "notice_limit" in self.config:
             self.config['notice_limit'] = 25
+        if not "browser" in self.config:
+            self.config['browser'] = "xdg-open '%s'"
+
+        self.url_regex = re.compile("http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+")
 
         try:
             self.conn = StatusNet(self.config['api_path'], self.config['username'], self.config['password'])
@@ -552,6 +556,18 @@ class IdentiCurse(object):
                     else:
                         self.config[keys[0]] = value
                     open(self.config_file, 'w').write(json.dumps(self.config, indent=4))
+
+                elif tokens[0] == "/link":
+                    dent_index = int(tokens[2]) - 1
+                    if tokens[1] == "*":
+                        self.status_bar.update_left("Opening links...")
+                        for target_url in self.url_regex.findall(self.tabs[self.current_tab].timeline[dent_index]['text']):
+                            subprocess.Popen(self.config['browser'] % (target_url), shell=True, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
+                    else:
+                        self.status_bar.update_left("Opening link...")
+                        link_index = int(tokens[1]) - 1
+                        target_url = self.url_regex.findall(self.tabs[self.current_tab].timeline[dent_index]['text'])[link_index]
+                        subprocess.Popen(self.config['browser'] % (target_url), shell=True, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
             else:
                 self.status_bar.update_left("Posting Notice...")
                 try:
