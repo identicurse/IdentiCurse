@@ -20,10 +20,10 @@ breakages.
 USING IDENTICURSE
 
 Once you've configured IdentiCurse for your account, start it by
-running main.py. You will see a message, "Welcome to IdentiCurse!",
-and then after a short while, IdentiCurse itself will load (this delay
-is due to fetching all the initial dents). Once you are at this
-screen, you can do press various keys to do the following:
+running the 'identicurse' command. You will see a message, "Welcome to
+IdentiCurse!", and then after a short while, IdentiCurse itself will
+load (this delay is due to fetching all the initial dents). Once you
+are at this screen, you can do press various keys to do the following:
     
     KEY         ACTION
     1           Switch to tab 1 (initial default: Personal Timeline).
