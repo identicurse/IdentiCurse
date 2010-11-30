@@ -27,7 +27,7 @@ def main():
     """
     Innit.
     """
-    print "Welcome to IdentiCurse 0.3.1 (Carolina) - %s" % (random.choice(SLOGANS))
+    print "Welcome to IdentiCurse 0.3.2 (Carolina) - %s" % (random.choice(SLOGANS))
     IdentiCurse()
 
 
