@@ -281,7 +281,7 @@ class IdentiCurse(object):
                     except ValueError:
                         user = tokens[1]
                         if user[0] == "@":
-                        	user = user[1:]
+                                user = user[1:]
                         id = 0  # this is not a reply to a dent
                     else:
                         user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
@@ -328,7 +328,7 @@ class IdentiCurse(object):
                     except ValueError:
                         user = tokens[1]
                         if user[0] == "@":
-                        	user = user[1:]
+                                user = user[1:]
                     else:
                         user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
 
@@ -346,7 +346,7 @@ class IdentiCurse(object):
                     except ValueError:
                         username = tokens[1]
                         if username[0] == "@":
-                        	username = username[1:]
+                                username = username[1:]
                         id = self.conn.users_show(screen_name=username)['id']
                     else:
                         id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['user']['id']
@@ -364,7 +364,7 @@ class IdentiCurse(object):
                         except ValueError:
                             user = token
                             if user[0] == "@":
-                            	user = user[1:]
+                                user = user[1:]
                             id = self.conn.users_show(screen_name=user)['id']
                         else:
                             user = self.tabs[self.current_tab].timeline[int(token) - 1]["user"]["screen_name"]
@@ -380,7 +380,7 @@ class IdentiCurse(object):
                         except ValueError:
                             user = token
                             if user[0] == "@":
-                            	user = user[1:]
+                                user = user[1:]
                             id = self.conn.users_show(screen_name=user)['id']
                         else:
                             user = self.tabs[self.current_tab].timeline[int(token) - 1]["user"]["screen_name"]
@@ -396,7 +396,7 @@ class IdentiCurse(object):
                         except ValueError:
                             user = tokens[1]
                             if user[0] == "@":
-                        	user = user[1:]
+                                user = user[1:]
                             id = self.conn.users_show(screen_name=user)['id']
                         else:
                             user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
@@ -429,7 +429,7 @@ class IdentiCurse(object):
                     except ValueError:
                         user = tokens[1]
                         if user[0] == "@":
-                        	user = user[1:]
+                                user = user[1:]
                         id = self.conn.users_show(screen_name=user)['id']
                     else:
                         user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
@@ -445,7 +445,7 @@ class IdentiCurse(object):
                     except ValueError:
                         user = tokens[1]
                         if user[0] == "@":
-                        	user = user[1:]
+                                user = user[1:]
                         id = self.conn.users_show(screen_name=user)['id']
                     else:
                         user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
