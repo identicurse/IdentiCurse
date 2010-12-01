@@ -64,21 +64,29 @@ class Tab(object):
         if self.page < 1:
             self.page = 1
             return False
+        self.scrolldown(0)  # scroll to the end of the newer page, so the dent immediately after the start of the last page can be seen
         return True
     
     def nextpage(self):
         self.page += 1
+        self.scrollup(0)  # as in prevpage, only the other way around
         return True
     
-    def scrollup(self, n):
-        self.start_line -= n
-        if self.start_line < 0:
+    def scrollup(self, n):  # n == 0 indicates maximum scroll-up, i.e., scroll right to the top
+        if not (n == 0):
+            self.start_line -= n
+            if self.start_line < 0:
+                self.start_line = 0
+        else:
             self.start_line = 0
 
-    def scrolldown(self, n):
-        self.start_line += n
+    def scrolldown(self, n):  # n == 0 indicates maximum scroll-down, i.e., scroll right to the bottom
         maxy, maxx = self.window.getmaxyx()[0], self.window.getmaxyx()[1]
-        if self.start_line > len(self.buffer.reflowed(maxx - 2)) - (maxy - 3):
+        if not (n == 0):
+            self.start_line += n
+            if self.start_line > len(self.buffer.reflowed(maxx - 2)) - (maxy - 3):
+                self.start_line = len(self.buffer.reflowed(maxx - 2)) - (maxy - 3)
+        else:
             self.start_line = len(self.buffer.reflowed(maxx - 2)) - (maxy - 3)
 
     def display(self):
