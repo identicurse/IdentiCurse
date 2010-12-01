@@ -193,16 +193,16 @@ class IdentiCurse(object):
         while running:
             input = self.main_window.getch()
 
-            if input == curses.KEY_UP or input == ord('k'):
+            if input == curses.KEY_UP or input == ord('k') or input == ord('K'):
                 self.tabs[self.current_tab].scrollup(1)
                 self.display_current_tab()
-            elif input == curses.KEY_PPAGE:
+            elif input == curses.KEY_PPAGE or input == ord('b') or input == ord('B'):
                 self.tabs[self.current_tab].scrollup(self.main_window.getmaxyx()[0] - 11) # the 11 offset gives 2 lines of overlap between the pre-scroll view and post-scroll view
                 self.display_current_tab()
-            elif input == curses.KEY_DOWN or input == ord('j'):
+            elif input == curses.KEY_DOWN or input == ord('j') or input == ord('J'):
                 self.tabs[self.current_tab].scrolldown(1)
                 self.display_current_tab()
-            elif input == curses.KEY_NPAGE:
+            elif input == curses.KEY_NPAGE or input == ord(' '):
                 self.tabs[self.current_tab].scrolldown(self.main_window.getmaxyx()[0] - 11) # as above
                 self.display_current_tab()
             elif input == curses.KEY_LEFT:
@@ -215,17 +215,17 @@ class IdentiCurse(object):
                     self.status_bar.update_left("Moving to older page...")
                     self.tabs[self.current_tab].update()
                     self.status_bar.update_left("Doing nothing.")
-            elif input == ord("r"):
+            elif input == ord("r") or input == ord('R'):
                 self.update_tabs()
-            elif input == ord("i"):
+            elif input == ord("i") or input == ord('I'):
                 self.update_timer.cancel()
                 self.insert_mode = True
                 self.parse_input(self.text_entry.edit())
-            elif input == ord("q"):
+            elif input == ord("q") or input == ord('Q'):
                 running = False
-            elif input == ord("x"):
+            elif input == ord("x") or input == ord('X'):
                 self.close_current_tab()
-            elif input == ord("h"):
+            elif input == ord("h") or input == ord('H'):
                 self.tabs.append(Help(self.notice_window, self.path))
                 self.tabs[self.current_tab].active = False
                 self.current_tab = len(self.tabs) - 1
@@ -237,10 +237,10 @@ class IdentiCurse(object):
             for x in range(0, len(self.tabs)):
                 if input == ord(str(x+1)):
                     switch_to_tab = x
-            if input == ord("n"):
+            if input == ord("n") or input == ord('N'):
                 if self.current_tab < (len(self.tabs) - 1):
                     switch_to_tab = self.current_tab + 1
-            elif input == ord("p"):
+            elif input == ord("p") or input == ord('P'):
                 if self.current_tab >= 1:
                     switch_to_tab = self.current_tab - 1
             
