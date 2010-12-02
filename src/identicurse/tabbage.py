@@ -1,9 +1,5 @@
 #!/usr/bin env python
-import os.path
-import re
-import threading
-import datetime, locale
-import time_helper
+import os.path, re, sys, threading, datetime, locale, time_helper
 DATETIME_FORMAT = "%a %b %d %H:%M:%S +0000 %Y"
 
 class Buffer(list):
@@ -92,7 +88,7 @@ class Tab(object):
     def display(self):
         maxy, maxx = self.window.getmaxyx()[0], self.window.getmaxyx()[1]
         self.window.erase()
-        self.window.addstr("\n".join(self.buffer.reflowed(maxx - 2)[self.start_line:maxy - 3 + self.start_line]).encode("utf-8"))
+        self.window.addstr("\n".join(self.buffer.reflowed(maxx - 2)[self.start_line:maxy - 3 + self.start_line]).encode(sys.getfilesystemencoding(), "replace"))
         self.window.refresh()
 
 class Help(Tab):
@@ -293,7 +289,7 @@ class Profile(Tab):
 
     def update_buffer(self):
         self.buffer.clear()
-        self.buffer.append("@" + self.profile['screen_name'].encode("utf-8") + "'s Profile")
+        self.buffer.append("@" + self.profile['screen_name'] + "'s Profile")
         self.buffer.append("")
         self.buffer.append("")
 
@@ -304,9 +300,9 @@ class Profile(Tab):
         if self.profile['description']:
             self.buffer.append("Bio: " + self.profile['description'])
         if self.profile['location']:
-            self.buffer.append("Location: " + str(self.profile['location']))
+            self.buffer.append("Location: " + self.profile['location'])
         if self.profile['url']:
-            self.buffer.append("URL: " + str(self.profile['url']))
+            self.buffer.append("URL: " + self.profile['url'])
         if self.profile['id']:
             self.buffer.append("User ID: " + str(self.profile['id']))
         if self.profile['created_at']:
