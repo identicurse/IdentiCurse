@@ -298,15 +298,15 @@ class Profile(Tab):
         self.buffer.append("")
 
         if self.profile['name']:
-            self.buffer.append(u"Real Name: " + self.profile['name'])
+            self.buffer.append("Real Name: " + self.profile['name'])
             self.buffer.append("")
        
         if self.profile['description']:
-            self.buffer.append(u"Bio: " + self.profile['description'])
+            self.buffer.append("Bio: " + self.profile['description'])
         if self.profile['location']:
-            self.buffer.append(u"Location: " + str(self.profile['location']))
+            self.buffer.append("Location: " + str(self.profile['location']))
         if self.profile['url']:
-            self.buffer.append(u"URL: " + str(self.profile['url']))
+            self.buffer.append("URL: " + str(self.profile['url']))
         if self.profile['id']:
             self.buffer.append("User ID: " + str(self.profile['id']))
         if self.profile['created_at']:
