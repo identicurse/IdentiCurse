@@ -16,16 +16,39 @@ def time_since(datetime_then):
     seconds_since -= time_diff['minutes'] * 60
     
     time_diff['seconds'] = int(round(seconds_since))
-    
+
+    return time_diff
+
+def format_time(time_dict, floating=False):
     timestr = ""
+    if floating:
+        formatstr = "%0.1f %s "
+    else:
+        formatstr = "%d %s "
     
     for unit in ['days', 'hours', 'minutes', 'seconds']:
-        if time_diff[unit] > 1:
-            timestr += "%d %s " % (time_diff[unit], unit)
-        elif time_diff[unit] == 1:
-            timestr += "%d %s " % (time_diff[unit], unit[:-1])
+        if time_dict[unit] > 1:
+            timestr += formatstr % (time_dict[unit], unit)
+        elif time_dict[unit] == 1:
+            timestr += formatstr % (time_dict[unit], unit[:-1])
     
     timestr += "ago"
 
     return timestr
 
+def single_unit(time_dict, unit):
+    total_seconds = float(time_dict['seconds'])
+    total_seconds += (time_dict['minutes'] * 60)
+    total_seconds += (time_dict['hours'] * (60 * 60))
+    total_seconds += (time_dict['days'] * (60 * 60 * 24))
+
+    time_dict = {'days':0, 'hours':0, 'minutes':0, 'seconds':0}
+    if unit == "seconds":
+        time_dict['seconds'] = total_seconds
+    elif unit == "minutes":
+        time_dict['minutes'] = (total_seconds / 60)
+    elif unit == "hours":
+        time_dict['hours'] = (total_seconds / (60 * 60))
+    elif unit == "days":
+        time_dict['days'] = (total_seconds / (60 * 60 * 24))
+    return time_dict

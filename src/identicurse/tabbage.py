@@ -184,7 +184,7 @@ class Timeline(Tab):
             locale.setlocale(locale.LC_TIME, 'C')  # hacky fix because statusnet uses english timestrings regardless of locale
             datetime_notice = datetime.datetime.strptime(n['created_at'], DATETIME_FORMAT)
             locale.setlocale(locale.LC_TIME, '') # other half of the hacky fix
-            time_msg = time_helper.time_since(datetime_notice)
+            time_msg = time_helper.format_time(time_helper.time_since(datetime_notice))
             
             self.buffer.append(str(c))
             y = len(self.buffer) - 1
@@ -248,7 +248,7 @@ class Context(Tab):
             locale.setlocale(locale.LC_TIME, 'C')  # hacky fix because statusnet uses english timestrings regardless of locale
             datetime_notice = datetime.datetime.strptime(n['created_at'], DATETIME_FORMAT)
             locale.setlocale(locale.LC_TIME, '') # other half of the hacky fix
-            time_msg = time_helper.time_since(datetime_notice)
+            time_msg = time_helper.format_time(time_helper.time_since(datetime_notice))
             
             self.buffer.append(str(c))
             y = len(self.buffer) - 1
