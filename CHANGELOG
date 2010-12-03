@@ -1,6 +1,14 @@
 New for 0.4:
  - Tabs know if they are active, so the display can be updated for the active tab as soon as its data is finished updating.
  - Links in a notice can now be opened in a browser with the /link command.
+ - Daily average for number of notices.
+ - New slogans.
+ - SPACE/b for moving down/up a whole page, B for moving up a whole page
+ - All applicable shortcuts now work with shift held as well.
+ - Moving to older/newer pages automatically scrolls to the top/bottom, respectively.
+ - HTTP errors when communicating with the SN instance now display in the status-bar instead of messing up the screen.
+ - Bugfixes for:
+      - Viewing profiles where bio/location contains non-ascii characters causes an exception.
 
 New for 0.3:
  - Filters
