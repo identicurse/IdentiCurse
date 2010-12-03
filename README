@@ -23,29 +23,31 @@ Once you've configured IdentiCurse for your account, start it by
 running the 'identicurse' command. You will see a message, "Welcome to
 IdentiCurse!", and then after a short while, IdentiCurse itself will
 load (this delay is due to fetching all the initial dents). Once you
-are at this screen, you can do press various keys to do the following:
+are at this screen, you can press various keys to do the following:
     
-    KEY         ACTION
-    1           Switch to tab 1 (initial default: Personal Timeline).
-    2           Switch to tab 2 (initial default: Mentions).
-    3           Switch to tab 3 (initial default: Direct Message Inbox).
-    4           Switch to tab 4 (initial default: Public Timeline).
-    5           Switch to tab 5 (no initial tab).
-    6           Switch to tab 6 (no initial tab).
-    7           Switch to tab 7 (no initial tab).
-    8           Switch to tab 8 (no initial tab).
-    9           Switch to tab 9 (no initial tab).
-    p           Switch to the previous tab.
-    n           Switch to the next tab.
-    x           Close the currently visible tab.
-    r           Refresh.
-    q           Quit IdentiCurse.
-    h           Open a tab that displays this README.
-    i           Switch to text entry mode.
-    UP or K     Scroll up (n the current tab).
-    DOWN or J   Scroll down (in the current tab).
-    LEFT        Move to a newer page (in the current tab, timelines only).
-    RIGHT       Move to an older page (in the current tab, timelines only).
+    KEY             ACTION
+    1               Switch to tab 1 (initial default: Personal Timeline).
+    2               Switch to tab 2 (initial default: Mentions).
+    3               Switch to tab 3 (initial default: Direct Message Inbox).
+    4               Switch to tab 4 (initial default: Public Timeline).
+    5               Switch to tab 5 (no initial tab).
+    6               Switch to tab 6 (no initial tab).
+    7               Switch to tab 7 (no initial tab).
+    8               Switch to tab 8 (no initial tab).
+    9               Switch to tab 9 (no initial tab).
+    p               Switch to the previous tab.
+    n               Switch to the next tab.
+    x               Close the currently visible tab.
+    r               Refresh.
+    q               Quit IdentiCurse.
+    h               Open a tab that displays this README.
+    i               Switch to text entry mode.
+    UP or k         Scroll up one line (in the current tab).
+    DOWN or j       Scroll down one line (in the current tab).
+    PgUp or b       Scroll up one screen (in the current tab).
+    PgDn or SPACE   Scroll down one screen (in the current tab).
+    LEFT            Move to a newer page (in the current tab, timelines only).
+    RIGHT           Move to an older page (in the current tab, timelines only).
 
 In text entry mode, the above key shortcuts are not available.
 Instead, you type a message directly into the text entry field,
@@ -203,6 +205,7 @@ dent). Available commands are as follows:
    browser) if you haven't got one specified in the config. You can
    also use * as the link number to open all links in the notice.
    There is also an alias for this: "/links [notice number]".
+   (See also 'ADVANCED CONFIGURATION, Link opening' section below.)
 
 /config [key] [value]                           (aliases: /set)
    This will set the config item with the specified key to the
@@ -282,5 +285,12 @@ browser. This is set in the "browser" config key, and should be set as
 the command to open a URL in the chosen browser, with '%s' instead of
 the URL, for example:
 
-    "firefox '%s'"
+    "browser": "firefox '%s'"
     (which would open URLs in Firefox)
+
+GNU Screen users:  If you are running IdentiCurse within GNU Screen,
+the following sample configuration may prove useful.  Suppose for
+example that you want to open URLs/links using the Elinks text
+browser.  In this case the following configuration line should work:
+
+    "browser": "screen elinks '%s'"
