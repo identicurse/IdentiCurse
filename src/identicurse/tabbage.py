@@ -316,9 +316,17 @@ class Profile(Tab):
         else:
             self.buffer.append("Followed by you: No")
 
-            self.buffer.append("")
+        self.buffer.append("")
 
-        if self.profile['statuses_count']:
-            self.buffer.append("Notices: " + str(self.profile['statuses_count']))
         if self.profile['favourites_count']:
             self.buffer.append("Favourites: " + str(self.profile['favourites_count']))
+        if self.profile['statuses_count']:
+            self.buffer.append("Notices: " + str(self.profile['statuses_count']))
+
+            locale.setlocale(locale.LC_TIME, 'C')  # hacky fix because statusnet uses english timestrings regardless of locale
+            datetime_joined = datetime.datetime.strptime(self.profile['created_at'], DATETIME_FORMAT)
+            locale.setlocale(locale.LC_TIME, '') # other half of the hacky fix
+            days_since_join = time_helper.single_unit(time_helper.time_since(datetime_joined), "days")['days']
+            notices_per_day = float(self.profile['statuses_count']) / days_since_join
+
+            self.buffer.append("Average daily notices: %0.2f" % (notices_per_day))
