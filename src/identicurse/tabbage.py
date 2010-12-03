@@ -128,9 +128,6 @@ class Timeline(Tab):
 
         Tab.__init__(self, window)
 
-    def get_time(self, time):
-        timestamp = strptime(time)
-
     def update(self):
         self.timeline = []
         get_count = self.notice_limit - len(self.timeline)
