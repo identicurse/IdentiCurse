@@ -3,7 +3,8 @@ New for 0.4:
  - Links in a notice can now be opened in a browser with the /link command.
  - Daily average for number of notices.
  - New slogans.
- - SPACE/b for moving down/up a whole page.
+ - SPACE/b for moving down/up a whole screen's worth.
+ - HOME/f for scrolling to the top of the page, END/g for scrolling to the bottom of the page.
  - All applicable shortcuts now work with shift held as well.
  - Moving to older/newer pages automatically scrolls to the top/bottom, respectively.
  - HTTP errors when communicating with the SN instance now display in the status-bar instead of messing up the screen.
