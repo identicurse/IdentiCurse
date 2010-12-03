@@ -196,11 +196,17 @@ class IdentiCurse(object):
             if input == curses.KEY_UP or input == ord('k') or input == ord('K'):
                 self.tabs[self.current_tab].scrollup(1)
                 self.display_current_tab()
+            elif input == curses.KEY_HOME or input == ord('f') or input == ord('F'):
+                self.tabs[self.current_tab].scrollup(0)
+                self.display_current_tab()
             elif input == curses.KEY_PPAGE or input == ord('b') or input == ord('B'):
                 self.tabs[self.current_tab].scrollup(self.main_window.getmaxyx()[0] - 11) # the 11 offset gives 2 lines of overlap between the pre-scroll view and post-scroll view
                 self.display_current_tab()
             elif input == curses.KEY_DOWN or input == ord('j') or input == ord('J'):
                 self.tabs[self.current_tab].scrolldown(1)
+                self.display_current_tab()
+            elif input == curses.KEY_END or input == ord('g') or input == ord('G'):
+                self.tabs[self.current_tab].scrolldown(0)
                 self.display_current_tab()
             elif input == curses.KEY_NPAGE or input == ord(' '):
                 self.tabs[self.current_tab].scrolldown(self.main_window.getmaxyx()[0] - 11) # as above
