@@ -46,10 +46,16 @@ are at this screen, you can press various keys to do the following:
     DOWN or j       Scroll down one line (in the current tab).
     PgUp or b       Scroll up one screen (in the current tab).
     PgDn or SPACE   Scroll down one screen (in the current tab).
-    HOME or f       Scroll to the top of the current page.
-    END or g	    Scroll to the bottom of the current page.
+    HOME or g       Scroll to the top of the current page.
+    END or G        Scroll to the bottom of the current page.
     LEFT            Move to a newer page (in the current tab, timelines only).
     RIGHT           Move to an older page (in the current tab, timelines only).
+
+The secondary keys listed above are configurable, and the choices
+listed are only the defaults. See the 'ADVANCED CONFIGURATION, Key
+shortcuts' section for information on how to change them. Also note
+that key shortcuts are case-sensitive - g indicates a press of the G
+key without shift, G a press of it with shift.
 
 In text entry mode, the above key shortcuts are not available.
 Instead, you type a message directly into the text entry field,
@@ -280,8 +286,43 @@ current value of the long_dent config key:
             last character that fits into the sendable length. This
             will be chosen if long_dent is set to "truncate".
 
-Link opening:
+Key shortcuts:
+When you press a key, IdentiCurse first checks it against its built-in
+keybindings, then against the bindings set in the config file (falling
+back to the defaults if you don't have them set). The values to set
+are all in the "keys" config key, and an example of the format
+follows:
 
+     "keys": {
+             "scrollup": ["k"],
+             "scrolldown": ["j"],
+             "refresh": ["l", "m"]
+     }
+
+     This would make k and j keybindings for scrolling up and
+     scrolling down, respectively, and make *both* l and m keybindings
+     for refreshing.
+
+The full range of keys you can set custom bindings for is as follows:
+    
+    KEYNAME        ACTION
+    scrollup       Scroll up one line.
+    scrolldown     Scroll down one line.
+    pageup         Scroll up one screen.
+    pagedown       Scroll down one screen.
+    scrolltop      Scroll right to the top of the current page.
+    scrollbottom   Scroll right to the bottom of the current page.
+    newerpage      Move to a newer page.
+    olderpage      Move to an older page.
+    refresh        Refresh.
+    input          Go into input mode.
+    quit           Quit IdentiCurse.
+    closetab       Close the current tab.
+    nexttab        Move to the next tab.
+    prevtab        Move to the previous tab.
+    help           Show the help.
+
+Link opening:
 When opening a link, IdentiCurse will attempt to use your choice of
 browser. This is set in the "browser" config key, and should be set as
 the command to open a URL in the chosen browser, with '%s' instead of
