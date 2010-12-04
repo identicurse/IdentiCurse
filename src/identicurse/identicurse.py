@@ -575,6 +575,19 @@ class IdentiCurse(object):
                             link_index = int(tokens[1]) - 1
                             target_url = self.url_regex.findall(self.tabs[self.current_tab].timeline[dent_index]['text'])[link_index]
                             subprocess.Popen(self.config['browser'] % (target_url), shell=True, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
+
+                    elif tokens[0] == "/bugreport":
+                        self.status_bar.update_left("Reporting bug...")
+    
+                        status = "#icursebug " + " ".join(tokens[1:])
+                        update = self.conn.statuses_update(status, "IdentiCurse", long_dent=self.config['long_dent'], dup_first_word=True)
+   
+                    elif tokens[0] == "/featurerequest":
+                        self.status_bar.update_left("Posting feature request...")
+    
+                        status = "#icurserequest " + " ".join(tokens[1:])
+                        update = self.conn.statuses_update(status, "IdentiCurse", long_dent=self.config['long_dent'], dup_first_word=True)
+   
                 except StatusNetError, e:
                     self.status_bar.timed_update_left("Status.Net error %d: %s" % (e.errcode, e.details))
             else:
