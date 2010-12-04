@@ -40,9 +40,17 @@
         "/gjoin": "/groupjoin", 
         "/del": "/delete", 
         "/inbox": "/directs",
-	"/links": "/link *"
+        "/links": "/link *"
     },
     "update_interval": 60,
     "long_dent": "split",
-    "browser": "xdg-open '%s'"
+    "browser": "xdg-open '%s'",
+    "keys": {
+            "scrollup": ["k"],
+            "scrolldown": ["j"],
+            "pageup": ["b"],
+            "pagedown": [" "],
+            "scrolltop": ["g"],
+            "scrollbottom": ["G"]
+    }
 }
