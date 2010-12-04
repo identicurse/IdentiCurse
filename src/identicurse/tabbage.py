@@ -1,4 +1,4 @@
-#!/usr/bin env python
+#!/usr/bin env python2
 import os.path, re, sys, threading, datetime, locale, time_helper
 DATETIME_FORMAT = "%a %b %d %H:%M:%S +0000 %Y"
 
