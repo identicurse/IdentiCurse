@@ -42,6 +42,39 @@ class IdentiCurse(object):
         if not "browser" in self.config:
             self.config['browser'] = "xdg-open '%s'"
 
+        if not "keys" in self.config:
+            self.config['keys'] = {}
+        if not "scrollup" in self.config['keys']:
+            self.config['keys']['scrollup'] = ['k']
+        if not "scrolltop" in self.config['keys']:
+            self.config['keys']['scrolltop'] = ['g']
+        if not "pageup" in self.config['keys']:
+            self.config['keys']['pageup'] = ['b']
+        if not "scrolldown" in self.config['keys']:
+            self.config['keys']['scrolldown'] = ['j']
+        if not "scrollbottom" in self.config['keys']:
+            self.config['keys']['scrollbottom'] = ['G']
+        if not "pagedown" in self.config['keys']:
+            self.config['keys']['pagedown'] = [' ']
+        if not "newerpage" in self.config['keys']:
+            self.config['keys']['newerpage'] = []
+        if not "olderpage" in self.config['keys']:
+            self.config['keys']['olderpage'] = []
+        if not "refresh" in self.config['keys']:
+            self.config['keys']['refresh'] = []
+        if not "input" in self.config['keys']:
+            self.config['keys']['input'] = []
+        if not "quit" in self.config['keys']:
+            self.config['keys']['quit'] = []
+        if not "closetab" in self.config['keys']:
+            self.config['keys']['closetab'] = []
+        if not "help" in self.config['keys']:
+            self.config['keys']['help'] = []
+        if not "nexttab" in self.config['keys']:
+            self.config['keys']['nexttab'] = []
+        if not "prevtab" in self.config['keys']:
+            self.config['keys']['prevtab'] = []
+
         self.url_regex = re.compile("http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+")
 
         try:
@@ -193,45 +226,45 @@ class IdentiCurse(object):
         while running:
             input = self.main_window.getch()
 
-            if input == curses.KEY_UP or input == ord('k') or input == ord('K'):
+            if input == curses.KEY_UP or input in [ord(key) for key in self.config['keys']['scrollup']]:
                 self.tabs[self.current_tab].scrollup(1)
                 self.display_current_tab()
-            elif input == curses.KEY_HOME or input == ord('f') or input == ord('F'):
+            elif input == curses.KEY_HOME or input in [ord(key) for key in self.config['keys']['scrolltop']]:
                 self.tabs[self.current_tab].scrollup(0)
                 self.display_current_tab()
-            elif input == curses.KEY_PPAGE or input == ord('b') or input == ord('B'):
+            elif input == curses.KEY_PPAGE or input in [ord(key) for key in self.config['keys']['pageup']]:
                 self.tabs[self.current_tab].scrollup(self.main_window.getmaxyx()[0] - 11) # the 11 offset gives 2 lines of overlap between the pre-scroll view and post-scroll view
                 self.display_current_tab()
-            elif input == curses.KEY_DOWN or input == ord('j') or input == ord('J'):
+            elif input == curses.KEY_DOWN or input in [ord(key) for key in self.config['keys']['scrolldown']]:
                 self.tabs[self.current_tab].scrolldown(1)
                 self.display_current_tab()
-            elif input == curses.KEY_END or input == ord('g') or input == ord('G'):
+            elif input == curses.KEY_END or input in [ord(key) for key in self.config['keys']['scrollbottom']]:
                 self.tabs[self.current_tab].scrolldown(0)
                 self.display_current_tab()
-            elif input == curses.KEY_NPAGE or input == ord(' '):
+            elif input == curses.KEY_NPAGE or input in [ord(key) for key in self.config['keys']['pagedown']]:
                 self.tabs[self.current_tab].scrolldown(self.main_window.getmaxyx()[0] - 11) # as above
                 self.display_current_tab()
-            elif input == curses.KEY_LEFT:
+            elif input == curses.KEY_LEFT or input in [ord(key) for key in self.config['keys']['newerpage']]:
                 if self.tabs[self.current_tab].prevpage():
                     self.status_bar.update_left("Moving to newer page...")
                     self.tabs[self.current_tab].update()
                     self.status_bar.update_left("Doing nothing.")
-            elif input == curses.KEY_RIGHT:
+            elif input == curses.KEY_RIGHT or input in [ord(key) for key in self.config['keys']['olderpage']]:
                 if self.tabs[self.current_tab].nextpage():
                     self.status_bar.update_left("Moving to older page...")
                     self.tabs[self.current_tab].update()
                     self.status_bar.update_left("Doing nothing.")
-            elif input == ord("r") or input == ord('R'):
+            elif input == ord("r") or input in [ord(key) for key in self.config['keys']['refresh']]:
                 self.update_tabs()
-            elif input == ord("i") or input == ord('I'):
+            elif input == ord("i") or input in [ord(key) for key in self.config['keys']['input']]:
                 self.update_timer.cancel()
                 self.insert_mode = True
                 self.parse_input(self.text_entry.edit())
-            elif input == ord("q") or input == ord('Q'):
+            elif input == ord("q") or input in [ord(key) for key in self.config['keys']['quit']]:
                 running = False
-            elif input == ord("x") or input == ord('X'):
+            elif input == ord("x") or input in [ord(key) for key in self.config['keys']['closetab']]:
                 self.close_current_tab()
-            elif input == ord("h") or input == ord('H'):
+            elif input == ord("h") or input in [ord(key) for key in self.config['keys']['help']]:
                 self.tabs.append(Help(self.notice_window, self.path))
                 self.tabs[self.current_tab].active = False
                 self.current_tab = len(self.tabs) - 1
@@ -243,10 +276,10 @@ class IdentiCurse(object):
             for x in range(0, len(self.tabs)):
                 if input == ord(str(x+1)):
                     switch_to_tab = x
-            if input == ord("n") or input == ord('N'):
+            if input == ord("n") or input in [ord(key) for key in self.config['keys']['nexttab']]:
                 if self.current_tab < (len(self.tabs) - 1):
                     switch_to_tab = self.current_tab + 1
-            elif input == ord("p") or input == ord('P'):
+            elif input == ord("p") or input in [ord(key) for key in self.config['keys']['prevtab']]:
                 if self.current_tab >= 1:
                     switch_to_tab = self.current_tab - 1
             
