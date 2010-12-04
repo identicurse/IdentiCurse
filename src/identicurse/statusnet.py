@@ -173,7 +173,7 @@ class StatusNet(object):
         params = {'id':id}
         return self.__makerequest("statuses/show", params)
 
-    def statuses_update(self, status, source="", in_reply_to_status_id=0, latitude=-200, longitude=-200, place_id="", display_coordinates=False, long_dent="split"):
+    def statuses_update(self, status, source="", in_reply_to_status_id=0, latitude=-200, longitude=-200, place_id="", display_coordinates=False, long_dent="split", dup_first_word=False):
         status = "".join([s.strip(" ") for s in status.split("\n")])  # rejoin split lines back to 1 line
         params = {'status':status}
         if not (source == ""):
@@ -203,7 +203,7 @@ class StatusNet(object):
                     else:
                         status_next = status[-1] + status_next
                         status = status[:-1]
-                if not (in_reply_to_status_id == 0):
+                if dup_first_word or (not (in_reply_to_status_id == 0)):
                     status_next = status.split(" ")[0] + " (...) " + status_next
                 else:
                     status_next = "(...) " + status_next
