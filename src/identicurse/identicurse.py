@@ -322,7 +322,7 @@ class IdentiCurse(object):
                         self.status_bar.update_left("Deleting Notice...")
                         id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['id']
                         try:
-                            update = self.conn.statuses_destroy(id)
+                            self.conn.statuses_destroy(id)
                         except urllib2.HTTPError, e:
                             if e.code == 403:
                                 self.status_bar.timed_update_left("ERROR: You cannot delete others' statuses.")
