@@ -4,9 +4,9 @@ New for 0.4:
  - Daily average for number of notices.
  - New slogans.
  - SPACE/b for moving down/up a whole screen's worth.
- - HOME/f for scrolling to the top of the page, END/g for scrolling to the bottom of the page.
- - All applicable shortcuts now work with shift held as well.
+ - HOME/g for scrolling to the top of the page, END/G for scrolling to the bottom of the page.
  - Moving to older/newer pages automatically scrolls to the top/bottom, respectively.
+ - Keybindings can be customised in config.
  - HTTP errors when communicating with the SN instance now display in the status-bar instead of messing up the screen.
  - New split indicator …, shorter than the original (...).
  - Bugfixes for:
