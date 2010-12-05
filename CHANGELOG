@@ -9,7 +9,6 @@ New for 0.4:
  - Keybindings can be customised in config.
  - HTTP errors when communicating with the SN instance now display in the status-bar instead of messing up the screen.
  - New split indicator …, shorter than the original (...).
- - Display group memberships in profiles.
  - /groupmember command for checking group membership.
  - Bugfixes for:
       - Viewing profiles where bio/location contains non-ascii characters causes an exception.
