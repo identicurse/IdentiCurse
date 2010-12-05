@@ -40,7 +40,9 @@
         "/gjoin": "/groupjoin", 
         "/del": "/delete", 
         "/inbox": "/directs",
-        "/links": "/link *"
+        "/links": "/link *",
+	"/gmember": "/groupmember",
+	"/gm": "/groupmember"
     },
     "update_interval": 60,
     "long_dent": "split",
