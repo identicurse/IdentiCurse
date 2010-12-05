@@ -142,6 +142,10 @@ dent). Available commands are as follows:
    This will remove you from membership of the group specified.  The !
    is optional.
 
+/groupmember [(!)group]                         (aliases: /gmember, /gm)
+   This will check whether or not you are a member of the group
+   specified. The ! is optional.
+
 /tag [(#)tag]                                   (aliases: /t)
    This will open a new tab showing the timeline of the tag
    specified. Like the @ or ! in username-/group-based commands, the #
