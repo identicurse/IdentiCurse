@@ -330,3 +330,10 @@ class Profile(Tab):
             notices_per_day = float(self.profile['statuses_count']) / days_since_join
 
             self.buffer.append("Average daily notices: %0.2f" % (notices_per_day))
+            
+            self.buffer.append("")
+
+            self.buffer.append("Groups:")
+            for group in self.conn.statusnet_groups_list(screen_name=self.id):
+                self.buffer.append(" !%s" % (group["nickname"]))
+
