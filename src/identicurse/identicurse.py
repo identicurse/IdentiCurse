@@ -524,6 +524,19 @@ class IdentiCurse(object):
     
                         self.conn.statusnet_groups_leave(group_id=id, nickname=group)
     
+                    elif tokens[0] == "/groupmember":
+                        self.status_bar.update_left("Checking membership...")
+                        group = tokens[1]
+                        if group[0] == "!":
+                            group = group[1:]
+                        group_id = int(self.conn.statusnet_groups_show(nickname=group)['id'])
+                        user_id = int(self.conn.users_show(screen_name=self.config['username'])['id'])
+
+                        if self.conn.statusnet_groups_is_member(user_id, group_id):
+                            self.status_bar.timed_update_left("You are a member of !%s." % (group))
+                        else:
+                            self.status_bar.timed_update_left("You are not a member of !%s." % (group))
+
                     elif tokens[0] == "/tag":
                         self.status_bar.update_left("Loading Tag Timeline...")
                         tag = tokens[1]
