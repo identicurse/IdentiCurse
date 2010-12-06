@@ -209,21 +209,21 @@ class StatusNet(object):
             if long_dent=="truncate":
                 params['status'] = status[:self.length_limit]
             elif long_dent=="split":
-                status_next = status[self.length_limit - 1:]
-                status = status[:self.length_limit-1]
+                status_next = status[self.length_limit - 2:]
+                status = status[:self.length_limit-2]
                 while True:
                     if len(status) == 0:
                         raise Exception("Maximum status length exceeded by %d characters, and no split point could be found." % (len(status) - self.length_limit))
                     elif status[-1] in [" "]:
-                        status = status + "…"
+                        status = status.encode('utf-8') + u".."
                         break # split point found
                     else:
                         status_next = status[-1] + status_next
                         status = status[:-1]
                 if dup_first_word or (not (in_reply_to_status_id == 0)):
-                    status_next = status.split(" ")[0] + " … " + status_next
+                    status_next = status.split(" ")[0] + " .. " + status_next
                 else:
-                    status_next = "… " + status_next
+                    status_next = ".. " + status_next
                 params['status'] = status
                 dents = [self.__makerequest("statuses/update", params)] # post the first piece as normal
                 next_dent = self.statuses_update(status_next, source=source, in_reply_to_status_id=in_reply_to_status_id, latitude=latitude, longitude=longitude, place_id=place_id, display_coordinates=display_coordinates, long_dent=long_dent) # then hand the rest off for potential further splitting
