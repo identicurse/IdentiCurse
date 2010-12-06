@@ -48,6 +48,39 @@ class IdentiCurse(object):
         except:
             sys.exit("ERROR: Couldn't read config file.")
 
+        # prepare the known commands list
+        self.known_commands = [
+            "/reply",
+            "/favourite",
+            "/repeat",
+            "/direct",
+            "/delete",
+            "/profile",
+            "/spamreport",
+            "/block",
+            "/unblock",
+            "/user",
+            "/context",
+            "/subscribe",
+            "/unsubscribe",
+            "/group",
+            "/groupjoin",
+            "/groupleave",
+            "/groupmember",
+            "/tag",
+            "/sentdirects",
+            "/favourites",
+            "/search",
+            "/home",
+            "/mentions",
+            "/directs",
+            "/public",
+            "/config",
+            "/link",
+            "/bugreport",
+            "/featurerequest"
+            ]
+
         # set some defaults for configs that we will always need to use, but that are optional
         if not "long_dent" in self.config:
             self.config['long_dent'] = "split"
@@ -322,11 +355,15 @@ class IdentiCurse(object):
         if len(input) > 0:      # don't do anything if the user didn't enter anything
             input = input.rstrip()
 
-            if input[0] == "/":
-                tokens = [token for token in input.split(" ") if token != ""]
+            tokens = [token for token in input.split(" ") if token != ""]
 
-                if tokens[0] in self.config["aliases"]:
-                    tokens = self.config["aliases"][tokens[0]].split(" ") + tokens[1:]
+            if tokens[0][0] == "i" and ((tokens[0][1:] in self.known_commands) or (tokens[0][1:] in self.config["aliases"])):
+                tokens[0] = tokens[0][1:]  # avoid doing the wrong thing when people accidentally submit stuff like "i/r 2 blabla"
+
+            if tokens[0] in self.config["aliases"]:
+                tokens = self.config["aliases"][tokens[0]].split(" ") + tokens[1:]
+
+            if tokens[0] in self.known_commands:
                 
                 try:
                     if tokens[0] == "/reply":
