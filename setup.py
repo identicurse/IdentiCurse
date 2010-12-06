@@ -13,7 +13,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="identicurse",
-    version='0.4-dev',
+    version='0.4',
     description="A simple Identi.ca client with a curses-based UI.",
     long_description=("A simple Identi.ca client with a curses-based UI."),
     author="Psychedelic Squid and Reality",
