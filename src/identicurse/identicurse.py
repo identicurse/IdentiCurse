@@ -48,6 +48,8 @@ class IdentiCurse(object):
         except:
             sys.exit("ERROR: Couldn't read config file.")
 
+        self.last_page_search = {'query':"", 'occurs':[], 'viewing':0}
+
         # prepare the known commands list
         self.known_commands = [
             "/reply",
@@ -734,12 +736,42 @@ class IdentiCurse(object):
         self.update_timer.start()
 
     def parse_search(self, query):
+        if query is not None:
+            query = query.rstrip()
+            if query == "":
+                query = self.last_page_search['query']
+            if (self.last_page_search['query'] == query) and not (query == ""):
+                # this is a continued search
+                if self.last_page_search['viewing'] < (len(self.last_page_search['occurs']) - 1):
+                    self.last_page_search['viewing'] += 1
+                    self.tabs[self.current_tab].scrollto(self.last_page_search['occurs'][self.last_page_search['viewing']])
+                    self.status_bar.update_left("Viewing result #%d for '%s'" % (self.last_page_search['viewing'] + 1, query))
+                    self.display_current_tab()
+                else:
+                    self.status_bar.update_left("No more results for '%s'" % (query))
+            else:
+                # new search
+                maxx = self.tabs[self.current_tab].window.getmaxyx()[1]
+                search_buffer = self.tabs[self.current_tab].buffer.reflowed(maxx - 2)
+
+                page_search = {'query':query, 'occurs':[], 'viewing':0}
+                
+                for line_index in range(len(search_buffer)):
+                    if query in search_buffer[line_index]:
+                        page_search['occurs'].append(line_index)
+
+                if len(page_search['occurs']) > 0:
+                    self.tabs[self.current_tab].scrollto(page_search['occurs'][0])
+                    self.status_bar.update_left("Viewing result #1 for '%s'" % (query))
+                    self.last_page_search = page_search  # keep this search
+                else:
+                    self.status_bar.update_left("No results for '%s'" % (query))
+                    self.last_page_search = {'query':"", 'occurs':[], 'viewing':0}  # reset to no search
+
         self.entry_window.clear()
         self.text_entry = Textbox(self.entry_window, insert_mode=True)
         self.text_entry.stripspaces = 1
         self.display_current_tab()
-        self.status_bar.update_left("If this feature was finished, you would've searched for: %s" % query)
-        self.tabs[self.current_tab].scrollto(120)
         self.insert_mode = False
         self.update_timer = Timer(self.config['update_interval'], self.update_tabs)
         self.update_timer.start()
