@@ -51,4 +51,4 @@ class Textbox(textpad.Textbox):
         if abort == False:
             return self.gather()
         else:
-            return ""
+            return None

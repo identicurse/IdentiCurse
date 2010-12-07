@@ -358,6 +358,9 @@ class IdentiCurse(object):
     def parse_input(self, input):
         update = False
 
+        if input is None:
+            input = ""
+
         if len(input) > 0:      # don't do anything if the user didn't enter anything
             input = input.rstrip()
 
@@ -736,6 +739,7 @@ class IdentiCurse(object):
         self.text_entry.stripspaces = 1
         self.display_current_tab()
         self.status_bar.update_left("If this feature was finished, you would've searched for: %s" % query)
+        self.tabs[self.current_tab].scrollto(120)
         self.insert_mode = False
         self.update_timer = Timer(self.config['update_interval'], self.update_tabs)
         self.update_timer.start()
