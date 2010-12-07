@@ -113,6 +113,8 @@ class IdentiCurse(object):
             self.config['keys']['refresh'] = []
         if not "input" in self.config['keys']:
             self.config['keys']['input'] = []
+        if not "search" in self.config['keys']:
+            self.config['keys']['search'] = []
         if not "quit" in self.config['keys']:
             self.config['keys']['quit'] = []
         if not "closetab" in self.config['keys']:
@@ -309,6 +311,10 @@ class IdentiCurse(object):
                 self.update_timer.cancel()
                 self.insert_mode = True
                 self.parse_input(self.text_entry.edit())
+            elif input == ord("/") or input in [ord(key) for key in self.config['keys']['search']]:
+                self.update_timer.cancel()
+                self.insert_mode = True
+                self.parse_search(self.text_entry.edit())
             elif input == ord("q") or input in [ord(key) for key in self.config['keys']['quit']]:
                 running = False
             elif input == ord("x") or input in [ord(key) for key in self.config['keys']['closetab']]:
@@ -720,6 +726,16 @@ class IdentiCurse(object):
         self.text_entry.stripspaces = 1
         self.display_current_tab()
         self.status_bar.update_left("Doing nothing.")
+        self.insert_mode = False
+        self.update_timer = Timer(self.config['update_interval'], self.update_tabs)
+        self.update_timer.start()
+
+    def parse_search(self, query):
+        self.entry_window.clear()
+        self.text_entry = Textbox(self.entry_window, insert_mode=True)
+        self.text_entry.stripspaces = 1
+        self.display_current_tab()
+        self.status_bar.update_left("If this feature was finished, you would've searched for: %s" % query)
         self.insert_mode = False
         self.update_timer = Timer(self.config['update_interval'], self.update_tabs)
         self.update_timer.start()
