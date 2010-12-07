@@ -102,6 +102,13 @@ class Tab(object):
         else:
             self.start_line = len(self.buffer.reflowed(maxx - 2)) - (maxy - 3)
 
+    def scrollto(self, n):  # attempt to get line number n as close to the top as possible - this is less clean than the relative scrolls, so don't call it unless you *need* to go to a specific line.
+        maxy, maxx = self.window.getmaxyx()[0], self.window.getmaxyx()[1]
+        if (n > self.start_line) and (n > len(self.buffer.reflowed(maxx - 2)) - (maxy - 3)):
+            self.start_line = len(self.buffer.reflowed(maxx - 2)) - (maxy - 3)
+        else:
+            self.start_line = n
+
     def display(self):
         maxy, maxx = self.window.getmaxyx()[0], self.window.getmaxyx()[1]
         self.window.erase()
