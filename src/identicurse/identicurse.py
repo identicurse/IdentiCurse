@@ -377,7 +377,7 @@ class IdentiCurse(object):
             if tokens[0] in self.known_commands:
                 
                 try:
-                    if tokens[0] == "/reply":
+                    if tokens[0] == "/reply" and len(tokens) >= 3:
                         self.status_bar.update_left("Posting Reply...")
     
                         try:
@@ -397,17 +397,17 @@ class IdentiCurse(object):
                         except Exception, (errmsg):
                             self.status_bar.timed_update_left("ERROR: Couldn't post status: %s" % (errmsg))
     
-                    elif tokens[0] == "/favourite":
+                    elif tokens[0] == "/favourite" and len(tokens) == 2:
                         self.status_bar.update_left("Favouriting Notice...")
                         id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['id']
                         self.conn.favorites_create(id)
     
-                    elif tokens[0] == "/repeat":
+                    elif tokens[0] == "/repeat" and len(tokens) == 2:
                         self.status_bar.update_left("Repeating Notice...")
                         id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['id']
                         update = self.conn.statuses_retweet(id, source="IdentiCurse")
                         
-                    elif tokens[0] == "/direct":
+                    elif tokens[0] == "/direct" and len(tokens) >= 3:
                         self.status_bar.update_left("Sending Direct...")
                         screen_name = tokens[1]
                         if screen_name[0] == "@":
@@ -415,7 +415,7 @@ class IdentiCurse(object):
                         id = self.conn.users_show(screen_name=screen_name)['id']
                         self.conn.direct_messages_new(screen_name, id, " ".join(tokens[2:]), source="IdentiCurse")
     
-                    elif tokens[0] == "/delete":
+                    elif tokens[0] == "/delete" and len(tokens) == 2:
                         self.status_bar.update_left("Deleting Notice...")
                         id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['id']
                         try:
@@ -424,7 +424,7 @@ class IdentiCurse(object):
                             if e.code == 403:
                                 self.status_bar.timed_update_left("ERROR: You cannot delete others' statuses.")
     
-                    elif tokens[0] == "/profile":
+                    elif tokens[0] == "/profile" and len(tokens) == 2:
                         self.status_bar.update_left("Loading Profile...")
                         # Yeuch
                         try:
@@ -442,7 +442,7 @@ class IdentiCurse(object):
                         self.tabs[self.current_tab].active = True
                         self.tab_order.insert(0, self.current_tab)
     
-                    elif tokens[0] == "/spamreport":
+                    elif tokens[0] == "/spamreport" and len(tokens) >= 3:
                         self.status_bar.update_left("Firing Orbital Laser Cannon...")
                         # Yeuch
                         try:
@@ -459,7 +459,7 @@ class IdentiCurse(object):
                         update = self.conn.statuses_update(status, "IdentiCurse")
                         self.conn.blocks_create(user_id=id, screen_name=username)
     
-                    elif tokens[0] == "/block":
+                    elif tokens[0] == "/block" and len(tokens) >= 2:
                         self.status_bar.update_left("Creating Block(s)...")
                         for token in tokens[1:]:
                             # Yeuch
@@ -475,7 +475,7 @@ class IdentiCurse(object):
                                 id = self.tabs[self.current_tab].timeline[int(token) - 1]['user']['id']
                             self.conn.blocks_create(user_id=id, screen_name=user)
     
-                    elif tokens[0] == "/unblock":
+                    elif tokens[0] == "/unblock" and len(tokens) >= 2:
                         self.status_bar.update_left("Removing Block(s)...")
                         for token in tokens[1:]:
                             # Yeuch
@@ -491,7 +491,7 @@ class IdentiCurse(object):
                                 id = self.tabs[self.current_tab].timeline[int(token) - 1]['user']['id']
                             self.conn.blocks_destroy(user_id=id, screen_name=user)
     
-                    elif tokens[0] == "/user":
+                    elif tokens[0] == "/user" and len(tokens) == 2:
                         self.status_bar.update_left("Loading User Timeline...")
                         try:
                             # Yeuch
@@ -515,7 +515,7 @@ class IdentiCurse(object):
                             if e.code == 404:
                                 self.status_bar.timed_update_left("ERROR: Couldn't open timeline: No such user")
     
-                    elif tokens[0] == "/context":
+                    elif tokens[0] == "/context" and len(tokens) == 2:
                         self.status_bar.update_left("Loading Context...")
                         id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["id"]
     
@@ -525,7 +525,7 @@ class IdentiCurse(object):
                         self.tabs[self.current_tab].active = True
                         self.tab_order.insert(0, self.current_tab)
     
-                    elif tokens[0] == "/subscribe":
+                    elif tokens[0] == "/subscribe" and len(tokens) == 2:
                         self.status_bar.update_left("Subscribing...")
                         # Yeuch
                         try:
@@ -541,7 +541,7 @@ class IdentiCurse(object):
     
                         self.conn.friendships_create(user_id=id, screen_name=user)
                         
-                    elif tokens[0] == "/unsubscribe":
+                    elif tokens[0] == "/unsubscribe" and len(tokens) == 2:
                         self.status_bar.update_left("Unsubscribing...")
                         # Yeuch
                         try:
@@ -557,7 +557,7 @@ class IdentiCurse(object):
     
                         self.conn.friendships_destroy(user_id=id, screen_name=user)
     
-                    elif tokens[0] == "/group":
+                    elif tokens[0] == "/group" and len(tokens) == 2:
                         self.status_bar.update_left("Loading Group Timeline...")
                         group = tokens[1]
                         if group[0] == "!":
@@ -570,7 +570,7 @@ class IdentiCurse(object):
                         self.tabs[self.current_tab].active = True
                         self.tab_order.insert(0, self.current_tab)
     
-                    elif tokens[0] == "/groupjoin":
+                    elif tokens[0] == "/groupjoin" and len(tokens) == 2:
                         self.status_bar.update_left("Joining Group...")
                         group = tokens[1]
                         if group[0] == "!":
@@ -579,7 +579,7 @@ class IdentiCurse(object):
     
                         self.conn.statusnet_groups_join(group_id=id, nickname=group)
     
-                    elif tokens[0] == "/groupleave":
+                    elif tokens[0] == "/groupleave" and len(tokens) == 2:
                         self.status_bar.update_left("Leaving Group...")
                         group = tokens[1]
                         if group[0] == "!":
@@ -588,7 +588,7 @@ class IdentiCurse(object):
     
                         self.conn.statusnet_groups_leave(group_id=id, nickname=group)
     
-                    elif tokens[0] == "/groupmember":
+                    elif tokens[0] == "/groupmember" and len(tokens) == 2:
                         self.status_bar.update_left("Checking membership...")
                         group = tokens[1]
                         if group[0] == "!":
@@ -601,7 +601,7 @@ class IdentiCurse(object):
                         else:
                             self.status_bar.timed_update_left("You are not a member of !%s." % (group))
 
-                    elif tokens[0] == "/tag":
+                    elif tokens[0] == "/tag" and len(tokens) == 2:
                         self.status_bar.update_left("Loading Tag Timeline...")
                         tag = tokens[1]
                         if tag[0] == "#":
@@ -613,7 +613,7 @@ class IdentiCurse(object):
                         self.tabs[self.current_tab].active = True
                         self.tab_order.insert(0, self.current_tab)
     
-                    elif tokens[0] == "/sentdirects":
+                    elif tokens[0] == "/sentdirects" and len(tokens) == 1:
                         self.status_bar.update_left("Loading Sent Directs...")
                         self.tabs.append(Timeline(self.conn, self.notice_window, "sentdirect", notice_limit=self.config['notice_limit'], filters=self.config['filters']))
                         self.tabs[self.current_tab].active = False
@@ -621,7 +621,7 @@ class IdentiCurse(object):
                         self.tabs[self.current_tab].active = True
                         self.tab_order.insert(0, self.current_tab)
     
-                    elif tokens[0] == "/favourites":
+                    elif tokens[0] == "/favourites" and len(tokens) == 1:
                         self.status_bar.update_left("Loading Favourites...")
                         self.tabs.append(Timeline(self.conn, self.notice_window, "favourites", notice_limit=self.config['notice_limit'], filters=self.config['filters']))
                         self.tabs[self.current_tab].active = False
@@ -629,7 +629,7 @@ class IdentiCurse(object):
                         self.tabs[self.current_tab].active = True
                         self.tab_order.insert(0, self.current_tab)
                         
-                    elif tokens[0] == "/search":
+                    elif tokens[0] == "/search" and len(tokens) >= 2:
                         self.status_bar.update_left("Searching...")
                         query = " ".join(tokens[1:])
                         self.tabs.append(Timeline(self.conn, self.notice_window, "search", {'query':query}, filters=self.config['filters']))
@@ -638,35 +638,35 @@ class IdentiCurse(object):
                         self.tabs[self.current_tab].active = True
                         self.tab_order.insert(0, self.current_tab)
                     
-                    elif tokens[0] == "/home":
+                    elif tokens[0] == "/home" and len(tokens) == 1:
                         self.tabs.append(Timeline(self.conn, self.notice_window, "home", notice_limit=self.config['notice_limit'], filters=self.config['filters']))
                         self.tabs[self.current_tab].active = False
                         self.current_tab = len(self.tabs) - 1
                         self.tabs[self.current_tab].active = True
                         self.tab_order.insert(0, self.current_tab)
                     
-                    elif tokens[0] == "/mentions":
+                    elif tokens[0] == "/mentions" and len(tokens) == 1:
                         self.tabs.append(Timeline(self.conn, self.notice_window, "mentions", notice_limit=self.config['notice_limit'], filters=self.config['filters']))
                         self.tabs[self.current_tab].active = False
                         self.current_tab = len(self.tabs) - 1
                         self.tabs[self.current_tab].active = True
                         self.tab_order.insert(0, self.current_tab)
                     
-                    elif tokens[0] == "/directs":
+                    elif tokens[0] == "/directs" and len(tokens) == 1:
                         self.tabs.append(Timeline(self.conn, self.notice_window, "direct", notice_limit=self.config['notice_limit'], filters=self.config['filters']))
                         self.tabs[self.current_tab].active = False
                         self.current_tab = len(self.tabs) - 1
                         self.tabs[self.current_tab].active = True
                         self.tab_order.insert(0, self.current_tab)
                     
-                    elif tokens[0] == "/public":
+                    elif tokens[0] == "/public" and len(tokens) == 1:
                         self.tabs.append(Timeline(self.conn, self.notice_window, "public", notice_limit=self.config['notice_limit'], filters=self.config['filters']))
                         self.tabs[self.current_tab].active = False
                         self.current_tab = len(self.tabs) - 1
                         self.tabs[self.current_tab].active = True
                         self.tab_order.insert(0, self.current_tab)
                         
-                    elif tokens[0] == "/config":
+                    elif tokens[0] == "/config" and len(tokens) >= 3:
                         keys, value = tokens[1].split('.'), " ".join(tokens[2:])
                         if len(keys) == 2:      # there has to be a clean way to avoid hardcoded len checks, but I can't think what right now, and technically it works for all currently valid config keys
                             self.config[keys[0]][keys[1]] = value
@@ -686,13 +686,13 @@ class IdentiCurse(object):
                             target_url = self.url_regex.findall(self.tabs[self.current_tab].timeline[dent_index]['text'])[link_index]
                             subprocess.Popen(self.config['browser'] % (target_url), shell=True, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
 
-                    elif tokens[0] == "/bugreport":
+                    elif tokens[0] == "/bugreport" and len(tokens) >= 2:
                         self.status_bar.update_left("Reporting bug...")
     
                         status = "#icursebug " + " ".join(tokens[1:])
                         update = self.conn.statuses_update(status, "IdentiCurse", long_dent=self.config['long_dent'], dup_first_word=True)
    
-                    elif tokens[0] == "/featurerequest":
+                    elif tokens[0] == "/featurerequest" and len(tokens) >= 2:
                         self.status_bar.update_left("Posting feature request...")
     
                         status = "#icurserequest " + " ".join(tokens[1:])
