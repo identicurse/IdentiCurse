@@ -4,9 +4,9 @@ Important note:
 IdentiCurse looks for your config file in two locations. First it
 checks .identicurse in your home directory, and then it checks
 config.json in the current directory. It is highly recommended that
-you copy the supplied config.json to $HOME/.identicurse before
-modifying, as that way future updates will not erase any customisation
-you have made.
+you copy the supplied config.json to $HOME and rename it to
+.identicurse before modifying, as that way future updates will not
+erase any customisation you have made.
 
 Before using IdentiCurse, you must configure it with your account
 login credentials. To do so, edit your config file in your favourite
