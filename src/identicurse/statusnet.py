@@ -30,7 +30,6 @@ class StatusNetError(Exception):
 class StatusNet(object):
     def __init__(self, api_path, username="", password="", use_auth=True):
         import base64
-        self.split_marker = ".."
         self.api_path = api_path
         self.use_auth = use_auth
         if self.use_auth:
@@ -215,15 +214,15 @@ class StatusNet(object):
                     if len(status) == 0:
                         raise Exception("Maximum status length exceeded by %d characters, and no split point could be found." % (len(status) - self.length_limit))
                     elif status[-1] in [" "]:
-                        status = status.encode('utf-8') + u"%s" % (self.split_marker)
+                        status = status.encode('utf-8') + u".."
                         break # split point found
                     else:
                         status_next = status[-1] + status_next
                         status = status[:-1]
                 if dup_first_word or (not (in_reply_to_status_id == 0)):
-                    status_next = status.split(" ")[0].encode('utf-8') + " %s " % (self.split_marker) + status_next
+                    status_next = status.split(" ")[0].encode('utf-8') + " .. " + status_next
                 else:
-                    status_next = "%s " % (self.split_marker) + status_next
+                    status_next = ".. " + status_next
                 params['status'] = status
                 dents = [self.__makerequest("statuses/update", params)] # post the first piece as normal
                 next_dent = self.statuses_update(status_next, source=source, in_reply_to_status_id=in_reply_to_status_id, latitude=latitude, longitude=longitude, place_id=place_id, display_coordinates=display_coordinates, long_dent=long_dent) # then hand the rest off for potential further splitting
