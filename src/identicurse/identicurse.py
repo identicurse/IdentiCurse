@@ -84,6 +84,8 @@ class IdentiCurse(object):
             ]
 
         # set some defaults for configs that we will always need to use, but that are optional
+        if not "search_case_sensitive" in self.config:
+            self.config['search_case_sensitive'] = "sensitive"
         if not "long_dent" in self.config:
             self.config['long_dent'] = "split"
         if not "filters" in self.config:
@@ -757,8 +759,12 @@ class IdentiCurse(object):
                 page_search = {'query':query, 'occurs':[], 'viewing':0}
                 
                 for line_index in range(len(search_buffer)):
-                    if query in search_buffer[line_index]:
-                        page_search['occurs'].append(line_index)
+                    if self.config['search_case_sensitive'] == "sensitive":
+                        if query in search_buffer[line_index]:
+                            page_search['occurs'].append(line_index)
+                    else:
+                        if query.upper() in search_buffer[line_index].upper():
+                            page_search['occurs'].append(line_index)
 
                 if len(page_search['occurs']) > 0:
                     self.tabs[self.current_tab].scrollto(page_search['occurs'][0])
