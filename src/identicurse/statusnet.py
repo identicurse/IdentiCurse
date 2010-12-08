@@ -221,7 +221,7 @@ class StatusNet(object):
                         status_next = status[-1] + status_next
                         status = status[:-1]
                 if dup_first_word or (not (in_reply_to_status_id == 0)):
-                    status_next = status.split(" ")[0] + " .. " + status_next
+                    status_next = status.split(" ")[0].encode('utf-8') + " .. " + status_next
                 else:
                     status_next = ".. " + status_next
                 params['status'] = status
