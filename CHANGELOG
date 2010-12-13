@@ -1,3 +1,9 @@
+New for 0.5:
+ - New slogans.
+ - Directs can now be sent by notice number as well as by name.
+ - Basic in-page search is now available (still needs to be documented before 0.5 release).
+ - Dents that begin with / but aren't commands  will now be sent as normal dents.
+
 New for 0.4:
  - Tabs know if they are active, so the display can be updated for the active tab as soon as its data is finished updating.
  - Links in a notice can now be opened in a browser with the /link command.
