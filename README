@@ -67,11 +67,14 @@ dent). Available commands are as follows:
 
 /reply [notice number] [message]                (aliases: /r)
    This will create a reply to the notice in your current view with
-   the notice number specified.
+   the notice number specified. If your current tab is Directs or
+   Sent Directs, the reply will be sent as a DM.
 
 /reply [(@)username] [message]                  (aliases: /r)
    This will create a mention of the user specified. The username can
    be entered with or without a @ at the beginning, either will work.
+   If your current tab is Directs or Sent Directs, the reply will be
+   sent as a DM.
 
 /favourite [notice number]            (aliases: /favorite, /fav, /f)
    This will add the notice with the notice number specified to your
