@@ -410,10 +410,20 @@ class IdentiCurse(object):
                         
                     elif tokens[0] == "/direct" and len(tokens) >= 3:
                         self.status_bar.update_left("Sending Direct...")
-                        screen_name = tokens[1]
-                        if screen_name[0] == "@":
-                            screen_name = screen_name[1:]
+                        
+                        try:
+                            float(tokens[1])
+                        except ValueError:
+                            screen_name = tokens[1]
+                            if screen_name[0] == "@":
+                                screen_name = screen_name[1:]
+                        else:
+                            if "direct" in self.tabs[self.current_tab].timeline_type:
+                                screen_name = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['sender']['screen_name']
+                            else:
+                                screen_name = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['user']['screen_name']
                         id = self.conn.users_show(screen_name=screen_name)['id']
+                        
                         self.conn.direct_messages_new(screen_name, id, " ".join(tokens[2:]), source="IdentiCurse")
     
                     elif tokens[0] == "/delete" and len(tokens) == 2:
