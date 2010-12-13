@@ -40,7 +40,8 @@ SLOGANS = [
             "#metametamicroblogging",
             "EXCEPT IN NEBRASKA",
             "ATTENTION SNOW: GTFO ITS TOO WARM FOR YOU!",
-            "eating paracetamol sandwiches."
+            "eating paracetamol sandwiches.",
+            "Do not operate heavy machinery while using IdentiCurse."
           ]
 
 def main():
