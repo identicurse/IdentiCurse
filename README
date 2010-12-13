@@ -85,6 +85,10 @@ dent). Available commands are as follows:
    This will send a direct message to the user specified. As with
    /reply, the username will work with or without the @.
 
+/direct [post number] [message]                 (aliases: /dm, /d)
+   This will send a direct message to the user who sent the notice
+   or DM with the post number specified.
+
 /delete [notice number]                         (aliases: /del)
    This will delete the notice with the notice number specified. It
    will only work for your notices, not those created by other users.
