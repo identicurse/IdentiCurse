@@ -375,8 +375,12 @@ class IdentiCurse(object):
             if tokens[0] in self.config["aliases"]:
                 tokens = self.config["aliases"][tokens[0]].split(" ") + tokens[1:]
 
-            if ("direct" in self.tabs[self.current_tab].timeline_type) and (tokens[0] == "/reply"):
-                tokens[0] = "/direct"
+            try:
+                if ("direct" in self.tabs[self.current_tab].timeline_type) and (tokens[0] == "/reply"):
+                    tokens[0] = "/direct"
+            except AttributeError:
+                # the tab has no timeline_type, so it's *definitely* not directs.
+                pass
 
             if tokens[0] in self.known_commands:
                 
