@@ -361,7 +361,7 @@ class IdentiCurse(object):
                 self.tabs[self.current_tab].active = True
                 self.tab_order.insert(0, self.current_tab)
                 self.tabs[self.current_tab].update()
-            elif input == ord("z") or input in [ord(key) for key in self.config['keys']['qreply']]:
+            elif input == ord("l") or input in [ord(key) for key in self.config['keys']['qreply']]:
                 self.qreply = True
             elif input == ord("d") or input in [ord(key) for key in self.config['keys']['creply']]:
                 self.update_timer.cancel()
