@@ -53,9 +53,9 @@
             "pageup": ["b"],
             "pagedown": [" "],
             "scrolltop": ["g"],
-            "scrollbottom": ["G"]
-            "qreply": ["a"]
-            "creply": ["c"]
+            "scrollbottom": ["G"],
+            "qreply": ["a"],
+            "creply": ["c"],
             "cfav": ["v"]
     }
 }
