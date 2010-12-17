@@ -361,21 +361,21 @@ class IdentiCurse(object):
                 self.tabs[self.current_tab].active = True
                 self.tab_order.insert(0, self.current_tab)
                 self.tabs[self.current_tab].update()
-            elif input == ord("a") or input in [ord(key) for key in self.config['keys']['qreply']]:
+            elif input == ord("z") or input in [ord(key) for key in self.config['keys']['qreply']]:
                 self.qreply = True
-            elif input == ord("c") or input in [ord(key) for key in self.config['keys']['creply']]:
+            elif input == ord("d") or input in [ord(key) for key in self.config['keys']['creply']]:
                 self.update_timer.cancel()
                 self.insert_mode = True
                 self.parse_input(self.text_entry.edit("/r " + str(self.tabs[self.current_tab].chosen_one + 1) + " "))
-            elif input == ord("f"):
+            elif input == ord("s"):
                 if self.tabs[self.current_tab].chosen_one != len(self.tabs[self.current_tab].timeline):
                     self.tabs[self.current_tab].chosen_one += 1
                     self.tabs[self.current_tab].update_buffer()
-            elif input == ord("d"):
+            elif input == ord("a"):
                 if self.tabs[self.current_tab].chosen_one != 0:
                     self.tabs[self.current_tab].chosen_one -= 1
                     self.tabs[self.current_tab].update_buffer()
-            elif input == ord("v") or input in [ord(key) for key in self.config['keys']['cfav']]:
+            elif input == ord("f") or input in [ord(key) for key in self.config['keys']['cfav']]:
                 self.status_bar.update_left("Favouriting Notice...")
                 id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['id']
                 self.conn.favorites_create(id)
