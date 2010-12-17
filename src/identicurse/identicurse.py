@@ -36,6 +36,7 @@ class IdentiCurse(object):
     
     def __init__(self):
         self.path = os.path.dirname(os.path.realpath( __file__ ))
+        self.mod = True
         
         self.config_file = os.path.join(os.path.expanduser("~") ,".identicurse")
         try:
@@ -128,6 +129,8 @@ class IdentiCurse(object):
             self.config['keys']['nexttab'] = []
         if not "prevtab" in self.config['keys']:
             self.config['keys']['prevtab'] = []
+        if not "mod" in self.config['keys']:
+            self.config['keys']['mod'] = []
 
         self.url_regex = re.compile("http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+")
 
@@ -279,7 +282,32 @@ class IdentiCurse(object):
 
         while running:
             input = self.main_window.getch()
+           
+            if not self.mod:
+                switch_to_tab = None
+                for x in range(0, len(self.tabs)):
+                    if input == ord(str(x+1)):
+                        switch_to_tab = x
+                if input == ord("n") or input in [ord(key) for key in self.config['keys']['nexttab']]:
+                    if self.current_tab < (len(self.tabs) - 1):
+                        switch_to_tab = self.current_tab + 1
+                elif input == ord("p") or input in [ord(key) for key in self.config['keys']['prevtab']]:
+                    if self.current_tab >= 1:
+                        switch_to_tab = self.current_tab - 1
 
+                if switch_to_tab is not None:
+                    self.tab_order.insert(0, self.tab_order.pop(self.tab_order.index(switch_to_tab)))
+                    self.tabs[self.current_tab].active = False
+                    self.current_tab = switch_to_tab
+                    self.tabs[self.current_tab].active = True
+            else:
+                for x in range(1, 9):
+                    if input == ord(str(x)):
+                        self.update_timer.cancel()
+                        self.insert_mode = True
+                        self.parse_input(self.text_entry.edit("/r " + str(x) + " "))
+                self.mod = False
+            
             if input == curses.KEY_UP or input in [ord(key) for key in self.config['keys']['scrollup']]:
                 self.tabs[self.current_tab].scrollup(1)
                 self.display_current_tab()
@@ -329,24 +357,10 @@ class IdentiCurse(object):
                 self.tabs[self.current_tab].active = True
                 self.tab_order.insert(0, self.current_tab)
                 self.tabs[self.current_tab].update()
+            elif input == ord("a") or input in [ord(key) for key in self.config['keys']['mod']]:
+                self.mod = True
             
-            switch_to_tab = None
-            for x in range(0, len(self.tabs)):
-                if input == ord(str(x+1)):
-                    switch_to_tab = x
-            if input == ord("n") or input in [ord(key) for key in self.config['keys']['nexttab']]:
-                if self.current_tab < (len(self.tabs) - 1):
-                    switch_to_tab = self.current_tab + 1
-            elif input == ord("p") or input in [ord(key) for key in self.config['keys']['prevtab']]:
-                if self.current_tab >= 1:
-                    switch_to_tab = self.current_tab - 1
             
-            if switch_to_tab is not None:
-                self.tab_order.insert(0, self.tab_order.pop(self.tab_order.index(switch_to_tab)))
-                self.tabs[self.current_tab].active = False
-                self.current_tab = switch_to_tab
-                self.tabs[self.current_tab].active = True
-
             y, x = self.screen.getmaxyx()
             if y != self.y or x != self.x:
                 self.redraw()

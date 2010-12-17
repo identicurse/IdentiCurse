@@ -54,5 +54,6 @@
             "pagedown": [" "],
             "scrolltop": ["g"],
             "scrollbottom": ["G"]
+            "mod": ["a"]
     }
 }

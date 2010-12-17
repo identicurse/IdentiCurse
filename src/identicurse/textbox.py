@@ -25,9 +25,11 @@ class Textbox(textpad.Textbox):
         except TypeError:  # python 2.5 didn't support insert_mode
             textpad.Textbox.__init__(self, win)
 
-    def edit(self):
-        abort = False
+    def edit(self, initial_input=""):
+        for char in list(initial_input):
+            self.do_command(char)
 
+        abort = False
         while 1:
             ch = self.win.getch()
 
