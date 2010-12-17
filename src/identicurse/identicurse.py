@@ -36,7 +36,7 @@ class IdentiCurse(object):
     
     def __init__(self):
         self.path = os.path.dirname(os.path.realpath( __file__ ))
-        self.mod = True
+        self.mod = False
         
         self.config_file = os.path.join(os.path.expanduser("~") ,".identicurse")
         try:
@@ -283,7 +283,7 @@ class IdentiCurse(object):
         while running:
             input = self.main_window.getch()
            
-            if not self.mod:
+            if self.mod == False:
                 switch_to_tab = None
                 for x in range(0, len(self.tabs)):
                     if input == ord(str(x+1)):
