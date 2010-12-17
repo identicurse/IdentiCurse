@@ -42,6 +42,7 @@ are at this screen, you can press various keys to do the following:
     q               Quit IdentiCurse.
     h               Open a tab that displays this README.
     i               Switch to text entry mode.
+    a               Followed by a number between 1 and 9 to quickly reply to that notice on the timeline.
     UP or k         Scroll up one line (in the current tab).
     DOWN or j       Scroll down one line (in the current tab).
     PgUp or b       Scroll up one screen (in the current tab).
