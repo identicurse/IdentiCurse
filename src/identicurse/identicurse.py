@@ -373,6 +373,11 @@ class IdentiCurse(object):
                 if self.tabs[self.current_tab].chosen_one != 0:
                     self.tabs[self.current_tab].chosen_one -= 1
                     self.tabs[self.current_tab].update_buffer()
+            elif input == ord("v") or input in [ord(key) for key in self.config['keys']['cfav']]:
+                self.status_bar.update_left("Favouriting Notice...")
+                id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['id']
+                self.conn.favorites_create(id)
+                self.status_bar.update_left("Doing Nothing.")
 
             y, x = self.screen.getmaxyx()
             if y != self.y or x != self.x:
