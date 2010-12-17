@@ -54,8 +54,8 @@
             "pagedown": [" "],
             "scrolltop": ["g"],
             "scrollbottom": ["G"],
-            "qreply": ["a"],
-            "creply": ["c"],
-            "cfav": ["v"]
+            "qreply": ["l"],
+            "creply": ["d"],
+            "cfav": ["f"]
     }
 }
