@@ -48,7 +48,10 @@ def format_time(time_dict, floating=False):
         elif time_dict[unit] == 1:
             timestr += formatstr % (time_dict[unit], unit[:-1])
     
-    timestr += "ago"
+    if timestr == "":
+        timestr = "Now"
+    else:
+        timestr += "ago"
 
     return timestr
 
