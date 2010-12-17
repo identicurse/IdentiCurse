@@ -36,7 +36,7 @@ class IdentiCurse(object):
     
     def __init__(self):
         self.path = os.path.dirname(os.path.realpath( __file__ ))
-        self.mod = False
+        self.qreply = False
         
         self.config_file = os.path.join(os.path.expanduser("~") ,".identicurse")
         try:
@@ -129,8 +129,10 @@ class IdentiCurse(object):
             self.config['keys']['nexttab'] = []
         if not "prevtab" in self.config['keys']:
             self.config['keys']['prevtab'] = []
-        if not "mod" in self.config['keys']:
-            self.config['keys']['mod'] = []
+        if not "qreply" in self.config['keys']:
+            self.config['keys']['qreply'] = []
+        if not "creply" in self.config['keys']:
+            self.config['keys']['creply'] = []
 
         self.url_regex = re.compile("http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+")
 
@@ -283,7 +285,7 @@ class IdentiCurse(object):
         while running:
             input = self.main_window.getch()
            
-            if self.mod == False:
+            if self.qreply == False:
                 switch_to_tab = None
                 for x in range(0, len(self.tabs)):
                     if input == ord(str(x+1)):
@@ -306,7 +308,7 @@ class IdentiCurse(object):
                         self.update_timer.cancel()
                         self.insert_mode = True
                         self.parse_input(self.text_entry.edit("/r " + str(x) + " "))
-                self.mod = False
+                self.qreply = False
             
             if input == curses.KEY_UP or input in [ord(key) for key in self.config['keys']['scrollup']]:
                 self.tabs[self.current_tab].scrollup(1)
@@ -357,10 +359,21 @@ class IdentiCurse(object):
                 self.tabs[self.current_tab].active = True
                 self.tab_order.insert(0, self.current_tab)
                 self.tabs[self.current_tab].update()
-            elif input == ord("a") or input in [ord(key) for key in self.config['keys']['mod']]:
-                self.mod = True
-            
-            
+            elif input == ord("a") or input in [ord(key) for key in self.config['keys']['qreply']]:
+                self.qreply = True
+            elif input == ord("c") or input in [ord(key) for key in self.config['keys']['creply']]:
+                self.update_timer.cancel()
+                self.insert_mode = True
+                self.parse_input(self.text_entry.edit("/r " + str(self.tabs[self.current_tab].chosen_one + 1) + " "))
+            elif input == ord("f"):
+                if self.tabs[self.current_tab].chosen_one != len(self.tabs[self.current_tab].timeline):
+                    self.tabs[self.current_tab].chosen_one += 1
+                    self.tabs[self.current_tab].update_buffer()
+            elif input == ord("d"):
+                if self.tabs[self.current_tab].chosen_one != 0:
+                    self.tabs[self.current_tab].chosen_one -= 1
+                    self.tabs[self.current_tab].update_buffer()
+
             y, x = self.screen.getmaxyx()
             if y != self.y or x != self.x:
                 self.redraw()

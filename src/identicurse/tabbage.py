@@ -135,6 +135,7 @@ class Timeline(Tab):
         self.type_params = type_params
         self.notice_limit = notice_limit
         self.filters = filters
+        self.chosen_one = 0
 
         if self.timeline_type == "user":
             self.name = "User (%s)" % self.type_params['screen_name']
@@ -211,7 +212,12 @@ class Timeline(Tab):
             
             self.buffer.append(str(c))
             y = len(self.buffer) - 1
-            self.buffer[y] += ' ' * 3
+
+            if (c - 1) == self.chosen_one:
+                self.buffer[y] += ' * '
+            else:
+                self.buffer[y] += ' ' * 3
+
             self.buffer[y] += user
             self.buffer[y] += ' ' * (maxx - ((len(source_msg) + len(user) + (5 + len(str(c))))))
             self.buffer[y] += source_msg
