@@ -133,6 +133,8 @@ class IdentiCurse(object):
             self.config['keys']['qreply'] = []
         if not "creply" in self.config['keys']:
             self.config['keys']['creply'] = []
+        if not "cfav" in self.config['keys']:
+            self.config['keys']['cfav'] = []
 
         self.url_regex = re.compile("http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+")
 

@@ -44,6 +44,7 @@ are at this screen, you can press various keys to do the following:
     i               Switch to text entry mode.
     a               Followed by a number between 1 and 9 to quickly reply to that notice on the timeline.
     c               Reply to currently selected dent
+    v               Favourite currently selected dent
     f               Move selected dent down (indicated by * character)
     d               Move selected dent up (indicated by * character)
     UP or k         Scroll up one line (in the current tab).
