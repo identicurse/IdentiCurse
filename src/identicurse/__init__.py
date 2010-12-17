@@ -41,7 +41,8 @@ SLOGANS = [
             "EXCEPT IN NEBRASKA",
             "ATTENTION SNOW: GTFO ITS TOO WARM FOR YOU!",
             "eating paracetamol sandwiches.",
-            "Do not operate heavy machinery while using IdentiCurse."
+            "Do not operate heavy machinery while using IdentiCurse.",
+            "35% the same as bathing in fine grape juice."
           ]
 
 def main():
