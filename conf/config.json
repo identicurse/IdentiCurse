@@ -54,6 +54,7 @@
             "pagedown": [" "],
             "scrolltop": ["g"],
             "scrollbottom": ["G"]
-            "mod": ["a"]
+            "qreply": ["a"]
+            "creply": ["c"]
     }
 }

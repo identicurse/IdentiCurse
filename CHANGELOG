@@ -4,7 +4,8 @@ New for 0.5:
  - Basic in-page search is now available (still needs to be documented before 0.5 release).
  - Dents that begin with / but aren't commands  will now be sent as normal dents.
  - /reply in DM tabs is treated as /direct, to prevent messages intended to be private from accidentally being sent publicly.
- - Can now type 'a' then a number between 1-9 to quickly reply to that dent.
+ - Quick Reply: Can now type 'a' then a number between 1-9 to quickly reply to that dent.
+ - Current Reply: Can now type 'c' to reply to the currently selected dent. Use 'f' and 'd' to switch current dent.
 
 New for 0.4:
  - Tabs know if they are active, so the display can be updated for the active tab as soon as its data is finished updating.
