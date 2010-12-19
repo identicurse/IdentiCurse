@@ -241,6 +241,7 @@ class Context(Tab):
         self.conn = conn
         self.notice = notice_id
         self.timeline = []
+        self.chosen_one = 0
 
         self.name = "Context"
 
@@ -281,7 +282,11 @@ class Context(Tab):
             
             self.buffer.append(str(c))
             y = len(self.buffer) - 1
-            self.buffer[y] += ' ' * 3
+
+            if (c - 1) == self.chosen_one:
+                self.buffer[y] += ' * '
+            else:
+                self.buffer[y] += ' ' * 3
             self.buffer[y] += user
             self.buffer[y] += ' ' * (maxx - ((len(source_msg) + len(user) + (5 + len(str(c))))))
             self.buffer[y] += source_msg
