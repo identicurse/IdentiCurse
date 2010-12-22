@@ -53,6 +53,7 @@ are at this screen, you can press various keys to do the following:
     PgDn or SPACE   Scroll down one screen (in the current tab).
     HOME or g       Scroll to the top of the current page.
     END or G        Scroll to the bottom of the current page.
+    =               Move to the newest page (in the current tab, timelines only).
     LEFT            Move to a newer page (in the current tab, timelines only).
     RIGHT           Move to an older page (in the current tab, timelines only).
 

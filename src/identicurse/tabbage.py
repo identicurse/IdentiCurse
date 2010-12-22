@@ -71,12 +71,19 @@ class Tab(object):
         self.page = 1
         self.active = False
         
-    def prevpage(self):
-        self.page -= 1
-        if self.page < 1:
-            self.page = 1
-            return False
-        self.scrolldown(0)  # scroll to the end of the newer page, so the dent immediately after the start of the last page can be seen
+    def prevpage(self, n=1):
+        if n > 0:
+            self.page -= n
+            if self.page < 1:
+                self.page = 1
+                return False
+            self.scrolldown(0)  # scroll to the end of the newer page, so the dent immediately after the start of the last page can be seen
+        else:
+            if self.page == 1:
+                return False
+            else:
+                self.page = 1
+                self.scrollup(0)
         return True
     
     def nextpage(self):

@@ -6,6 +6,7 @@ New for 0.5:
  - /reply in DM tabs is treated as /direct, to prevent messages intended to be private from accidentally being sent publicly.
  - Quick Reply: Can now type 'l' then a number between 1-9 to quickly reply to that dent.
  - Current Reply: Can now type 'd' to reply to the currently selected dent. Use 'a' and 's' to switch current dent. (and f for fav)
+ - Can now press = to go back to the top of the newest page (in paged tabs).
 
 New for 0.4:
  - Tabs know if they are active, so the display can be updated for the active tab as soon as its data is finished updating.

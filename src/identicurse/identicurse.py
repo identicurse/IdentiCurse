@@ -109,6 +109,8 @@ class IdentiCurse(object):
             self.config['keys']['scrollbottom'] = ['G']
         if not "pagedown" in self.config['keys']:
             self.config['keys']['pagedown'] = [' ']
+        if not "firstpage" in self.config['keys']:
+            self.config['keys']['firstpage'] = []
         if not "newerpage" in self.config['keys']:
             self.config['keys']['newerpage'] = []
         if not "olderpage" in self.config['keys']:
@@ -330,6 +332,11 @@ class IdentiCurse(object):
             elif input == curses.KEY_NPAGE or input in [ord(key) for key in self.config['keys']['pagedown']]:
                 self.tabs[self.current_tab].scrolldown(self.main_window.getmaxyx()[0] - 11) # as above
                 self.display_current_tab()
+            elif input == ord("=") or input in [ord(key) for key in self.config['keys']['firstpage']]:
+                if self.tabs[self.current_tab].prevpage(0):
+                    self.status_bar.update_left("Moving to first page...")
+                    self.tabs[self.current_tab].update()
+                    self.status_bar.update_left("Doing nothing.")
             elif input == curses.KEY_LEFT or input in [ord(key) for key in self.config['keys']['newerpage']]:
                 if self.tabs[self.current_tab].prevpage():
                     self.status_bar.update_left("Moving to newer page...")
