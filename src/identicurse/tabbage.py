@@ -145,18 +145,19 @@ class Timeline(Tab):
         self.chosen_one = 0
 
         if self.timeline_type == "user":
-            self.name = "User (%s)" % self.type_params['screen_name']
+            self.basename = "User (%s)" % self.type_params['screen_name']
         elif self.timeline_type == "tag":
-            self.name = "Tag (%s)" % self.type_params['tag']
+            self.basename = "Tag (%s)" % self.type_params['tag']
         elif self.timeline_type == "group":
-            self.name = "Group (%s)" % self.type_params['nickname']
+            self.basename = "Group (%s)" % self.type_params['nickname']
         elif self.timeline_type == "search":
-            self.name = "Search (%s)" % self.type_params['query']
+            self.basename = "Search (%s)" % self.type_params['query']
         elif self.timeline_type == "sentdirect":
-            self.name = "Sent Directs"
+            self.basename = "Sent Directs"
         else:
-            self.name = self.timeline_type.capitalize()
-
+            self.basename = self.timeline_type.capitalize()
+        self.name = self.basename
+        
         Tab.__init__(self, window)
 
     def update(self):
@@ -192,6 +193,10 @@ class Timeline(Tab):
             if passes_filters:
                 self.timeline.append(notice)
 
+        if self.page > 1:
+            self.name = self.basename + "+%d" % (self.page - 1)
+        else:
+            self.name = self.basename
         self.update_buffer()
 
     def update_buffer(self):
