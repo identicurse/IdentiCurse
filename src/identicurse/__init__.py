@@ -16,9 +16,9 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from identicurse import IdentiCurse
-import random
+import random, os
 
-SLOGANS = [
+preset_slogans = [
             "100% hippy-approved",
             "powered by hatred",
             "we don't get OAuth either",
@@ -50,7 +50,14 @@ def main():
     """
     Innit.
     """
-    print "Welcome to IdentiCurse 0.5-dev - %s" % (random.choice(SLOGANS))
+    user_slogans_file = os.path.join(os.path.expanduser("~"), ".identicurse_slogans")
+    try:
+        user_slogans_raw = open(user_slogans_file).read()
+        user_slogans = [slogan for slogan in user_slogans_raw.split("\n") if slogan.strip() != ""]
+        slogans = user_slogans
+    except:
+        slogans = preset_slogans
+    print "Welcome to IdentiCurse 0.5-dev - %s" % (random.choice(slogans))
     IdentiCurse()
 
 
