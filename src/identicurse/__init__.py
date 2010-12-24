@@ -43,7 +43,8 @@ preset_slogans = [
             "eating paracetamol sandwiches.",
             "Do not operate heavy machinery while using IdentiCurse.",
             "35% the same as bathing in fine grape juice.",
-            "DOT MATRIX WITH STEREO SOUND"
+            "DOT MATRIX WITH STEREO SOUND",
+            "oh god how did this get here I am not good with computer",
           ]
 
 def main():
