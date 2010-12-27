@@ -141,6 +141,12 @@ class IdentiCurse(object):
             self.config['keys']['ccontext'] = []
         if not "crepeat" in self.config['keys']:
             self.config['keys']['crepeat'] = []
+        if not "cnext" in self.config['keys']:
+            self.config['keys']['cnext'] = []
+        if not "cprev" in self.config['keys']:
+            self.config['keys']['cprev'] = []
+        if not "cfirst" in self.config['keys']:
+            self.config['keys']['cfirst'] = []
 
         self.url_regex = re.compile("http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+")
 
@@ -378,14 +384,19 @@ class IdentiCurse(object):
                 self.update_timer.cancel()
                 self.insert_mode = True
                 self.parse_input(self.text_entry.edit("/r " + str(self.tabs[self.current_tab].chosen_one + 1) + " "))
-            elif input == ord("s"):
+            elif input == ord("s") or input in [ord(key) for key in self.config['keys']['cnext']]:
                 if self.tabs[self.current_tab].chosen_one != (len(self.tabs[self.current_tab].timeline) - 1):
                     self.tabs[self.current_tab].chosen_one += 1
                     self.tabs[self.current_tab].update_buffer()
                     self.tabs[self.current_tab].scrolltodent(self.tabs[self.current_tab].chosen_one)
-            elif input == ord("a"):
+            elif input == ord("a") or input in [ord(key) for key in self.config['keys']['cprev']]:
                 if self.tabs[self.current_tab].chosen_one != 0:
                     self.tabs[self.current_tab].chosen_one -= 1
+                    self.tabs[self.current_tab].update_buffer()
+                    self.tabs[self.current_tab].scrolltodent(self.tabs[self.current_tab].chosen_one)
+            elif input == ord("z") or input in [ord(key) for key in self.config['keys']['cfirst']]:
+                if self.tabs[self.current_tab].chosen_one != 0:
+                    self.tabs[self.current_tab].chosen_one = 0
                     self.tabs[self.current_tab].update_buffer()
                     self.tabs[self.current_tab].scrolltodent(self.tabs[self.current_tab].chosen_one)
             elif input == ord("f") or input in [ord(key) for key in self.config['keys']['cfav']]:
