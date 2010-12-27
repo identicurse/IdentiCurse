@@ -108,12 +108,24 @@ class Tab(object):
         else:
             self.start_line = len(self.buffer.reflowed(maxx - 2)) - (maxy - 3)
 
-    def scrollto(self, n):  # attempt to get line number n as close to the top as possible - this is less clean than the relative scrolls, so don't call it unless you *need* to go to a specific line.
+    def scrollto(self, n):  # attempt to get line number n as close to the top as possible unless already visible - this is less clean than the relative scrolls, so don't call it unless you *need* to go to a specific line.
         maxy, maxx = self.window.getmaxyx()[0], self.window.getmaxyx()[1]
+        if (n >= self.start_line) and (n < (maxy - 3 + self.start_line)):  # if the line is already visible, bail out
+            return
         if (n > self.start_line) and (n > len(self.buffer.reflowed(maxx - 2)) - (maxy - 3)):
             self.start_line = len(self.buffer.reflowed(maxx - 2)) - (maxy - 3)
         else:
             self.start_line = n
+
+    def scrolltodent(self, n):
+        maxy, maxx = self.window.getmaxyx()[0], self.window.getmaxyx()[1]
+        dent_line = 0
+        for line in self.buffer.reflowed(maxx - 2):
+            if ("%d * " % (n + 1) in line) or ("%d   " % (n + 1) in line):
+                break
+            else:
+                dent_line += 1
+        self.scrollto(dent_line)
 
     def display(self):
         maxy, maxx = self.window.getmaxyx()[0], self.window.getmaxyx()[1]

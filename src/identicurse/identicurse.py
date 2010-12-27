@@ -382,10 +382,12 @@ class IdentiCurse(object):
                 if self.tabs[self.current_tab].chosen_one != (len(self.tabs[self.current_tab].timeline) - 1):
                     self.tabs[self.current_tab].chosen_one += 1
                     self.tabs[self.current_tab].update_buffer()
+                    self.tabs[self.current_tab].scrolltodent(self.tabs[self.current_tab].chosen_one)
             elif input == ord("a"):
                 if self.tabs[self.current_tab].chosen_one != 0:
                     self.tabs[self.current_tab].chosen_one -= 1
                     self.tabs[self.current_tab].update_buffer()
+                    self.tabs[self.current_tab].scrolltodent(self.tabs[self.current_tab].chosen_one)
             elif input == ord("f") or input in [ord(key) for key in self.config['keys']['cfav']]:
                 self.status_bar.update_left("Favouriting Notice...")
                 id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['id']
