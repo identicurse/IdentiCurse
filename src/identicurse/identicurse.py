@@ -379,7 +379,7 @@ class IdentiCurse(object):
                 self.insert_mode = True
                 self.parse_input(self.text_entry.edit("/r " + str(self.tabs[self.current_tab].chosen_one + 1) + " "))
             elif input == ord("s"):
-                if self.tabs[self.current_tab].chosen_one != len(self.tabs[self.current_tab].timeline):
+                if self.tabs[self.current_tab].chosen_one != (len(self.tabs[self.current_tab].timeline) - 1):
                     self.tabs[self.current_tab].chosen_one += 1
                     self.tabs[self.current_tab].update_buffer()
             elif input == ord("a"):
