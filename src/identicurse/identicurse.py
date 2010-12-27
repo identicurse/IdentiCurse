@@ -137,6 +137,10 @@ class IdentiCurse(object):
             self.config['keys']['creply'] = []
         if not "cfav" in self.config['keys']:
             self.config['keys']['cfav'] = []
+        if not "ccontext" in self.config['keys']:
+            self.config['keys']['ccontext'] = []
+        if not "crepeat" in self.config['keys']:
+            self.config['keys']['crepeat'] = []
 
         self.url_regex = re.compile("http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+")
 
@@ -386,6 +390,27 @@ class IdentiCurse(object):
                 self.status_bar.update_left("Favouriting Notice...")
                 id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['id']
                 self.conn.favorites_create(id)
+                self.status_bar.update_left("Doing Nothing.")
+            elif input == ord("e") or input in [ord(key) for key in self.config['keys']['crepeat']]:
+                self.status_bar.update_left("Repeating Notice...")
+                id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['id']
+                update = self.conn.statuses_retweet(id, source="IdentiCurse")
+                if isinstance(update, list):
+                    for notice in update:
+                        self.tabs[self.current_tab].timeline.insert(0, notice)
+                else:
+                    self.tabs[self.current_tab].timeline.insert(0, update)
+                self.tabs[self.current_tab].update_buffer()
+                self.status_bar.update_left("Doing Nothing.")
+            elif input == ord("c") or input in [ord(key) for key in self.config['keys']['ccontext']]:
+                self.status_bar.update_left("Loading Context...")
+                id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['id']
+                self.tabs.append(Context(self.conn, self.notice_window, id))
+                self.tabs[self.current_tab].active = False
+                self.current_tab = len(self.tabs) - 1
+                self.tabs[self.current_tab].active = True
+                self.tab_order.insert(0, self.current_tab)
+                self.tabs[self.current_tab].update()
                 self.status_bar.update_left("Doing Nothing.")
 
             y, x = self.screen.getmaxyx()
