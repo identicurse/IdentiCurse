@@ -221,18 +221,17 @@ class Timeline(Tab):
             if "direct" in self.timeline_type:
                 user = unicode("%s -> %s" % (n["sender"]["screen_name"], n["recipient"]["screen_name"]))
                 source_msg = ""
-                repeat_msg = ""
             else:
-                user = unicode(n["user"]["screen_name"])
+                if "retweeted_status" in n:
+                    user = "%s [ repeat bu %s ]" % (n["retweeted_status"]["user"]["screen_name"], n["user"]["screen_name"])
+                    n = n["retweeted_status"]
+                else:
+                    user = unicode(n["user"]["screen_name"])
                 raw_source_msg = "from %s" % (n["source"])
                 source_msg = self.html_regex.sub("", raw_source_msg)
                 repeat_msg = ""
                 if n["in_reply_to_status_id"] is not None:
                     source_msg += " [+]"
-                elif "retweeted_status" in n:
-                    source_msg += " [~]"
-                    user = unicode(n["retweeted_status"]["user"]["screen_name"])
-                    repeat_msg += " [ repeat by %s ]" % (n["user"]["screen_name"])
             locale.setlocale(locale.LC_TIME, 'C')  # hacky fix because statusnet uses english timestrings regardless of locale
             datetime_notice = datetime.datetime.strptime(n['created_at'], DATETIME_FORMAT)
             locale.setlocale(locale.LC_TIME, '') # other half of the hacky fix
@@ -247,15 +246,11 @@ class Timeline(Tab):
                 self.buffer[y] += ' ' * 3
 
             self.buffer[y] += user
-            self.buffer[y] += repeat_msg
-            self.buffer[y] += ' ' * (maxx - ((len(source_msg) + len(user) + len(repeat_msg) + (5 + len(str(c))))))
+            self.buffer[y] += ' ' * (maxx - ((len(source_msg) + len(user) + (5 + len(str(c))))))
             self.buffer[y] += source_msg
 
             try:
-                if "retweeted_status" in n:
-                    self.buffer.append(n['retweeted_status']['text'])
-                else:
-                    self.buffer.append(n['text'])
+                self.buffer.append(n['text'])
             except UnicodeDecodeError:
                 self.buffer.append("Caution: Terminal too shit to display this notice.")
 
