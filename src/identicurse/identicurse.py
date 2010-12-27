@@ -417,7 +417,10 @@ class IdentiCurse(object):
                 self.status_bar.update_left("Doing Nothing.")
             elif input == ord("c") or input in [ord(key) for key in self.config['keys']['ccontext']]:
                 self.status_bar.update_left("Loading Context...")
-                id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['id']
+                if "retweeted_status" in self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]:
+                    id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['retweeted_status']['id']
+                else:
+                    id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['id']
                 self.tabs.append(Context(self.conn, self.notice_window, id))
                 self.tabs[self.current_tab].active = False
                 self.current_tab = len(self.tabs) - 1
@@ -475,8 +478,12 @@ class IdentiCurse(object):
                                     user = user[1:]
                             id = 0  # this is not a reply to a dent
                         else:
-                            user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
-                            id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['id']
+                            if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
+                                user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["retweeted_status"]["user"]["screen_name"]
+                                id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['retweeted_status']['id']
+                            else:
+                                user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
+                                id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['id']
                         status = "@" + user + " " + " ".join(tokens[2:])
     
                         try:
@@ -486,12 +493,18 @@ class IdentiCurse(object):
     
                     elif tokens[0] == "/favourite" and len(tokens) == 2:
                         self.status_bar.update_left("Favouriting Notice...")
-                        id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['id']
+                        if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
+                            id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['retweeted_status']['id']
+                        else:
+                            id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['id']
                         self.conn.favorites_create(id)
     
                     elif tokens[0] == "/repeat" and len(tokens) == 2:
                         self.status_bar.update_left("Repeating Notice...")
-                        id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['id']
+                        if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
+                            id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['retweeted_status']['id']
+                        else:
+                            id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['id']
                         update = self.conn.statuses_retweet(id, source="IdentiCurse")
                         
                     elif tokens[0] == "/direct" and len(tokens) >= 3:
@@ -507,14 +520,20 @@ class IdentiCurse(object):
                             if "direct" in self.tabs[self.current_tab].timeline_type:
                                 screen_name = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['sender']['screen_name']
                             else:
-                                screen_name = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['user']['screen_name']
+                                if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
+                                    screen_name = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['retweeted_status']['user']['screen_name']
+                                else:
+                                    screen_name = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['user']['screen_name']
                         id = self.conn.users_show(screen_name=screen_name)['id']
                         
                         self.conn.direct_messages_new(screen_name, id, " ".join(tokens[2:]), source="IdentiCurse")
     
                     elif tokens[0] == "/delete" and len(tokens) == 2:
                         self.status_bar.update_left("Deleting Notice...")
-                        id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['id']
+                        if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
+                            id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['retweeted_status']['id']
+                        else:
+                            id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['id']
                         try:
                             self.conn.statuses_destroy(id)
                         except urllib2.HTTPError, e:
@@ -531,7 +550,10 @@ class IdentiCurse(object):
                             if user[0] == "@":
                                     user = user[1:]
                         else:
-                            user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
+                            if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
+                                user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["retweeted_status"]["user"]["screen_name"]
+                            else:
+                                user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
     
                         self.tabs.append(Profile(self.conn, self.notice_window,user))
                         self.tabs[self.current_tab].active = False
@@ -550,8 +572,12 @@ class IdentiCurse(object):
                                     username = username[1:]
                             id = self.conn.users_show(screen_name=username)['id']
                         else:
-                            id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['user']['id']
-                            username = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
+                            if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
+                                id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['retweeted_status']['user']['id']
+                                username = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1][["retweeted_status"]"user"]["screen_name"]
+                            else:
+                                id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['user']['id']
+                                username = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
                         status = "@support !sr @%s UID %d %s" % (username, id, " ".join(tokens[2:]))
                         update = self.conn.statuses_update(status, "IdentiCurse")
                         self.conn.blocks_create(user_id=id, screen_name=username)
@@ -568,8 +594,12 @@ class IdentiCurse(object):
                                     user = user[1:]
                                 id = self.conn.users_show(screen_name=user)['id']
                             else:
-                                user = self.tabs[self.current_tab].timeline[int(token) - 1]["user"]["screen_name"]
-                                id = self.tabs[self.current_tab].timeline[int(token) - 1]['user']['id']
+                                if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
+                                    user = self.tabs[self.current_tab].timeline[int(token) - 1]["retweeted_status"]["user"]["screen_name"]
+                                    id = self.tabs[self.current_tab].timeline[int(token) - 1]['retweeted_status']['user']['id']
+                                else:
+                                    user = self.tabs[self.current_tab].timeline[int(token) - 1]["user"]["screen_name"]
+                                    id = self.tabs[self.current_tab].timeline[int(token) - 1]['user']['id']
                             self.conn.blocks_create(user_id=id, screen_name=user)
     
                     elif tokens[0] == "/unblock" and len(tokens) >= 2:
@@ -584,8 +614,12 @@ class IdentiCurse(object):
                                     user = user[1:]
                                 id = self.conn.users_show(screen_name=user)['id']
                             else:
-                                user = self.tabs[self.current_tab].timeline[int(token) - 1]["user"]["screen_name"]
-                                id = self.tabs[self.current_tab].timeline[int(token) - 1]['user']['id']
+                                if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
+                                    user = self.tabs[self.current_tab].timeline[int(token) - 1]["retweeted_status"]["user"]["screen_name"]
+                                    id = self.tabs[self.current_tab].timeline[int(token) - 1]['retweeted_status']['user']['id']
+                                else:
+                                    user = self.tabs[self.current_tab].timeline[int(token) - 1]["user"]["screen_name"]
+                                    id = self.tabs[self.current_tab].timeline[int(token) - 1]['user']['id']
                             self.conn.blocks_destroy(user_id=id, screen_name=user)
     
                     elif tokens[0] == "/user" and len(tokens) == 2:
@@ -600,8 +634,12 @@ class IdentiCurse(object):
                                     user = user[1:]
                                 id = self.conn.users_show(screen_name=user)['id']
                             else:
-                                user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
-                                id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["id"]
+                                if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
+                                    user = self.tabs[self.current_tab].timeline[int(token) - 1]["retweeted_status"]["user"]["screen_name"]
+                                    id = self.tabs[self.current_tab].timeline[int(token) - 1]['retweeted_status']['user']['id']
+                                else:
+                                    user = self.tabs[self.current_tab].timeline[int(token) - 1]["user"]["screen_name"]
+                                    id = self.tabs[self.current_tab].timeline[int(token) - 1]['user']['id']
                             
                             self.tabs.append(Timeline(self.conn, self.notice_window, "user", {'user_id':id, 'screen_name':user}, notice_limit=self.config['notice_limit'], filters=self.config['filters']))
                             self.tabs[self.current_tab].active = False
@@ -614,7 +652,10 @@ class IdentiCurse(object):
     
                     elif tokens[0] == "/context" and len(tokens) == 2:
                         self.status_bar.update_left("Loading Context...")
-                        id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["id"]
+                        if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
+                            id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["retweeted_status"]["id"]
+                        else:
+                            id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["id"]
     
                         self.tabs.append(Context(self.conn, self.notice_window, id))
                         self.tabs[self.current_tab].active = False
@@ -633,8 +674,12 @@ class IdentiCurse(object):
                                     user = user[1:]
                             id = self.conn.users_show(screen_name=user)['id']
                         else:
-                            user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
-                            id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["id"]
+                            if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
+                                user = self.tabs[self.current_tab].timeline[int(token) - 1]["retweeted_status"]["user"]["screen_name"]
+                                id = self.tabs[self.current_tab].timeline[int(token) - 1]['retweeted_status']['user']['id']
+                            else:
+                                user = self.tabs[self.current_tab].timeline[int(token) - 1]["user"]["screen_name"]
+                                id = self.tabs[self.current_tab].timeline[int(token) - 1]['user']['id']
     
                         self.conn.friendships_create(user_id=id, screen_name=user)
                         
@@ -649,8 +694,12 @@ class IdentiCurse(object):
                                     user = user[1:]
                             id = self.conn.users_show(screen_name=user)['id']
                         else:
-                            user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
-                            id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["id"]
+                            if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
+                                user = self.tabs[self.current_tab].timeline[int(token) - 1]["retweeted_status"]["user"]["screen_name"]
+                                id = self.tabs[self.current_tab].timeline[int(token) - 1]['retweeted_status']['user']['id']
+                            else:
+                                user = self.tabs[self.current_tab].timeline[int(token) - 1]["user"]["screen_name"]
+                                id = self.tabs[self.current_tab].timeline[int(token) - 1]['user']['id']
     
                         self.conn.friendships_destroy(user_id=id, screen_name=user)
     
@@ -775,12 +824,19 @@ class IdentiCurse(object):
                         dent_index = int(tokens[2]) - 1
                         if tokens[1] == "*":
                             self.status_bar.update_left("Opening links...")
-                            for target_url in self.url_regex.findall(self.tabs[self.current_tab].timeline[dent_index]['text']):
-                                subprocess.Popen(self.config['browser'] % (target_url), shell=True, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
+                            if "retweeted_status" in self.tabs[self.current_tab].timeline[dent_index]:
+                                for target_url in self.url_regex.findall(self.tabs[self.current_tab].timeline[dent_index]['retweeted_status']['text']):
+                                    subprocess.Popen(self.config['browser'] % (target_url), shell=True, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
+                            else:
+                                for target_url in self.url_regex.findall(self.tabs[self.current_tab].timeline[dent_index]['text']):
+                                    subprocess.Popen(self.config['browser'] % (target_url), shell=True, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
                         else:
                             self.status_bar.update_left("Opening link...")
                             link_index = int(tokens[1]) - 1
-                            target_url = self.url_regex.findall(self.tabs[self.current_tab].timeline[dent_index]['text'])[link_index]
+                            if "retweeted_status" in self.tabs[self.current_tab].timeline[dent_index]:
+                                target_url = self.url_regex.findall(self.tabs[self.current_tab].timeline[dent_index]['retweeted_status']['text'])[link_index]
+                            else:
+                                target_url = self.url_regex.findall(self.tabs[self.current_tab].timeline[dent_index]['text'])[link_index]
                             subprocess.Popen(self.config['browser'] % (target_url), shell=True, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
 
                     elif tokens[0] == "/bugreport" and len(tokens) >= 2:
