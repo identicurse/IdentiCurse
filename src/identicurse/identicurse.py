@@ -574,7 +574,7 @@ class IdentiCurse(object):
                         else:
                             if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
                                 id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['retweeted_status']['user']['id']
-                                username = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1][["retweeted_status"]"user"]["screen_name"]
+                                username = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["retweeted_status"]["user"]["screen_name"]
                             else:
                                 id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['user']['id']
                                 username = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
