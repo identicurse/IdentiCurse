@@ -1,14 +1,20 @@
 New for 0.5:
  - New slogans.
  - Directs can now be sent by notice number as well as by name.
- - Basic in-page search is now available (still needs to be documented before 0.5 release).
- - Dents that begin with / but aren't commands  will now be sent as normal dents.
+ - In-page search, activated with / key. n/N can be used to quickly move between matches.
+ - Dents that begin with / but aren't commands will now be sent as normal dents.
  - /reply in DM tabs is treated as /direct, to prevent messages intended to be private from accidentally being sent publicly.
+ - Tab-switching is now keys < and >.
  - Quick Reply: Can now type 'l' then a number between 1-9 to quickly reply to that dent.
- - Current Reply: Can now type 'd' to reply to the currently selected dent. Use 'a' and 's' to switch current dent. (and f for fav)
+ - Current Reply, Current Favourite, Current Repeat, and Current Context: Can now type 'd' to reply to the currently selected dent, 'f' to favourite it, 'e' to repeat it, or 'c' to view its context. Use 'a' and 's' to switch current dent, or 'z' to switch back to the first dent in the current page.
  - Can now press = to go back to the top of the newest page (in paged tabs).
  - Page number indicator in tab names.
- - Character counter for insert mode
+ - Character counter for insert mode.
+ - Slogans will now be read from ~/.identicurse_slogans (see README for format details) if it exists.
+ - Repeats are now displayed and handled the same as their source dent (except that the user section of the dent gains a "repeat by" section on repeats).
+ - Bugfixes for:
+      - Split statuses cause crashes if set to preserve the first word (i.e., replies, bug reports, and feature requests).
+      - Timestamp is " ago" if the dent was created within a second of current time. (Fixed timestamp in this situation is "Now".)
 
 New for 0.4:
  - Tabs know if they are active, so the display can be updated for the active tab as soon as its data is finished updating.
