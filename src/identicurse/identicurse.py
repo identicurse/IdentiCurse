@@ -411,7 +411,10 @@ class IdentiCurse(object):
         self.quit();
 
     def validate(self, character_count):
-        self.status_bar.update_left("Insert Mode: " + str(character_count))
+        if self.conn.length_limit == 0:
+            self.status_bar.update_left("Insert Mode: " + str(character_count))
+        else:
+            self.status_bar.update_left("Insert Mode: " + str(self.conn.length_limit - character_count))
 
     def parse_input(self, input):
         update = False
