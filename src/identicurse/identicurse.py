@@ -624,31 +624,27 @@ class IdentiCurse(object):
     
                     elif tokens[0] == "/user" and len(tokens) == 2:
                         self.status_bar.update_left("Loading User Timeline...")
+                        # Yeuch
                         try:
-                            # Yeuch
-                            try:
-                                float(tokens[1])
-                            except ValueError:
-                                user = tokens[1]
-                                if user[0] == "@":
-                                    user = user[1:]
-                                id = self.conn.users_show(screen_name=user)['id']
+                            float(tokens[1])
+                        except ValueError:
+                            user = tokens[1]
+                            if user[0] == "@":
+                                user = user[1:]
+                            id = self.conn.users_show(screen_name=user)['id']
+                        else:
+                            if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
+                                user = self.tabs[self.current_tab].timeline[int(token) - 1]["retweeted_status"]["user"]["screen_name"]
+                                id = self.tabs[self.current_tab].timeline[int(token) - 1]['retweeted_status']['user']['id']
                             else:
-                                if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
-                                    user = self.tabs[self.current_tab].timeline[int(token) - 1]["retweeted_status"]["user"]["screen_name"]
-                                    id = self.tabs[self.current_tab].timeline[int(token) - 1]['retweeted_status']['user']['id']
-                                else:
-                                    user = self.tabs[self.current_tab].timeline[int(token) - 1]["user"]["screen_name"]
-                                    id = self.tabs[self.current_tab].timeline[int(token) - 1]['user']['id']
-                            
-                            self.tabs.append(Timeline(self.conn, self.notice_window, "user", {'user_id':id, 'screen_name':user}, notice_limit=self.config['notice_limit'], filters=self.config['filters']))
-                            self.tabs[self.current_tab].active = False
-                            self.current_tab = len(self.tabs) - 1
-                            self.tabs[self.current_tab].active = True
-                            self.tab_order.insert(0, self.current_tab)
-                        except urllib2.HTTPError, e:
-                            if e.code == 404:
-                                self.status_bar.timed_update_left("ERROR: Couldn't open timeline: No such user")
+                                user = self.tabs[self.current_tab].timeline[int(token) - 1]["user"]["screen_name"]
+                                id = self.tabs[self.current_tab].timeline[int(token) - 1]['user']['id']
+                        
+                        self.tabs.append(Timeline(self.conn, self.notice_window, "user", {'user_id':id, 'screen_name':user}, notice_limit=self.config['notice_limit'], filters=self.config['filters']))
+                        self.tabs[self.current_tab].active = False
+                        self.current_tab = len(self.tabs) - 1
+                        self.tabs[self.current_tab].active = True
+                        self.tab_order.insert(0, self.current_tab)
     
                     elif tokens[0] == "/context" and len(tokens) == 2:
                         self.status_bar.update_left("Loading Context...")
