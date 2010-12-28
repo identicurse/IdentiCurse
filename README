@@ -35,18 +35,23 @@ are at this screen, you can press various keys to do the following:
     7               Switch to tab 7 (no initial tab).
     8               Switch to tab 8 (no initial tab).
     9               Switch to tab 9 (no initial tab).
-    p               Switch to the previous tab.
-    n               Switch to the next tab.
+    <               Switch to the previous tab.
+    >               Switch to the next tab.
     x               Close the currently visible tab.
     r               Refresh.
     q               Quit IdentiCurse.
     h               Open a tab that displays this README.
     i               Switch to text entry mode.
+    /               Do an in-page search.
+    n               Move to the next match for most recent in-page search query.
+    N               Move to the previous match for most recent in-page search query.
     l               Followed by a number between 1 and 9 to quickly reply to that notice on the timeline.
-    d               Reply to currently selected dent
-    f               Favourite currently selected dent
-    s               Move selected dent down (indicated by * character)
-    a               Move selected dent up (indicated by * character)
+    d               Reply to currently selected dent.
+    f               Favourite currently selected dent.
+    e               Repeat currently selected dent.
+    c               View context for currently selected dent.
+    s               Move selected dent down (indicated by * character).
+    a               Move selected dent up (indicated by * character).
     UP or k         Scroll up one line (in the current tab).
     DOWN or j       Scroll down one line (in the current tab).
     PgUp or b       Scroll up one screen (in the current tab).
@@ -329,6 +334,7 @@ The full range of keys you can set custom bindings for is as follows:
     pagedown       Scroll down one screen.
     scrolltop      Scroll right to the top of the current page.
     scrollbottom   Scroll right to the bottom of the current page.
+    firstpage      Move to the newest page.
     newerpage      Move to a newer page.
     olderpage      Move to an older page.
     refresh        Refresh.
@@ -338,6 +344,18 @@ The full range of keys you can set custom bindings for is as follows:
     nexttab        Move to the next tab.
     prevtab        Move to the previous tab.
     help           Show the help.
+    search         Start an in-page search.
+    qreply         Start a reply to the notice with notice number
+                   entered immediately after this key.
+    cfirst         Move selected notice to first on current page.
+    cnext          Move selected notice down.
+    cprev          Move selected notice up.
+    creply         Reply to selected notice.
+    cfav           Favourite selected notice.
+    crepeat        Repeat selected notice.
+    ccontext       View context for selected notice.
+    nextmatch      Move to next match for in-page search.
+    prevmatch      Move to previous match for in-page search.
 
 Link opening:
 When opening a link, IdentiCurse will attempt to use your choice of
