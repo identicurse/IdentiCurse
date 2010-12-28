@@ -331,7 +331,10 @@ class IdentiCurse(object):
             elif input == ord("i") or input in [ord(key) for key in self.config['keys']['input']]:
                 self.update_timer.cancel()
                 self.insert_mode = True
-                self.status_bar.update_left("Insert Mode: 0")
+                if self.conn.length_limit == 0:
+                    self.status_bar.update_left("Insert Mode: 0")
+                else:
+                    self.status_bar.update_left("Insert Mode: " + str(self.conn.length_limit))
                 self.parse_input(self.text_entry.edit())
             elif input == ord("/") or input in [ord(key) for key in self.config['keys']['search']]:
                 self.update_timer.cancel()
