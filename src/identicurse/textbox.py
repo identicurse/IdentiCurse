@@ -62,7 +62,10 @@ class Textbox(textpad.Textbox):
         count = 0
         for y in range(self.maxy+1):
             self.win.move(y, 0)
-            stop = self._end_of_line(y)
+            if (y == cursor_position[0]) and (cursor_position[1] > self._end_of_line(y)):
+                stop = cursor_position[1]
+            else:
+                stop = self._end_of_line(y)
             if stop != 0:
                 count -= 1
             else:
