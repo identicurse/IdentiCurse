@@ -372,3 +372,11 @@ example that you want to open URLs/links using the Elinks text
 browser.  In this case the following configuration line should work:
 
     "browser": "screen elinks '%s'"
+
+Personalised slogans:
+If you'd rather use your own slogans instead of the built-in ones,
+you'll need to create a file called .identicurse_slogans in your home
+directory. In this file, you should place slogans, one per line. These
+will then be displayed on starting IdentiCurse. The default slogans
+will not be used in this case, so if there are any you want to keep,
+you will need to add them to your slogans file.
