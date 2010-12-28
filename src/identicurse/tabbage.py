@@ -223,7 +223,7 @@ class Timeline(Tab):
                 source_msg = ""
             else:
                 if "retweeted_status" in n:
-                    user = "%s [ repeat bu %s ]" % (n["retweeted_status"]["user"]["screen_name"], n["user"]["screen_name"])
+                    user = "%s [ repeat by %s ]" % (n["retweeted_status"]["user"]["screen_name"], n["user"]["screen_name"])
                     n = n["retweeted_status"]
                 else:
                     user = unicode(n["user"]["screen_name"])
