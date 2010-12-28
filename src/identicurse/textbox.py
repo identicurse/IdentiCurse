@@ -29,8 +29,7 @@ class Textbox(textpad.Textbox):
     def edit(self, initial_input=""):
         for char in list(initial_input):
             self.do_command(char)
-        if initial_input != "":
-            self.poll_function(self.count())
+        self.poll_function(self.count())
 
         abort = False
         while 1:
@@ -66,6 +65,8 @@ class Textbox(textpad.Textbox):
             stop = self._end_of_line(y)
             if stop != 0:
                 count -= 1
+            else:
+                return 0
             for x in range(self.maxx+1):
                 if self.stripspaces and x > stop:
                     break
