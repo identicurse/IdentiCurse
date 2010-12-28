@@ -8,6 +8,7 @@ New for 0.5:
  - Current Reply: Can now type 'd' to reply to the currently selected dent. Use 'a' and 's' to switch current dent. (and f for fav)
  - Can now press = to go back to the top of the newest page (in paged tabs).
  - Page number indicator in tab names.
+ - Character counter for insert mode
 
 New for 0.4:
  - Tabs know if they are active, so the display can be updated for the active tab as soon as its data is finished updating.
