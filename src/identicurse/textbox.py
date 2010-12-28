@@ -29,7 +29,8 @@ class Textbox(textpad.Textbox):
     def edit(self, initial_input=""):
         for char in list(initial_input):
             self.do_command(char)
-        self.poll_function(self.count())
+        if initial_input != "":
+            self.poll_function(self.count())
 
         abort = False
         while 1:
