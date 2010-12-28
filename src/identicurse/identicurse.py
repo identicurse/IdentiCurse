@@ -94,7 +94,6 @@ class IdentiCurse(object):
             self.config['notice_limit'] = 25
         if not "browser" in self.config:
             self.config['browser'] = "xdg-open '%s'"
-
         if not "keys" in self.config:
             self.config['keys'] = {}
         if not "scrollup" in self.config['keys']:
@@ -109,45 +108,15 @@ class IdentiCurse(object):
             self.config['keys']['scrollbottom'] = ['G']
         if not "pagedown" in self.config['keys']:
             self.config['keys']['pagedown'] = [' ']
-        if not "firstpage" in self.config['keys']:
-            self.config['keys']['firstpage'] = []
-        if not "newerpage" in self.config['keys']:
-            self.config['keys']['newerpage'] = []
-        if not "olderpage" in self.config['keys']:
-            self.config['keys']['olderpage'] = []
-        if not "refresh" in self.config['keys']:
-            self.config['keys']['refresh'] = []
-        if not "input" in self.config['keys']:
-            self.config['keys']['input'] = []
-        if not "search" in self.config['keys']:
-            self.config['keys']['search'] = []
-        if not "quit" in self.config['keys']:
-            self.config['keys']['quit'] = []
-        if not "closetab" in self.config['keys']:
-            self.config['keys']['closetab'] = []
-        if not "help" in self.config['keys']:
-            self.config['keys']['help'] = []
-        if not "nexttab" in self.config['keys']:
-            self.config['keys']['nexttab'] = []
-        if not "prevtab" in self.config['keys']:
-            self.config['keys']['prevtab'] = []
-        if not "qreply" in self.config['keys']:
-            self.config['keys']['qreply'] = []
-        if not "creply" in self.config['keys']:
-            self.config['keys']['creply'] = []
-        if not "cfav" in self.config['keys']:
-            self.config['keys']['cfav'] = []
-        if not "ccontext" in self.config['keys']:
-            self.config['keys']['ccontext'] = []
-        if not "crepeat" in self.config['keys']:
-            self.config['keys']['crepeat'] = []
-        if not "cnext" in self.config['keys']:
-            self.config['keys']['cnext'] = []
-        if not "cprev" in self.config['keys']:
-            self.config['keys']['cprev'] = []
-        if not "cfirst" in self.config['keys']:
-            self.config['keys']['cfirst'] = []
 
+        empty_default_keys = ("firstpage", "newerpage", "olderpage", "refresh",
+            "input", "search", "quit", "closetab", "help", "nexttab", "prevtab",
+            "qreply", "creply", "cfav", "ccontext", "crepeat", "cnext", "cprev",
+            "cfirst")
+
+        for k in empty_default_keys:
+            self.config['keys'][k] = []
+        
         self.url_regex = re.compile("http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+")
 
         try:
