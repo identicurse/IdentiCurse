@@ -20,12 +20,13 @@ your distribution does not provide a package (instructions for which
 will not be given here).  The package name for setuptools in various
 distributions is known to be:
 
-	python-setuptools   in	Fedora, Ubuntu, Debian, openSUSE
-	python2-distribute  in	Arch
-	setuptools	    in	Slackware
-	
-	(if your distribution of choice is not in this list yet,
-	feel free to inform us of the correct package name)
+        python-setuptools   in  Fedora, Ubuntu, Debian, openSUSE
+        python2-distribute  in  Arch
+        setuptools          in  Slackware
+        devel/py-setuptools in  OpenBSD
+        
+        (if your distribution of choice is not in this list yet,
+        feel free to inform us of the correct package name)
 
 Once you have setuptools installed, you can proceed with the install
 as above.
