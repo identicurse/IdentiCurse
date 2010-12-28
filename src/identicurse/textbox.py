@@ -19,11 +19,12 @@ import curses
 from curses import textpad
 
 class Textbox(textpad.Textbox):
-    def __init__(self, win, insert_mode=False):
+    def __init__(self, win, poll, insert_mode=False):
         try:
             textpad.Textbox.__init__(self, win, insert_mode)
         except TypeError:  # python 2.5 didn't support insert_mode
             textpad.Textbox.__init__(self, win)
+        self.poll_function = poll
 
     def edit(self, initial_input=""):
         for char in list(initial_input):
@@ -47,9 +48,25 @@ class Textbox(textpad.Textbox):
             elif not self.do_command(ch):
                 break
 
+            self.poll_function(self.count())
             self.win.refresh()
 
         if abort == False:
             return self.gather()
         else:
             return None
+
+    def count(self):
+        cursor_position = self.win.getyx()
+        count = 0
+        for y in range(self.maxy+1):
+            self.win.move(y, 0)
+            stop = self._end_of_line(y)
+            if stop != 0:
+                count -= 1
+            for x in range(self.maxx+1):
+                if self.stripspaces and x > stop:
+                    break
+                count += 1
+        self.win.move(cursor_position[0], cursor_position[1])
+        return count

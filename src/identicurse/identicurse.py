@@ -175,7 +175,7 @@ class IdentiCurse(object):
 
         self.entry_window = self.main_window.subwin(entry_lines, x-10, 4, 5)
 
-        self.text_entry = Textbox(self.entry_window, insert_mode=True)
+        self.text_entry = Textbox(self.entry_window, self.validate, insert_mode=True)
 
         self.text_entry.stripspaces = 1
         self.notice_window = self.main_window.subwin(y-7, x-4, 5 + entry_lines, 5)
@@ -362,6 +362,7 @@ class IdentiCurse(object):
             elif input == ord("i") or input in [ord(key) for key in self.config['keys']['input']]:
                 self.update_timer.cancel()
                 self.insert_mode = True
+                self.status_bar.update_left("Insert Mode: 0")
                 self.parse_input(self.text_entry.edit())
             elif input == ord("/") or input in [ord(key) for key in self.config['keys']['search']]:
                 self.update_timer.cancel()
@@ -439,6 +440,9 @@ class IdentiCurse(object):
             self.main_window.refresh()
 
         self.quit();
+
+    def validate(self, character_count):
+        self.status_bar.update_left("Insert Mode: " + str(character_count))
 
     def parse_input(self, input):
         update = False
@@ -876,7 +880,7 @@ class IdentiCurse(object):
           
 
         self.entry_window.clear()
-        self.text_entry = Textbox(self.entry_window, insert_mode=True)
+        self.text_entry = Textbox(self.entry_window, self.validate, insert_mode=True)
         self.text_entry.stripspaces = 1
         self.display_current_tab()
         self.status_bar.update_left("Doing nothing.")
@@ -922,7 +926,7 @@ class IdentiCurse(object):
                     self.last_page_search = {'query':"", 'occurs':[], 'viewing':0}  # reset to no search
 
         self.entry_window.clear()
-        self.text_entry = Textbox(self.entry_window, insert_mode=True)
+        self.text_entry = Textbox(self.entry_window, self.validate, insert_mode=True)
         self.text_entry.stripspaces = 1
         self.display_current_tab()
         self.insert_mode = False
