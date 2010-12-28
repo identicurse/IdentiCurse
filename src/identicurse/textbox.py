@@ -69,7 +69,7 @@ class Textbox(textpad.Textbox):
             if stop != 0:
                 count -= 1
             else:
-                return 0
+                break
             for x in range(self.maxx+1):
                 if self.stripspaces and x > stop:
                     break
