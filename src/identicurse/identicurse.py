@@ -125,6 +125,7 @@ class IdentiCurse(object):
             sys.exit("ERROR: Couldn't establish connection: %s" % (errmsg))
 
         self.insert_mode = False
+        self.search_mode = False
         curses.wrapper(self.initialise)
 
     def redraw(self):
@@ -336,6 +337,7 @@ class IdentiCurse(object):
             elif input == ord("/") or input in [ord(key) for key in self.config['keys']['search']]:
                 self.update_timer.cancel()
                 self.insert_mode = True
+                self.search_mode = True
                 self.parse_search(self.text_entry.edit())
             elif input == ord("q") or input in [ord(key) for key in self.config['keys']['quit']]:
                 running = False
@@ -411,10 +413,16 @@ class IdentiCurse(object):
         self.quit();
 
     def validate(self, character_count):
-        if self.conn.length_limit == 0:
-            self.status_bar.update_left("Insert Mode: " + str(character_count))
+        if not self.search_mode:
+            if self.conn.length_limit == 0:
+                self.status_bar.update_left("Insert Mode: " + str(character_count))
+            else:
+                self.status_bar.update_left("Insert Mode: " + str(self.conn.length_limit - character_count))
         else:
-            self.status_bar.update_left("Insert Mode: " + str(self.conn.length_limit - character_count))
+            if self.last_page_search['query'] != "":
+                self.status_bar.update_left("In-page Search (last search: '%s')" % (self.last_page_search['query']))
+            else:
+                self.status_bar.update_left("In-page Search")
 
     def parse_input(self, input):
         update = False
@@ -902,6 +910,7 @@ class IdentiCurse(object):
         self.text_entry.stripspaces = 1
         self.display_current_tab()
         self.insert_mode = False
+        self.search_mode = False
         self.update_timer = Timer(self.config['update_interval'], self.update_tabs)
         self.update_timer.start()
 
