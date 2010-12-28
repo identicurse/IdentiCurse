@@ -48,7 +48,7 @@ class IdentiCurse(object):
         except:
             sys.exit("ERROR: Couldn't read config file.")
 
-        self.last_page_search = {'query':"", 'occurs':[], 'viewing':0}
+        self.last_page_search = {'query':"", 'occurs':[], 'viewing':0, 'tab':-1}
 
         # prepare the known commands list
         self.known_commands = [
@@ -112,7 +112,7 @@ class IdentiCurse(object):
         empty_default_keys = ("firstpage", "newerpage", "olderpage", "refresh",
             "input", "search", "quit", "closetab", "help", "nexttab", "prevtab",
             "qreply", "creply", "cfav", "ccontext", "crepeat", "cnext", "cprev",
-            "cfirst")
+            "cfirst", "nextmatch", "prevmatch")
 
         for k in empty_default_keys:
             self.config['keys'][k] = []
@@ -274,10 +274,10 @@ class IdentiCurse(object):
                 for x in range(0, len(self.tabs)):
                     if input == ord(str(x+1)):
                         switch_to_tab = x
-                if input == ord("n") or input in [ord(key) for key in self.config['keys']['nexttab']]:
+                if input == ord(">") or input in [ord(key) for key in self.config['keys']['nexttab']]:
                     if self.current_tab < (len(self.tabs) - 1):
                         switch_to_tab = self.current_tab + 1
-                elif input == ord("p") or input in [ord(key) for key in self.config['keys']['prevtab']]:
+                elif input == ord("<") or input in [ord(key) for key in self.config['keys']['prevtab']]:
                     if self.current_tab >= 1:
                         switch_to_tab = self.current_tab - 1
 
@@ -403,6 +403,30 @@ class IdentiCurse(object):
                 self.tab_order.insert(0, self.current_tab)
                 self.tabs[self.current_tab].update()
                 self.status_bar.update_left("Doing Nothing.")
+            elif input == ord("n") or input in [ord(key) for key in self.config['keys']['nextmatch']]:
+                if (self.last_page_search['query'] != "") and (self.last_page_search['tab'] == self.current_tab):
+                    if self.last_page_search['viewing'] < (len(self.last_page_search['occurs']) - 1):
+                        self.last_page_search['viewing'] += 1
+                    else:
+                        self.last_page_search['viewing'] = 0
+                    self.tabs[self.current_tab].scrollto(self.last_page_search['occurs'][self.last_page_search['viewing']])
+                    if self.last_page_search['viewing'] == 0:
+                        self.status_bar.update_left("Viewing result #%d for '%s' (search hit BOTTOM, continuing at TOP)" % (self.last_page_search['viewing'] + 1, self.last_page_search['query']))
+                    else:
+                        self.status_bar.update_left("Viewing result #%d for '%s'" % (self.last_page_search['viewing'] + 1, self.last_page_search['query']))
+                    self.display_current_tab()
+            elif input == ord("N") or input in [ord(key) for key in self.config['keys']['prevmatch']]:
+                if (self.last_page_search['query'] != "") and (self.last_page_search['tab'] == self.current_tab):
+                    if self.last_page_search['viewing'] > 0:
+                        self.last_page_search['viewing'] -= 1
+                    else:
+                        self.last_page_search['viewing'] = len(self.last_page_search['occurs']) - 1
+                    self.tabs[self.current_tab].scrollto(self.last_page_search['occurs'][self.last_page_search['viewing']])
+                    if self.last_page_search['viewing'] == (len(self.last_page_search['occurs']) - 1):
+                        self.status_bar.update_left("Viewing result #%d for '%s' (search hit TOP, continuing at BOTTOM)" % (self.last_page_search['viewing'] + 1, self.last_page_search['query']))
+                    else:
+                        self.status_bar.update_left("Viewing result #%d for '%s'" % (self.last_page_search['viewing'] + 1, self.last_page_search['query']))
+                    self.display_current_tab()
 
             y, x = self.screen.getmaxyx()
             if y != self.y or x != self.x:
@@ -876,7 +900,7 @@ class IdentiCurse(object):
             query = query.rstrip()
             if query == "":
                 query = self.last_page_search['query']
-            if (self.last_page_search['query'] == query) and not (query == ""):
+            if (self.last_page_search['query'] == query) and not (query == "") and (self.last_page_search['tab'] == self.current_tab):
                 # this is a continued search
                 if self.last_page_search['viewing'] < (len(self.last_page_search['occurs']) - 1):
                     self.last_page_search['viewing'] += 1
@@ -890,7 +914,7 @@ class IdentiCurse(object):
                 maxx = self.tabs[self.current_tab].window.getmaxyx()[1]
                 search_buffer = self.tabs[self.current_tab].buffer.reflowed(maxx - 2)
 
-                page_search = {'query':query, 'occurs':[], 'viewing':0}
+                page_search = {'query':query, 'occurs':[], 'viewing':0, 'tab':self.current_tab}
                 
                 for line_index in range(len(search_buffer)):
                     if self.config['search_case_sensitive'] == "sensitive":
@@ -906,7 +930,7 @@ class IdentiCurse(object):
                     self.last_page_search = page_search  # keep this search
                 else:
                     self.status_bar.update_left("No results for '%s'" % (query))
-                    self.last_page_search = {'query':"", 'occurs':[], 'viewing':0}  # reset to no search
+                    self.last_page_search = {'query':"", 'occurs':[], 'viewing':0, 'tab':-1}  # reset to no search
 
         self.entry_window.clear()
         self.text_entry = Textbox(self.entry_window, self.validate, insert_mode=True)
