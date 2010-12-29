@@ -372,12 +372,18 @@ class IdentiCurse(object):
                     self.tabs[self.current_tab].scrolltodent(self.tabs[self.current_tab].chosen_one)
             elif input == ord("f") or input in [ord(key) for key in self.config['keys']['cfav']]:
                 self.status_bar.update_left("Favouriting Notice...")
-                id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['id']
+                if "retweeted_status" in self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]:
+                    id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['retweeted_status']['id']
+                else:
+                    id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['id']
                 self.conn.favorites_create(id)
                 self.status_bar.update_left("Doing Nothing.")
             elif input == ord("e") or input in [ord(key) for key in self.config['keys']['crepeat']]:
                 self.status_bar.update_left("Repeating Notice...")
-                id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['id']
+                if "retweeted_status" in self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]:
+                    id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['retweeted_status']['id']
+                else:
+                    id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['id']
                 update = self.conn.statuses_retweet(id, source="IdentiCurse")
                 if isinstance(update, list):
                     for notice in update:
