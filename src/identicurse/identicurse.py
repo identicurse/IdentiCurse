@@ -94,6 +94,8 @@ class IdentiCurse(object):
             self.config['notice_limit'] = 25
         if not "browser" in self.config:
             self.config['browser'] = "xdg-open '%s'"
+        if not "border" in self.config:
+            self.config['border'] = True
         if not "keys" in self.config:
             self.config['keys'] = {}
         if not "scrollup" in self.config['keys']:
@@ -132,9 +134,12 @@ class IdentiCurse(object):
         self.screen.erase()
         self.y, self.x = self.screen.getmaxyx()
 
-        self.main_window = self.screen.subwin(self.y-2, self.x-3, 2, 2)
+        if self.config['border']:
+            self.main_window = self.screen.subwin(self.y-3, self.x-3, 2, 2)
+            self.main_window.box(0, 0)
+        else:
+            self.main_window = self.screen.subwin(self.y-1, self.x-1, 1, 1)
         self.main_window.keypad(1)
-        self.main_window.box(0, 0)
 
         y, x = self.main_window.getmaxyx()
 
@@ -143,19 +148,28 @@ class IdentiCurse(object):
         else:
             entry_lines = (self.conn.length_limit / x) + 1
 
-        self.entry_window = self.main_window.subwin(entry_lines, x-10, 4, 5)
+        if self.config['border']:
+            self.entry_window = self.main_window.subwin(entry_lines, x-10, 4, 5)
+        else:
+            self.entry_window = self.main_window.subwin(entry_lines, x-1, 1, 1)
 
         self.text_entry = Textbox(self.entry_window, self.validate, insert_mode=True)
 
         self.text_entry.stripspaces = 1
-        self.notice_window = self.main_window.subwin(y-7, x-4, 5 + entry_lines, 5)
+        if self.config['border']:
+            self.notice_window = self.main_window.subwin(y-7, x-4, 5 + entry_lines, 5)
+        else:
+            self.notice_window = self.main_window.subwin(y-2, x, 2 + entry_lines, 1)
 
         # I don't like this, but it looks like it has to be done
         if hasattr(self, 'tabs'):
             for tab in self.tabs:
                 tab.window = self.notice_window
 
-        self.status_window = self.main_window.subwin(1, x-4, y, 5)
+        if self.config['border']:
+            self.status_window = self.main_window.subwin(1, x-4, y, 5)
+        else:
+            self.status_window = self.main_window.subwin(1, x, y, 1)
         if hasattr(self, 'status_bar'):
             self.status_bar.window = self.status_window
 
