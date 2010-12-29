@@ -3,10 +3,10 @@ BASIC CONFIGURATION
 Important note:
 IdentiCurse looks for your config file in two locations. First it
 checks .identicurse in your home directory, and then it checks
-config.json in the current directory. It is highly recommended that
-you copy the supplied config.json to $HOME and rename it to
-.identicurse before modifying, as that way future updates will not
-erase any customisation you have made.
+config.json in its installed directory. It is highly recommended that
+you copy the supplied config.json (found in conf/ in the tarball) to
+$HOME and rename it to .identicurse before modifying, as that way
+future updates will not erase any customisation you have made.
 
 Before using IdentiCurse, you must configure it with your account
 login credentials. To do so, edit your config file in your favourite
@@ -26,10 +26,10 @@ load (this delay is due to fetching all the initial dents). Once you
 are at this screen, you can press various keys to do the following:
     
     KEY             ACTION
-    1               Switch to tab 1 (initial default: Personal Timeline).
-    2               Switch to tab 2 (initial default: Mentions).
-    3               Switch to tab 3 (initial default: Direct Message Inbox).
-    4               Switch to tab 4 (initial default: Public Timeline).
+    1               Switch to tab 1 (initial tab: Personal Timeline).
+    2               Switch to tab 2 (initial tab: Mentions).
+    3               Switch to tab 3 (initial tab: DM Inbox).
+    4               Switch to tab 4 (initial tab: Public Timeline).
     5               Switch to tab 5 (no initial tab).
     6               Switch to tab 6 (no initial tab).
     7               Switch to tab 7 (no initial tab).
@@ -43,9 +43,10 @@ are at this screen, you can press various keys to do the following:
     h               Open a tab that displays this README.
     i               Switch to text entry mode.
     /               Do an in-page search.
-    n               Move to the next match for most recent in-page search query.
-    N               Move to the previous match for most recent in-page search query.
-    l               Followed by a number between 1 and 9 to quickly reply to that notice on the timeline.
+    n               Move to the next match for latest in-page search.
+    N               Move to the previous match for latest in-page search.
+    l               Followed by a number between 1 and 9,
+                     quickly reply to that notice on the timeline.
     d               Reply to currently selected dent.
     f               Favourite currently selected dent.
     e               Repeat currently selected dent.
@@ -58,9 +59,9 @@ are at this screen, you can press various keys to do the following:
     PgDn or SPACE   Scroll down one screen (in the current tab).
     HOME or g       Scroll to the top of the current page.
     END or G        Scroll to the bottom of the current page.
-    =               Move to the newest page (in the current tab, timelines only).
-    LEFT            Move to a newer page (in the current tab, timelines only).
-    RIGHT           Move to an older page (in the current tab, timelines only).
+    =               Move to the newest page (in current timeline tab).
+    LEFT            Move to a newer page (in current timeline tab).
+    RIGHT           Move to an older page (in current timeline tab).
 
 The secondary keys listed above are configurable, and the choices
 listed are only the defaults. See the 'ADVANCED CONFIGURATION, Key
@@ -69,12 +70,12 @@ that key shortcuts are case-sensitive - g indicates a press of the G
 key without shift, G a press of it with shift.
 
 In text entry mode, the above key shortcuts are not available.
-Instead, you type a message directly into the text entry field,
-and then press enter to submit. A plain message will simply be
-posted as a normal dent, but you can also use various commands by
-starting the message with a / (for example "/reply 1 Hello!" would
-trigger the /reply command rather than post "/reply 1 Hello!"  as a
-dent). Available commands are as follows:
+Instead, you type a message directly into the text entry field, and
+then press enter to submit. A plain message will simply be posted as a
+normal dent, but you can also use various commands by starting the
+message with a / (for example "/reply 1 Hello!" would trigger the
+/reply command rather than post "/reply 1 Hello!"  as a dent).
+Available commands are as follows:
 
 /reply [notice number] [message]                (aliases: /r)
    This will create a reply to the notice in your current view with
@@ -142,10 +143,6 @@ dent). Available commands are as follows:
 /unsubscribe [(@)username]                      (aliases: /unsub)
    This will unsubscribe you from the user specified.  The @ is
    optional.
-
-/subscribe [notice number]                      (aliases: /sub)
-   This will subscribe you to the user who created the notice with the
-   notice number specified.
 
 /group [(!)group]                               (aliases: /g)
    This will open a new tab showing the timeline of the group
