@@ -39,8 +39,11 @@ class StatusBar(object):
 
     def update(self):
         self.window.erase()
-        self.window.addstr(0, 0, self.left_text)
         right_x = self.window.getmaxyx()[1] - (len(self.right_text) + 2)
+        if len(self.left_text) >= (right_x - 3):  # if the left text would end up too near the right text
+            self.window.addstr(0, 0, self.left_text[:right_x-6].strip() + "...")  # then truncate it and add a ...
+        else:
+            self.window.addstr(0, 0, self.left_text)
         self.window.addstr(0, right_x, self.right_text)
         self.window.refresh()
 
