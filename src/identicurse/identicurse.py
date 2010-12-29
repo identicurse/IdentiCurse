@@ -927,6 +927,8 @@ class IdentiCurse(object):
                 else:
                     self.status_bar.update_left("No results for '%s'" % (query))
                     self.last_page_search = {'query':"", 'occurs':[], 'viewing':0, 'tab':-1}  # reset to no search
+        else:
+            self.status_bar.update_left("Doing nothing.")
 
         self.entry_window.clear()
         self.text_entry = Textbox(self.entry_window, self.validate, insert_mode=True)
