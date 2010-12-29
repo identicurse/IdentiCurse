@@ -58,7 +58,7 @@ def main():
         slogans = user_slogans
     except:
         slogans = preset_slogans
-    print "Welcome to IdentiCurse 0.5-dev - %s" % (random.choice(slogans))
+    print "Welcome to IdentiCurse 0.6-dev - %s" % (random.choice(slogans))
     IdentiCurse()
 
 
