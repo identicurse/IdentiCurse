@@ -18,6 +18,8 @@
 import time, datetime
 
 def time_since(datetime_then):
+    if datetime_then > datetime.datetime.utcnow():
+        return {'days':0, 'hours':0, 'minutes':0, 'seconds':0}
     time_diff_raw = datetime.datetime.utcnow() - datetime_then
     days_since = time_diff_raw.days
     seconds_since = time_diff_raw.seconds
