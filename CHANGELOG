@@ -2,6 +2,7 @@ New for 0.6:
  - New slogans.
  - Borders can now be switched off, with the 'border' config option.
  - Notices can now be displayed in compact mode (new default), or non-compact mode (as in old versions), as dictated by the 'compact_notices' config option..
+ - Catch typos like "/r1 foo", and automatically treat as "/r 1 foo" (favours exactly what was typed if it's interpretable as valid).
 
 New for 0.5:
  - New slogans.
