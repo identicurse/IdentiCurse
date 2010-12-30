@@ -35,12 +35,32 @@ def time_since(datetime_then):
 
     return time_diff
 
-def format_time(time_dict, floating=False):
+def format_time(time_dict, floating=False, approximate=False):
     timestr = ""
     if floating:
         formatstr = "%0.1f %s "
     else:
         formatstr = "%d %s "
+
+    if approximate:
+        if time_dict['days'] > 0:
+            if time_dict['hours'] >= 12:
+                time_dict['days'] += 1
+            if (time_dict['hours'] != 0) or (time_dict['minutes'] != 0) or (time_dict['seconds'] != 0):
+                timestr = "about "
+                time_dict['hours'], time_dict['minutes'], time_dict['seconds'] = 0, 0, 0
+        elif time_dict['hours'] > 0:
+            if time_dict['minutes'] >= 30:
+                time_dict['hours'] += 1
+            if (time_dict['minutes'] != 0) or (time_dict['seconds'] != 0):
+                timestr = "about "
+                time_dict['minutes'], time_dict['seconds'] = 0, 0
+        elif time_dict['minutes'] > 0:
+            if time_dict['seconds'] >= 30:
+                time_dict['minutes'] += 1
+            if time_dict['seconds'] != 0:
+                timestr = "about "
+                time_dict['seconds'] = 0
     
     for unit in ['days', 'hours', 'minutes', 'seconds']:
         if time_dict[unit] > 1:
