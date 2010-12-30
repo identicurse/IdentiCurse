@@ -34,11 +34,15 @@ code = locale.getpreferredencoding()
 class IdentiCurse(object):
     """Contains Main IdentiCurse application"""
     
-    def __init__(self):
+    def __init__(self, additional_config={}):
         self.path = os.path.dirname(os.path.realpath( __file__ ))
         self.qreply = False
         
-        self.config_file = os.path.join(os.path.expanduser("~") ,".identicurse")
+        if "config_filename" in additional_config:
+            self.config_file = os.path.expanduser(additional_config['config_filename'])
+        else:
+            self.config_file = os.path.join(os.path.expanduser("~") ,".identicurse")
+
         try:
             if os.path.exists(self.config_file):
                 self.config = json.loads(open(self.config_file).read())

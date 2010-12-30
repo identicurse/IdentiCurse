@@ -16,6 +16,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from identicurse import IdentiCurse
+from optparse import OptionParser
 import random, os
 
 preset_slogans = [
@@ -52,7 +53,25 @@ def main():
     """
     Innit.
     """
-    user_slogans_file = os.path.join(os.path.expanduser("~"), ".identicurse_slogans")
+    parser = OptionParser()
+    parser.add_option("-c", "--config",
+            help="specify an alternative config file to use",
+            action="store", type="string", dest="config_filename", metavar="FILE")
+    parser.add_option("-s", "--slogans",
+            help="specify an alternative slogans file to use",
+            action="store", type="string", dest="slogans_filename", metavar="FILE")
+    (options, args) = parser.parse_args()
+
+    additional_config = {}
+
+    if options.slogans_filename is not None:
+        user_slogans_file = os.path.expanduser(options.slogans_filename)
+    else:
+        user_slogans_file = os.path.join(os.path.expanduser("~"), ".identicurse_slogans")
+    
+    if options.config_filename is not None:
+        additional_config['config_filename'] = options.config_filename
+
     try:
         user_slogans_raw = open(user_slogans_file).read()
         user_slogans = [slogan for slogan in user_slogans_raw.split("\n") if slogan.strip() != ""]
@@ -60,7 +79,7 @@ def main():
     except:
         slogans = preset_slogans
     print "Welcome to IdentiCurse 0.6-dev - %s" % (random.choice(slogans))
-    IdentiCurse()
+    IdentiCurse(additional_config)
 
 
 if __name__ == '__main__':
