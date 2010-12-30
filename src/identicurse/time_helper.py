@@ -50,19 +50,19 @@ def format_time(time_dict, floating=False, short_form=False):
             if time_dict['hours'] >= 12:
                 time_dict['days'] += 1
             if (time_dict['hours'] != 0) or (time_dict['minutes'] != 0) or (time_dict['seconds'] != 0):
-                timestr = "~"
+                # timestr = "~"
                 time_dict['hours'], time_dict['minutes'], time_dict['seconds'] = 0, 0, 0
         elif time_dict['hours'] > 0:
             if time_dict['minutes'] >= 30:
                 time_dict['hours'] += 1
             if (time_dict['minutes'] != 0) or (time_dict['seconds'] != 0):
-                timestr = "~"
+                # timestr = "~"
                 time_dict['minutes'], time_dict['seconds'] = 0, 0
         elif time_dict['minutes'] > 0:
             if time_dict['seconds'] >= 30:
                 time_dict['minutes'] += 1
             if time_dict['seconds'] != 0:
-                timestr = "~"
+                # timestr = "~"
                 time_dict['seconds'] = 0
     
     for unit in ['days', 'hours', 'minutes', 'seconds']:
