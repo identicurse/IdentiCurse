@@ -487,6 +487,14 @@ class IdentiCurse(object):
             if tokens[0][0] == "i" and ((tokens[0][1:] in self.known_commands) or (tokens[0][1:] in self.config["aliases"])):
                 tokens[0] = tokens[0][1:]  # avoid doing the wrong thing when people accidentally submit stuff like "i/r 2 blabla"
 
+            # catch mistakes like "/r1" - the last condition is so that, for example, "/directs" is not mistakenly converted to "/direct s"
+            for command in self.known_commands:
+                if (tokens[0][:len(command)] == command) and (tokens[0] != command) and not (tokens[0] in self.known_commands) and not (tokens[0] in self.config['aliases']):
+                    tokens[:1] = [command, tokens[0].replace(command, "")]
+            for alias in self.config['aliases']:
+                if (tokens[0][:len(alias)] == alias) and (tokens[0] != alias) and not (tokens[0] in self.known_commands) and not (tokens[0] in self.config['aliases']):
+                    tokens[:1] = [alias, tokens[0].replace(alias, "")]
+
             if tokens[0] in self.config["aliases"]:
                 tokens = self.config["aliases"][tokens[0]].split(" ") + tokens[1:]
 
