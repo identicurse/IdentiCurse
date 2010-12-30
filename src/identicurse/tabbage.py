@@ -147,13 +147,14 @@ class Help(Tab):
         self.buffer.append(open(self.path, 'r').read())
 
 class Timeline(Tab):
-    def __init__(self, conn, window, timeline, type_params={}, notice_limit=25, filters=[]):
+    def __init__(self, conn, window, timeline, type_params={}, notice_limit=25, filters=[], compact_style=False):
         self.conn = conn
         self.timeline = []
         self.timeline_type = timeline
         self.type_params = type_params
         self.notice_limit = notice_limit
         self.filters = filters
+        self.compact_style = compact_style
         self.chosen_one = 0
 
         if self.timeline_type == "user":
@@ -235,7 +236,10 @@ class Timeline(Tab):
             locale.setlocale(locale.LC_TIME, 'C')  # hacky fix because statusnet uses english timestrings regardless of locale
             datetime_notice = datetime.datetime.strptime(n['created_at'], DATETIME_FORMAT)
             locale.setlocale(locale.LC_TIME, '') # other half of the hacky fix
-            time_msg = time_helper.format_time(time_helper.time_since(datetime_notice))
+            if self.compact_style:
+                time_msg = time_helper.format_time(time_helper.time_since(datetime_notice), short_form=True)
+            else:
+                time_msg = time_helper.format_time(time_helper.time_since(datetime_notice))
             
             self.buffer.append(str(c))
             y = len(self.buffer) - 1
@@ -246,19 +250,26 @@ class Timeline(Tab):
                 self.buffer[y] += ' ' * 3
 
             self.buffer[y] += user
-            self.buffer[y] += ' ' * (maxx - ((len(source_msg) + len(user) + (5 + len(str(c))))))
-            self.buffer[y] += source_msg
+            if self.compact_style:
+                self.buffer[y] += ' ' * (maxx - ((len(source_msg) + len(time_msg) + len(user) + (6 + len(str(c))))))
+                self.buffer[y] += time_msg
+                self.buffer[y] += " "
+                self.buffer[y] += source_msg
+            else:
+                self.buffer[y] += ' ' * (maxx - ((len(source_msg) + len(user) + (5 + len(str(c))))))
+                self.buffer[y] += source_msg
 
             try:
                 self.buffer.append(n['text'])
             except UnicodeDecodeError:
                 self.buffer.append("Caution: Terminal too shit to display this notice.")
 
-            self.buffer.append(" " * (maxx - (len(time_msg) + 2)))
-            y = len(self.buffer) - 1
-            self.buffer[y] += time_msg
-            
-            self.buffer.append("")
+            if not self. compact_style:
+                self.buffer.append(" " * (maxx - (len(time_msg) + 2)))
+                y = len(self.buffer) - 1
+                self.buffer[y] += time_msg
+                
+                self.buffer.append("")
             self.buffer.append("")
 
             c += 1
