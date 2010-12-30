@@ -151,7 +151,7 @@ class IdentiCurse(object):
         if self.config['border']:
             self.entry_window = self.main_window.subwin(entry_lines, x-10, 4, 5)
         else:
-            self.entry_window = self.main_window.subwin(entry_lines, x-1, 1, 1)
+            self.entry_window = self.main_window.subwin(entry_lines, x-2, 1, 1)
 
         self.text_entry = Textbox(self.entry_window, self.validate, insert_mode=True)
 
@@ -159,7 +159,7 @@ class IdentiCurse(object):
         if self.config['border']:
             self.notice_window = self.main_window.subwin(y-7, x-4, 5 + entry_lines, 5)
         else:
-            self.notice_window = self.main_window.subwin(y-2, x, 2 + entry_lines, 1)
+            self.notice_window = self.main_window.subwin(y-4, x, 2 + entry_lines, 1)
 
         # I don't like this, but it looks like it has to be done
         if hasattr(self, 'tabs'):
@@ -169,7 +169,7 @@ class IdentiCurse(object):
         if self.config['border']:
             self.status_window = self.main_window.subwin(1, x-4, y, 5)
         else:
-            self.status_window = self.main_window.subwin(1, x, y, 1)
+            self.status_window = self.main_window.subwin(1, x, y-1, 1)
         if hasattr(self, 'status_bar'):
             self.status_bar.window = self.status_window
 
