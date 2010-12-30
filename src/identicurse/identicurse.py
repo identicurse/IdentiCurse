@@ -97,7 +97,7 @@ class IdentiCurse(object):
         if not "border" in self.config:
             self.config['border'] = True
         if not "compact_notices" in self.config:
-            self.config['compact_notices'] = False
+            self.config['compact_notices'] = True
         if not "keys" in self.config:
             self.config['keys'] = {}
         if not "scrollup" in self.config['keys']:
