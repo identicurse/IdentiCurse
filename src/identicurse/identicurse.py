@@ -572,14 +572,15 @@ class IdentiCurse(object):
                     elif tokens[0] == "/delete" and len(tokens) == 2:
                         self.status_bar.update_left("Deleting Notice...")
                         if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
-                            id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['retweeted_status']['id']
-                        else:
-                            id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['id']
+                            repeat_id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['retweeted_status']['id']
+                        id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['id']
                         try:
                             self.conn.statuses_destroy(id)
-                        except urllib2.HTTPError, e:
-                            if e.code == 403:
-                                self.status_bar.timed_update_left("ERROR: You cannot delete others' statuses.")
+                        except statusnet.StatusNetError, e:
+                            if e.errcode == 403:  # user doesn't own the original status, so is probably trying to delete the repeat
+                                self.conn.statuses_destroy(repeat_id)
+                            else:  # it wasn't a 403, so re-raise
+                                raise(e)
     
                     elif tokens[0] == "/profile" and len(tokens) == 2:
                         self.status_bar.update_left("Loading Profile...")
