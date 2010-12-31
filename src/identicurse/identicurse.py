@@ -47,10 +47,24 @@ class IdentiCurse(object):
             if os.path.exists(self.config_file):
                 self.config = json.loads(open(self.config_file).read())
             else:
-                self.config_file = os.path.join(self.path, "config.json")
-                self.config = json.loads(open(self.config_file).read())
+                self.config = json.loads(open(os.path.join("/etc", "identicurse.conf")).read())
         except:
-            sys.exit("ERROR: Couldn't read config file.")
+            import getpass, time
+            # no config yet, so let's build one
+            self.config = json.loads(open(os.path.join(self.path, "config.json"), "r").read())  # get the base config
+            print "No config was found, so we will now run through a few quick questions to set up a basic config for you (which will be saved as ~/.identicurse so you can manually edit it later). If the default (where defaults are available, they're stated in []) is already fine for any question, just press Enter without typing anything, and the default will be used."
+            self.config['username'] = raw_input("Username: ")
+            self.config['password'] = getpass.getpass("Password: ")
+            api_path = raw_input("API path [%s]: " % (self.config['api_path']))
+            if api_path != "":
+                self.config['api_path'] = api_path
+            try:
+                temp_conn = StatusNet(self.config['api_path'], self.config['username'], self.config['password'])
+            except Exception, (errmsg):
+                sys.exit("Couldn't establish connection with provided credentials: %s" % (errmsg))
+            print "Okay! Everything seems good! Your new config will now be saved, then IdentiCurse will start properly."
+            open(self.config_file, "w").write(json.dumps(self.config))
+            time.sleep(1)
 
         self.last_page_search = {'query':"", 'occurs':[], 'viewing':0, 'tab':-1}
 
