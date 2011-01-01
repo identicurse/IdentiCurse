@@ -52,7 +52,7 @@ class IdentiCurse(object):
             import getpass, time
             # no config yet, so let's build one
             self.config = json.loads(open(os.path.join(self.path, "config.json"), "r").read())  # get the base config
-            print "No config was found, so we will now run through a few quick questions to set up a basic config for you (which will be saved as ~/.identicurse so you can manually edit it later). If the default (where defaults are available, they're stated in []) is already fine for any question, just press Enter without typing anything, and the default will be used."
+            print "No config was found, so we will now run through a few quick questions to set up a basic config for you (which will be saved as %s so you can manually edit it later). If the default (where defaults are available, they're stated in []) is already fine for any question, just press Enter without typing anything, and the default will be used." % (self.config_file)
             self.config['username'] = raw_input("Username: ")
             self.config['password'] = getpass.getpass("Password: ")
             api_path = raw_input("API path [%s]: " % (self.config['api_path']))
