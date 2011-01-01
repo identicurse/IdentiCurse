@@ -125,6 +125,16 @@ class IdentiCurse(object):
         }
 
         # Set some defaults for configs that we will always need to use, but that are optional
+        if not "enable_colours" in self.config:
+            self.config["enable_colours"] = False
+        else:
+            # Default colour scheme
+            if not "colours" in self.config:
+                self.config["colours"] = {
+                    "timelines": ("magenta", "none"),
+                    "statusbar": ("cyan", "none")
+                }
+
         if not "search_case_sensitive" in self.config:
             self.config['search_case_sensitive'] = "sensitive"
         if not "long_dent" in self.config:
@@ -226,7 +236,6 @@ class IdentiCurse(object):
         # We need to do this here rather than in __init__ because of initscr
         if curses.has_colors() and self.config['enable_colours'] == True:
             curses.start_color()
-            
             for field, (fg, bg) in self.config['colours'].items():
                 try:
                     curses.init_pair(self.colour_fields[field], self.colours[fg], self.colours[bg])
