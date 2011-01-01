@@ -58,6 +58,12 @@ class IdentiCurse(object):
             api_path = raw_input("API path [%s]: " % (self.config['api_path']))
             if api_path != "":
                 self.config['api_path'] = api_path
+            update_interval = raw_input("Auto-refresh interval (in whole seconds) [%d]: " % (self.config['update_interval']))
+            if update_interval != "":
+                try:
+                    self.config['update_interval'] = int(update_interval)
+                except ValueError:
+                    print "Sorry, you entered an invalid interval. The default of %d will be used instead." % (self.config['update_interval'])
             try:
                 temp_conn = StatusNet(self.config['api_path'], self.config['username'], self.config['password'])
             except Exception, (errmsg):
