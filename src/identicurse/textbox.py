@@ -27,6 +27,8 @@ class Textbox(textpad.Textbox):
         self.poll_function = poll
 
     def edit(self, initial_input=""):
+        curses.curs_set(1)
+
         for char in list(initial_input):
             self.do_command(char)
         self.poll_function(self.count())
@@ -52,10 +54,13 @@ class Textbox(textpad.Textbox):
             self.poll_function(self.count())
             self.win.refresh()
 
+        curses.curs_set(0)
         if abort == False:
             return self.gather()
         else:
             return None
+
+
 
     def count(self):
         cursor_position = self.win.getyx()
