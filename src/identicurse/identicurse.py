@@ -121,7 +121,8 @@ class IdentiCurse(object):
 
         self.colour_fields = {
             "statusbar": 1,
-            "timelines": 2
+            "timelines": 2,
+            "entry": 3
         }
 
         # Set some defaults for configs that we will always need to use, but that are optional
@@ -131,8 +132,9 @@ class IdentiCurse(object):
             # Default colour scheme
             if not "colours" in self.config:
                 self.config["colours"] = {
-                    "timelines": ("magenta", "none"),
-                    "statusbar": ("cyan", "none")
+                    "timelines": ("none", "none"),
+                    "statusbar": ("cyan", "blue"),
+                    "entry": ("red", "none")
                 }
 
         if not "search_case_sensitive" in self.config:
@@ -205,6 +207,7 @@ class IdentiCurse(object):
             self.entry_window = self.main_window.subwin(entry_lines, x-10, 4, 5)
         else:
             self.entry_window = self.main_window.subwin(entry_lines, x-2, 1, 1)
+        self.entry_window.bkgd(" ", curses.color_pair(3))
 
         self.text_entry = Textbox(self.entry_window, self.validate, insert_mode=True)
 
@@ -213,6 +216,7 @@ class IdentiCurse(object):
             self.notice_window = self.main_window.subwin(y-7, x-4, 5 + entry_lines, 5)
         else:
             self.notice_window = self.main_window.subwin(y-4, x, 2 + entry_lines, 1)
+        self.notice_window.bkgd(" ", curses.color_pair(2))
 
         # I don't like this, but it looks like it has to be done
         if hasattr(self, 'tabs'):
@@ -220,7 +224,7 @@ class IdentiCurse(object):
                 tab.window = self.notice_window
 
         if self.config['border']:
-            self.status_window = self.main_window.subwin(1, x-4, y, 5)
+            self.status_window = self.main_window.subwin(1, x-5, y, 5)
         else:
             self.status_window = self.main_window.subwin(1, x, y-1, 1)
         if hasattr(self, 'status_bar'):

@@ -20,6 +20,7 @@ import threading, time, curses
 class StatusBar(object):
     def __init__(self, window):
         self.window = window
+        self.window.bkgd(" ", curses.color_pair(1))
         self.left_text = ""
         self.right_text = ""
 
@@ -41,10 +42,10 @@ class StatusBar(object):
         self.window.erase()
         right_x = self.window.getmaxyx()[1] - (len(self.right_text) + 2)
         if len(self.left_text) >= (right_x - 3):  # if the left text would end up too near the right text
-            self.window.addstr(0, 0, self.left_text[:right_x-6].strip() + "...", curses.color_pair(1))  # then truncate it and add a ...
+            self.window.addstr(0, 0, self.left_text[:right_x-6].strip() + "...")
         else:
-            self.window.addstr(0, 0, self.left_text, curses.color_pair(1))
-        self.window.addstr(0, right_x, self.right_text, curses.color_pair(1))
+            self.window.addstr(0, 0, self.left_text)
+        self.window.addstr(0, right_x, self.right_text)
         self.window.refresh()
 
 class TimedUpdate(threading.Thread):
