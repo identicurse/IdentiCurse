@@ -133,7 +133,7 @@ class Tab(object):
 
         buffer = self.buffer.reflowed(maxx - 2)
         for line in buffer[self.start_line:maxy - 3 + self.start_line]:
-            self.window.addstr(line.encode(sys.getfilesystemencoding(), "replace"), curses.color_pair(2))
+            self.window.addstr(line.encode(sys.getfilesystemencoding(), "replace"))
             self.window.addstr("\n")
 
         self.window.refresh()
