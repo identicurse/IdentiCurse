@@ -57,5 +57,6 @@
             "qreply": ["l"],
             "creply": ["d"],
             "cfav": ["f"]
-    }
+    },
+    "enable_colours": true
 }
