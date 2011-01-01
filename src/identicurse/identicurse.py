@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2010 Reality <tinmachin3@gmail.com> and Psychedelic Squid <psquid@psquid.net>
+# Copyright (C) 2010-2011 Reality <tinmachin3@gmail.com> and Psychedelic Squid <psquid@psquid.net>
 # 
 # This program is free software: you can redistribute it and/or modify 
 # it under the terms of the GNU General Public License as published by 
@@ -34,19 +34,43 @@ code = locale.getpreferredencoding()
 class IdentiCurse(object):
     """Contains Main IdentiCurse application"""
     
-    def __init__(self):
+    def __init__(self, additional_config={}):
         self.path = os.path.dirname(os.path.realpath( __file__ ))
         self.qreply = False
         
-        self.config_file = os.path.join(os.path.expanduser("~") ,".identicurse")
+        if "config_filename" in additional_config:
+            self.config_file = os.path.expanduser(additional_config['config_filename'])
+        else:
+            self.config_file = os.path.join(os.path.expanduser("~") ,".identicurse")
+
         try:
             if os.path.exists(self.config_file):
                 self.config = json.loads(open(self.config_file).read())
             else:
-                self.config_file = os.path.join(self.path, "config.json")
-                self.config = json.loads(open(self.config_file).read())
+                self.config = json.loads(open(os.path.join("/etc", "identicurse.conf")).read())
         except:
-            sys.exit("ERROR: Couldn't read config file.")
+            import getpass, time
+            # no config yet, so let's build one
+            self.config = json.loads(open(os.path.join(self.path, "config.json"), "r").read())  # get the base config
+            print "No config was found, so we will now run through a few quick questions to set up a basic config for you (which will be saved as %s so you can manually edit it later). If the default (where defaults are available, they're stated in []) is already fine for any question, just press Enter without typing anything, and the default will be used." % (self.config_file)
+            self.config['username'] = raw_input("Username: ")
+            self.config['password'] = getpass.getpass("Password: ")
+            api_path = raw_input("API path [%s]: " % (self.config['api_path']))
+            if api_path != "":
+                self.config['api_path'] = api_path
+            update_interval = raw_input("Auto-refresh interval (in whole seconds) [%d]: " % (self.config['update_interval']))
+            if update_interval != "":
+                try:
+                    self.config['update_interval'] = int(update_interval)
+                except ValueError:
+                    print "Sorry, you entered an invalid interval. The default of %d will be used instead." % (self.config['update_interval'])
+            try:
+                temp_conn = StatusNet(self.config['api_path'], self.config['username'], self.config['password'])
+            except Exception, (errmsg):
+                sys.exit("Couldn't establish connection with provided credentials: %s" % (errmsg))
+            print "Okay! Everything seems good! Your new config will now be saved, then IdentiCurse will start properly."
+            open(self.config_file, "w").write(json.dumps(self.config))
+            time.sleep(1)
 
         self.last_page_search = {'query':"", 'occurs':[], 'viewing':0, 'tab':-1}
 
@@ -217,28 +241,20 @@ class IdentiCurse(object):
         self.tabs = []
         for tabspec in self.config['initial_tabs'].split("|"):
             tab = tabspec.split(':')
-            if tab[0] == "home":
-                self.tabs.append(Timeline(self.conn, self.notice_window, "home", notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices']))
-            if tab[0] == "mentions":
-                self.tabs.append(Timeline(self.conn, self.notice_window, "mentions", notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices']))
-            if tab[0] == "direct":
-                self.tabs.append(Timeline(self.conn, self.notice_window, "direct", notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices']))
-            if tab[0] == "public":
-                self.tabs.append(Timeline(self.conn, self.notice_window, "public", filters=self.config['filters'], compact_style=self.config['compact_notices']))
-            if tab[0] == "profile":
+            if tab[0] in ("home", "mentions", "direct", "public", "sentdirect"):
+                self.tabs.append(Timeline(self.conn, self.notice_window, tab[0], notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices']))
+            elif tab[0] == "profile":
                 screen_name = tab[1]
                 if screen_name[0] == "@":
                     screen_name = screen_name[1:]
                 self.tabs.append(Profile(self.conn, self.notice_window, screen_name))
-            if tab[0] == "sentdirect":
-                self.tabs.append(Timeline(self.conn, self.notice_window, "sentdirect", notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices']))
-            if tab[0] == "user":
+            elif tab[0] == "user":
                 screen_name = tab[1]
                 if screen_name[0] == "@":
                     screen_name = screen_name[1:]
                 user_id = self.conn.users_show(screen_name=screen_name)['id']
                 self.tabs.append(Timeline(self.conn, self.notice_window, "user", {'screen_name':screen_name, 'user_id':user_id}, notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices']))
-            if tab[0] == "group":
+            elif tab[0] == "group":
                 nickname = tab[1]
                 if nickname[0] == "!":
                     nickname = nickname[1:]
@@ -510,6 +526,14 @@ class IdentiCurse(object):
             if tokens[0][0] == "i" and ((tokens[0][1:] in self.known_commands) or (tokens[0][1:] in self.config["aliases"])):
                 tokens[0] = tokens[0][1:]  # avoid doing the wrong thing when people accidentally submit stuff like "i/r 2 blabla"
 
+            # catch mistakes like "/r1" - the last condition is so that, for example, "/directs" is not mistakenly converted to "/direct s"
+            for command in self.known_commands:
+                if (tokens[0][:len(command)] == command) and (tokens[0] != command) and not (tokens[0] in self.known_commands) and not (tokens[0] in self.config['aliases']):
+                    tokens[:1] = [command, tokens[0].replace(command, "")]
+            for alias in self.config['aliases']:
+                if (tokens[0][:len(alias)] == alias) and (tokens[0] != alias) and not (tokens[0] in self.known_commands) and not (tokens[0] in self.config['aliases']):
+                    tokens[:1] = [alias, tokens[0].replace(alias, "")]
+
             if tokens[0] in self.config["aliases"]:
                 tokens = self.config["aliases"][tokens[0]].split(" ") + tokens[1:]
 
@@ -587,14 +611,15 @@ class IdentiCurse(object):
                     elif tokens[0] == "/delete" and len(tokens) == 2:
                         self.status_bar.update_left("Deleting Notice...")
                         if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
-                            id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['retweeted_status']['id']
-                        else:
-                            id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['id']
+                            repeat_id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['retweeted_status']['id']
+                        id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['id']
                         try:
                             self.conn.statuses_destroy(id)
-                        except urllib2.HTTPError, e:
-                            if e.code == 403:
-                                self.status_bar.timed_update_left("ERROR: You cannot delete others' statuses.")
+                        except statusnet.StatusNetError, e:
+                            if e.errcode == 403:  # user doesn't own the original status, so is probably trying to delete the repeat
+                                self.conn.statuses_destroy(repeat_id)
+                            else:  # it wasn't a 403, so re-raise
+                                raise(e)
     
                     elif tokens[0] == "/profile" and len(tokens) == 2:
                         self.status_bar.update_left("Loading Profile...")

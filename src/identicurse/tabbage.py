@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2010 Reality <tinmachin3@gmail.com> and Psychedelic Squid <psquid@psquid.net>
+# Copyright (C) 2010-2011 Reality <tinmachin3@gmail.com> and Psychedelic Squid <psquid@psquid.net>
 # 
 # This program is free software: you can redistribute it and/or modify 
 # it under the terms of the GNU General Public License as published by 
@@ -312,7 +312,11 @@ class Context(Tab):
         maxx = self.window.getmaxyx()[1]
 
         for n in self.timeline:
-            user = unicode(n["user"]["screen_name"])
+            if "retweeted_status" in n:
+                user = "%s [ repeat by %s ]" % (n["retweeted_status"]["user"]["screen_name"], n["user"]["screen_name"])
+                n = n["retweeted_status"]
+            else:
+                user = unicode(n["user"]["screen_name"])
             raw_source_msg = "from %s" % (n["source"])
             source_msg = self.html_regex.sub("", raw_source_msg)
             if n["in_reply_to_status_id"] is not None:

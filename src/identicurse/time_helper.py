@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2010 Reality <tinmachin3@gmail.com> and Psychedelic Squid <psquid@psquid.net>
+# Copyright (C) 2010-2011 Reality <tinmachin3@gmail.com> and Psychedelic Squid <psquid@psquid.net>
 # 
 # This program is free software: you can redistribute it and/or modify 
 # it under the terms of the GNU General Public License as published by 
@@ -18,6 +18,8 @@
 import time, datetime
 
 def time_since(datetime_then):
+    if datetime_then > datetime.datetime.utcnow():
+        return {'days':0, 'hours':0, 'minutes':0, 'seconds':0}
     time_diff_raw = datetime.datetime.utcnow() - datetime_then
     days_since = time_diff_raw.days
     seconds_since = time_diff_raw.seconds
