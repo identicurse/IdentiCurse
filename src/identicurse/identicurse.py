@@ -214,28 +214,20 @@ class IdentiCurse(object):
         self.tabs = []
         for tabspec in self.config['initial_tabs'].split("|"):
             tab = tabspec.split(':')
-            if tab[0] == "home":
-                self.tabs.append(Timeline(self.conn, self.notice_window, "home", notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices']))
-            if tab[0] == "mentions":
-                self.tabs.append(Timeline(self.conn, self.notice_window, "mentions", notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices']))
-            if tab[0] == "direct":
-                self.tabs.append(Timeline(self.conn, self.notice_window, "direct", notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices']))
-            if tab[0] == "public":
-                self.tabs.append(Timeline(self.conn, self.notice_window, "public", filters=self.config['filters'], compact_style=self.config['compact_notices']))
-            if tab[0] == "profile":
+            if tab[0] in ("home", "mentions", "direct", "public", "sentdirect"):
+                self.tabs.append(Timeline(self.conn, self.notice_window, tab[0], notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices']))
+            elif tab[0] == "profile":
                 screen_name = tab[1]
                 if screen_name[0] == "@":
                     screen_name = screen_name[1:]
                 self.tabs.append(Profile(self.conn, self.notice_window, screen_name))
-            if tab[0] == "sentdirect":
-                self.tabs.append(Timeline(self.conn, self.notice_window, "sentdirect", notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices']))
-            if tab[0] == "user":
+            elif tab[0] == "user":
                 screen_name = tab[1]
                 if screen_name[0] == "@":
                     screen_name = screen_name[1:]
                 user_id = self.conn.users_show(screen_name=screen_name)['id']
                 self.tabs.append(Timeline(self.conn, self.notice_window, "user", {'screen_name':screen_name, 'user_id':user_id}, notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices']))
-            if tab[0] == "group":
+            elif tab[0] == "group":
                 nickname = tab[1]
                 if nickname[0] == "!":
                     nickname = nickname[1:]
