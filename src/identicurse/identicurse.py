@@ -83,7 +83,24 @@ class IdentiCurse(object):
             "/featurerequest"
             ]
 
-        # set some defaults for configs that we will always need to use, but that are optional
+        # This could be a constant but I can't be effed
+        self.colours = {
+            "red": curses.COLOR_RED,
+            "cyan": curses.COLOR_CYAN,
+            "green": curses.COLOR_GREEN,
+            "magenta": curses.COLOR_MAGENTA,
+            "yellow": curses.COLOR_YELLOW,
+            "blue": curses.COLOR_BLUE,
+            "black": curses.COLOR_BLACK,
+            "none": -1
+        }
+
+        self.colour_fields = {
+            "statusbar": 1,
+            "timelines": 2
+        }
+
+        # Set some defaults for configs that we will always need to use, but that are optional
         if not "search_case_sensitive" in self.config:
             self.config['search_case_sensitive'] = "sensitive"
         if not "long_dent" in self.config:
@@ -181,6 +198,16 @@ class IdentiCurse(object):
         curses.noecho()
         curses.cbreak()
         curses.use_default_colors()
+
+        # We need to do this here rather than in __init__ because of initscr
+        if curses.has_colors() and self.config['enable_colours'] == True:
+            curses.start_color()
+            
+            for field, (fg, bg)  in self.config['colours'].items():
+                try:
+                    curses.init_pair(self.colour_fields[field], self.colours[fg], self.colours[bg])
+                except:
+                    continue
 
         self.redraw()
 

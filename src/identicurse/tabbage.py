@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import os.path, re, sys, threading, datetime, locale, time_helper
+import os.path, re, sys, threading, datetime, locale, time_helper, curses, random
 DATETIME_FORMAT = "%a %b %d %H:%M:%S +0000 %Y"
 
 class Buffer(list):
@@ -130,7 +130,12 @@ class Tab(object):
     def display(self):
         maxy, maxx = self.window.getmaxyx()[0], self.window.getmaxyx()[1]
         self.window.erase()
-        self.window.addstr("\n".join(self.buffer.reflowed(maxx - 2)[self.start_line:maxy - 3 + self.start_line]).encode(sys.getfilesystemencoding(), "replace"))
+
+        buffer = self.buffer.reflowed(maxx - 2)
+        for line in buffer[self.start_line:maxy - 3 + self.start_line]:
+            self.window.addstr(line.encode(sys.getfilesystemencoding(), "replace"), curses.color_pair(2))
+            self.window.addstr("\n")
+
         self.window.refresh()
 
 class Help(Tab):
