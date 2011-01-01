@@ -207,7 +207,7 @@ class IdentiCurse(object):
             self.entry_window = self.main_window.subwin(entry_lines, x-10, 4, 5)
         else:
             self.entry_window = self.main_window.subwin(entry_lines, x-2, 1, 1)
-        self.entry_window.bkgd(" ", curses.color_pair(3))
+        self.entry_window.bkgd(" ", curses.color_pair(self.colour_fields["entry"]))
 
         self.text_entry = Textbox(self.entry_window, self.validate, insert_mode=True)
 
@@ -216,7 +216,7 @@ class IdentiCurse(object):
             self.notice_window = self.main_window.subwin(y-7, x-4, 5 + entry_lines, 5)
         else:
             self.notice_window = self.main_window.subwin(y-4, x, 2 + entry_lines, 1)
-        self.notice_window.bkgd(" ", curses.color_pair(2))
+        self.notice_window.bkgd(" ", curses.color_pair(self.colour_fields["timelines"]))
 
         # I don't like this, but it looks like it has to be done
         if hasattr(self, 'tabs'):
@@ -229,6 +229,7 @@ class IdentiCurse(object):
             self.status_window = self.main_window.subwin(1, x, y-1, 1)
         if hasattr(self, 'status_bar'):
             self.status_bar.window = self.status_window
+        self.status_window.bkgd(" ", curses.color_pair(self.colour_fields["statusbar"]))
 
     def initialise(self, screen):
         self.screen = screen
