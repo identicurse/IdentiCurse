@@ -227,11 +227,14 @@ class IdentiCurse(object):
         if curses.has_colors() and self.config['enable_colours'] == True:
             curses.start_color()
             
-            for field, (fg, bg)  in self.config['colours'].items():
+            for field, (fg, bg) in self.config['colours'].items():
                 try:
                     curses.init_pair(self.colour_fields[field], self.colours[fg], self.colours[bg])
                 except:
                     continue
+        else:
+            for field in self.colour_fields:
+                curses.init_pair(self.colour_fields[field], -1, -1)
 
         self.redraw()
 
