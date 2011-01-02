@@ -66,6 +66,12 @@ class IdentiCurse(object):
                     self.config['update_interval'] = int(update_interval)
                 except ValueError:
                     print "Sorry, you entered an invalid interval. The default of %d will be used instead." % (self.config['update_interval'])
+            notice_limit = raw_input("Number of notices to fetch per timeline page [%d]: " % (self.config['notice_limit']))
+            if notice_limit != "":
+                try:
+                    self.config['notice_limit'] = int(notice_limit)
+                except ValueError:
+                    print "Sorry, you entered an invalid number of notices. The default of %d will be used instead." % (self.config['notice_limit'])
             try:
                 temp_conn = StatusNet(self.config['api_path'], self.config['username'], self.config['password'])
             except Exception, (errmsg):
