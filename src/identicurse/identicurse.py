@@ -236,7 +236,6 @@ class IdentiCurse(object):
 
         curses.noecho()
         curses.cbreak()
-        curses.curs_set(0)
         curses.use_default_colors()
 
         # We need to do this here rather than in __init__ because of initscr
