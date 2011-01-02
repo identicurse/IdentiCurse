@@ -27,7 +27,6 @@ class Textbox(textpad.Textbox):
         self.poll_function = poll
 
     def edit(self, initial_input=""):
-
         for char in list(initial_input):
             self.do_command(char)
         self.poll_function(self.count())
