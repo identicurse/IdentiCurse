@@ -69,7 +69,7 @@ class IdentiCurse(object):
             except Exception, (errmsg):
                 sys.exit("Couldn't establish connection with provided credentials: %s" % (errmsg))
             print "Okay! Everything seems good! Your new config will now be saved, then IdentiCurse will start properly."
-            open(self.config_file, "w").write(json.dumps(self.config))
+            open(self.config_file, "w").write(json.dumps(self.config, indent=4))
             time.sleep(1)
 
         self.last_page_search = {'query':"", 'occurs':[], 'viewing':0, 'tab':-1}
