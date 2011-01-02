@@ -48,7 +48,9 @@ class IdentiCurse(object):
                 self.config = json.loads(open(self.config_file).read())
             else:
                 self.config = json.loads(open(os.path.join("/etc", "identicurse.conf")).read())
-        except:
+        except ValueError:
+            sys.exit("ERROR: Your config file could not be succesfully loaded due to JSON syntax error(s). Please fix it.")
+        except IOError:
             import getpass, time
             # no config yet, so let's build one
             self.config = json.loads(open(os.path.join(self.path, "config.json"), "r").read())  # get the base config
