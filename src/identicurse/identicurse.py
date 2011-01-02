@@ -206,7 +206,7 @@ class IdentiCurse(object):
             entry_lines = (self.conn.length_limit / x) + 1
 
         if self.config['border']:
-            self.entry_window = self.main_window.subwin(entry_lines, x-10, 4, 5)
+            self.entry_window = self.main_window.subwin(entry_lines, x-6, 4, 5)
         else:
             self.entry_window = self.main_window.subwin(entry_lines, x-2, 1, 1)
         self.entry_window.bkgd(" ", curses.color_pair(self.colour_fields["entry"]))
