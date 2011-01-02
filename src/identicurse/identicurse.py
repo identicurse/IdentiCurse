@@ -110,6 +110,7 @@ class IdentiCurse(object):
             "/directs",
             "/public",
             "/config",
+            "/alias",
             "/link",
             "/bugreport",
             "/featurerequest"
@@ -922,6 +923,16 @@ class IdentiCurse(object):
                             self.config[keys[0]] = value
                         open(self.config_file, 'w').write(json.dumps(self.config, indent=4))
     
+                    elif tokens[0] == "/alias" and len(tokens) >= 3:
+                        self.status_bar.update_left("Creating alias...")
+                        alias, command = tokens[1], " ".join(tokens[2:])
+                        if alias[0] != "/":
+                            alias = "/" + alias
+                        if command[0] != "/":
+                            command = "/" + command
+                        self.config["aliases"][alias] = command
+                        open(self.config_file, 'w').write(json.dumps(self.config, indent=4))
+
                     elif tokens[0] == "/link":
                         dent_index = int(tokens[2]) - 1
                         if tokens[1] == "*":
