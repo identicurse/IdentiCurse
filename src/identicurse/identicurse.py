@@ -31,6 +31,19 @@ from statusbar import StatusBar
 locale.setlocale(locale.LC_ALL, '')
 code = locale.getpreferredencoding()
 
+colour_fields = {
+    "none": 0,
+    "statusbar": 1,
+    "timelines": 2,
+    "entry": 3,
+    "selector": 4,
+    "username": 5,
+    "time": 6,
+    "source": 7,
+    "notice_count": 8,
+    "notice": 9
+}
+
 class IdentiCurse(object):
     """Contains Main IdentiCurse application"""
     
@@ -128,12 +141,6 @@ class IdentiCurse(object):
             "none": -1
         }
 
-        self.colour_fields = {
-            "statusbar": 1,
-            "timelines": 2,
-            "entry": 3
-        }
-
         # Set some defaults for configs that we will always need to use, but that are optional
         if not "enable_colours" in self.config:
             self.config["enable_colours"] = False
@@ -143,7 +150,14 @@ class IdentiCurse(object):
                 self.config["colours"] = {
                     "timelines": ("none", "none"),
                     "statusbar": ("cyan", "none"),
-                    "entry": ("red", "none")
+                    "entry": ("red", "none"),
+                    "selector": ("yellow", "blue"),
+                    "time": ("black", "cyan"),
+                    "source": ("red", "green"),
+                    "notice": ("magenta", "black"),
+                    "notice_count": ("yellow", "black"),
+                    "username": ("cyan", "black"),
+                    "none": ("red", -1)
                 }
 
         if not "search_case_sensitive" in self.config:
@@ -216,7 +230,7 @@ class IdentiCurse(object):
             self.entry_window = self.main_window.subwin(entry_lines, x-6, 4, 5)
         else:
             self.entry_window = self.main_window.subwin(entry_lines, x-2, 1, 1)
-        self.entry_window.bkgd(" ", curses.color_pair(self.colour_fields["entry"]))
+        self.entry_window.bkgd(" ", curses.color_pair(colour_fields["entry"]))
 
         self.text_entry = Textbox(self.entry_window, self.validate, insert_mode=True)
 
@@ -225,7 +239,7 @@ class IdentiCurse(object):
             self.notice_window = self.main_window.subwin(y-6, x-4, 5 + entry_lines, 5)
         else:
             self.notice_window = self.main_window.subwin(y-4, x, 2 + entry_lines, 1)
-        self.notice_window.bkgd(" ", curses.color_pair(self.colour_fields["timelines"]))
+        self.notice_window.bkgd(" ", curses.color_pair(colour_fields["timelines"]))
 
         # I don't like this, but it looks like it has to be done
         if hasattr(self, 'tabs'):
@@ -238,7 +252,7 @@ class IdentiCurse(object):
             self.status_window = self.main_window.subwin(1, x, y-1, 1)
         if hasattr(self, 'status_bar'):
             self.status_bar.window = self.status_window
-        self.status_window.bkgd(" ", curses.color_pair(self.colour_fields["statusbar"]))
+        self.status_window.bkgd(" ", curses.color_pair(colour_fields["statusbar"]))
 
     def initialise(self, screen):
         self.screen = screen
@@ -252,12 +266,12 @@ class IdentiCurse(object):
             curses.start_color()
             for field, (fg, bg) in self.config['colours'].items():
                 try:
-                    curses.init_pair(self.colour_fields[field], self.colours[fg], self.colours[bg])
+                    curses.init_pair(colour_fields[field], self.colours[fg], self.colours[bg])
                 except:
                     continue
         else:
-            for field in self.colour_fields:
-                curses.init_pair(self.colour_fields[field], -1, -1)
+            for field in colour_fields:
+                curses.init_pair(colour_fields[field], -1, -1)
 
         self.redraw()
 

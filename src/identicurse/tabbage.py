@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import os.path, re, sys, threading, datetime, locale, time_helper, curses, random
+import os.path, re, sys, threading, datetime, locale, time_helper, curses, random, identicurse
 DATETIME_FORMAT = "%a %b %d %H:%M:%S +0000 %Y"
 
 class Buffer(list):
@@ -23,14 +23,15 @@ class Buffer(list):
         list.__init__(self)
 
     def append(self, item):
-        if "\n" in item:  # sometimes there are newlines in the buffer's input, even when it's a dent. we need to remove them.
+        '''if "\n" in item:  # sometimes there are newlines in the buffer's input, even when it's a dent. we need to remove them.
             for line in item.split("\n"):
                 self.append(line)  # pass the line back in for further checking
         elif "\t" in item:  # if there are tabs in the input, it will display wider than the expected number of characters. convert them to spaces.
             item = "    ".join(item.split("\t"))
             self.append(item)  # pass the result back in for further checking
         else:  # we should only get here when we have a completely clean line
-            list.append(self, item)
+            list.append(self, item)'''
+        list.append(self, item)
         
     def clear(self):
         self[:] = []
@@ -131,11 +132,11 @@ class Tab(object):
         maxy, maxx = self.window.getmaxyx()[0], self.window.getmaxyx()[1]
         self.window.erase()
 
-        buffer = self.buffer.reflowed(maxx - 2)
-        for line in buffer[self.start_line:maxy - 3 + self.start_line]:
-            self.window.addstr(line.encode(sys.getfilesystemencoding(), "replace"))
+        #buffer = self.buffer.reflowed(maxx - 2)
+        for line in self.buffer[self.start_line:maxy - 3 + self.start_line]:
+            for (part, attr) in line:
+                self.window.addstr(part.encode(sys.getfilesystemencoding(), "replace"), curses.color_pair(attr))
             self.window.addstr("\n")
-
         self.window.refresh()
 
 class Help(Tab):
@@ -245,37 +246,43 @@ class Timeline(Tab):
                 time_msg = time_helper.format_time(time_helper.time_since(datetime_notice), short_form=True)
             else:
                 time_msg = time_helper.format_time(time_helper.time_since(datetime_notice))
-            
-            self.buffer.append(str(c))
-            y = len(self.buffer) - 1
+           
+            # Build the line
+            line = []
+            line.append((str(c), identicurse.colour_fields["notice_count"]))
 
             if (c - 1) == self.chosen_one:
-                self.buffer[y] += ' * '
+                line.append((' * ', identicurse.colour_fields["selector"]))
             else:
-                self.buffer[y] += ' ' * 3
+                line.append((' ' * 3, identicurse.colour_fields["selector"]))
 
-            self.buffer[y] += user
+            line.append((user, identicurse.colour_fields["username"]))
+
             if self.compact_style:
-                self.buffer[y] += ' ' * (maxx - ((len(source_msg) + len(time_msg) + len(user) + (6 + len(str(c))))))
-                self.buffer[y] += time_msg
-                self.buffer[y] += " "
-                self.buffer[y] += source_msg
+                line.append((' ' * (maxx - ((len(source_msg) + len(time_msg) + len(user) + (6 + len(str(c)))))), identicurse.colour_fields["none"]))
+                line.append((time_msg, identicurse.colour_fields["time"]))
+                line.append((' ', identicurse.colour_fields["none"]))
+                line.append((source_msg, identicurse.colour_fields["source"]))
             else:
-                self.buffer[y] += ' ' * (maxx - ((len(source_msg) + len(user) + (5 + len(str(c))))))
-                self.buffer[y] += source_msg
+                line.append((' ' * (maxx - ((len(source_msg) + len(user) + (5 + len(str(c)))))), identicurse.colour_fields["none"]))
+                line.append(source_msg, identicurse.colour_fields["source"])
+
+            self.buffer.append(line)
 
             try:
-                self.buffer.append(n['text'])
+                self.buffer.append([(n['text'], identicurse.colour_fields["notice"])])
             except UnicodeDecodeError:
-                self.buffer.append("Caution: Terminal too shit to display this notice.")
+                self.buffer.append([("Caution: Terminal too shit to display this notice.", identicurse.colour_fields["none"])])
 
-            if not self. compact_style:
-                self.buffer.append(" " * (maxx - (len(time_msg) + 2)))
-                y = len(self.buffer) - 1
-                self.buffer[y] += time_msg
+            if not self.compact_style:
+                line = []
+                line.append((" " * (maxx - (len(time_msg) + 2)), identicurse.colour_fields["time"]))
+                line.append((time_msg, identicurse.colour_fields["none"]))
                 
-                self.buffer.append("")
-            self.buffer.append("")
+                self.buffer.append(line)
+                self.buffer.append([])
+
+            self.buffer.append([])
 
             c += 1
 
