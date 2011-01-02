@@ -141,7 +141,7 @@ class IdentiCurse(object):
             if not "colours" in self.config:
                 self.config["colours"] = {
                     "timelines": ("none", "none"),
-                    "statusbar": ("cyan", "blue"),
+                    "statusbar": ("cyan", "none"),
                     "entry": ("red", "none")
                 }
 
