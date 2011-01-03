@@ -143,12 +143,9 @@ class Tab(object):
         for line in self.buffer.reflowed(maxx - 2):
             for block in line:
                 if block[1] == identicurse.colour_fields['notice_count'] and block[0] == nout:
-                    found_dent = True
-                    break
-            if not found_dent:
-                dent_line += 1
-            else:
-                break
+                    self.scrollto(dent_line, force_top=False)
+                    return
+            dent_line += 1
         self.scrollto(dent_line, force_top=False)
 
     def display(self):
