@@ -172,14 +172,16 @@ class Help(Tab):
         #for l in open(self.path, 'r').readline():
 
 class Timeline(Tab):
-    def __init__(self, conn, window, timeline, type_params={}, notice_limit=25, filters=[], compact_style=False):
+    def __init__(self, conn, window, timeline, type_params={}, notice_limit=25, filters=[], compact_style=False, user_rainbow=False):
         self.conn = conn
         self.timeline = []
+        self.user_cache = {}
         self.timeline_type = timeline
         self.type_params = type_params
         self.notice_limit = notice_limit
         self.filters = filters
         self.compact_style = compact_style
+        self.user_rainbow = user_rainbow
         self.chosen_one = 0
 
         if self.timeline_type == "user":
@@ -261,21 +263,33 @@ class Timeline(Tab):
             locale.setlocale(locale.LC_TIME, 'C')  # hacky fix because statusnet uses english timestrings regardless of locale
             datetime_notice = datetime.datetime.strptime(n['created_at'], DATETIME_FORMAT)
             locale.setlocale(locale.LC_TIME, '') # other half of the hacky fix
+
             if self.compact_style:
                 time_msg = time_helper.format_time(time_helper.time_since(datetime_notice), short_form=True)
             else:
                 time_msg = time_helper.format_time(time_helper.time_since(datetime_notice))
+
+            if not user in self.user_cache:
+                self.user_cache[user] = random.choice(identicurse.base_colours.items())[1]
            
             # Build the line
             line = []
-            line.append((str(c), identicurse.colour_fields["notice_count"]))
+
+            if c < 10:
+                cout = " " + str(c)
+            else:
+                cout = str(c)
+            line.append((cout, identicurse.colour_fields["notice_count"]))
 
             if (c - 1) == self.chosen_one:
                 line.append((' * ', identicurse.colour_fields["selector"]))
             else:
                 line.append((' ' * 3, identicurse.colour_fields["selector"]))
 
-            line.append((user, identicurse.colour_fields["username"]))
+            if self.user_rainbow:
+                line.append((user, self.user_cache[user]))
+            else:
+                line.append((user, identicurse.colour_fields["username"]))
 
             if self.compact_style:
                 line.append((' ' * (maxx - ((len(source_msg) + len(time_msg) + len(user) + (6 + len(str(c)))))), identicurse.colour_fields["none"]))

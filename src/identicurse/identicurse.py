@@ -55,6 +55,8 @@ colours = {
     "none": -1
 }
 
+base_colours = {}
+
 class IdentiCurse(object):
     """Contains Main IdentiCurse application"""
     
@@ -174,6 +176,8 @@ class IdentiCurse(object):
             self.config['border'] = True
         if not "compact_notices" in self.config:
             self.config['compact_notices'] = True
+        if not "user_rainbow" in self.config:
+            self.config["user_rainbow"] = False
         if not "keys" in self.config:
             self.config['keys'] = {}
         if not "scrollup" in self.config['keys']:
@@ -268,6 +272,12 @@ class IdentiCurse(object):
                     curses.init_pair(colour_fields[field], colours[fg], colours[bg])
                 except:
                     continue
+            c = 50
+            for (key, value) in colours.items():
+                if key != "black":
+                    base_colours[colours[key]] = c
+                    curses.init_pair(c, value, colours["none"])
+                    c += 1
         else:
             for field in colour_fields:
                 curses.init_pair(colour_fields[field], -1, -1)
@@ -281,7 +291,7 @@ class IdentiCurse(object):
         for tabspec in self.config['initial_tabs'].split("|"):
             tab = tabspec.split(':')
             if tab[0] in ("home", "mentions", "direct", "public", "sentdirect"):
-                self.tabs.append(Timeline(self.conn, self.notice_window, tab[0], notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices']))
+                self.tabs.append(Timeline(self.conn, self.notice_window, tab[0], notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices'], user_rainbow=self.config['user_rainbow']))
             elif tab[0] == "profile":
                 screen_name = tab[1]
                 if screen_name[0] == "@":
@@ -292,20 +302,20 @@ class IdentiCurse(object):
                 if screen_name[0] == "@":
                     screen_name = screen_name[1:]
                 user_id = self.conn.users_show(screen_name=screen_name)['id']
-                self.tabs.append(Timeline(self.conn, self.notice_window, "user", {'screen_name':screen_name, 'user_id':user_id}, notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices']))
+                self.tabs.append(Timeline(self.conn, self.notice_window, "user", {'screen_name':screen_name, 'user_id':user_id}, notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices'], user_rainbow=self.config['user_rainbow']))
             elif tab[0] == "group":
                 nickname = tab[1]
                 if nickname[0] == "!":
                     nickname = nickname[1:]
                 group_id = int(self.conn.statusnet_groups_show(nickname=nickname)['id'])
-                self.tabs.append(Timeline(self.conn, self.notice_window, "group", {'nickname':nickname, 'group_id':group_id}, notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices']))
+                self.tabs.append(Timeline(self.conn, self.notice_window, "group", {'nickname':nickname, 'group_id':group_id}, notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices'], user_rainbow=self.config['user_rainbow']))
             if tab[0] == "tag":
                 tag = tab[1]
                 if tag[0] == "#":
                     tag = tag[1:]
-                self.tabs.append(Timeline(self.conn, self.notice_window, "tag", {'tag':tag}, notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices']))
+                self.tabs.append(Timeline(self.conn, self.notice_window, "tag", {'tag':tag}, notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices'], user_rainbow=self.config['user_rainbow']))
             if tab[0] == "search":
-                self.tabs.append(Timeline(self.conn, self.notice_window, "search", {'query':tab[1]}, filters=self.config['filters'], compact_style=self.config['compact_notices']))
+                self.tabs.append(Timeline(self.conn, self.notice_window, "search", {'query':tab[1]}, filters=self.config['filters'], compact_style=self.config['compact_notices'], user_rainbow=self.config['user_rainbow']))
             #not too sure why anyone would need to auto-open these last two, but it couldn't hurt to add them
             if tab[0] == "context":
                 notice_id = int(tab[1])
