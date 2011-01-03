@@ -316,9 +316,10 @@ class Timeline(Tab):
                     if len(part_list) > 0:
                         if part_list[0] == '@':
                             wtf = True
-                            if not user in self.user_cache:
-                                self.user_cache["".join(part_list[1:])] = random.choice(identicurse.base_colours.items())[1]
-                            line.append((part, self.user_cache[user]))
+                            username = str("".join(part_list[1:]))
+                            if not username in self.user_cache:
+                                self.user_cache[username] = random.choice(identicurse.base_colours.items())[1]
+                            line.append((part, self.user_cache[username]))
                         else:
                             line.append((part, identicurse.colour_fields["notice"]))
 
