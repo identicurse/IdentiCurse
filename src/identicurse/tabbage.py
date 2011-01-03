@@ -275,10 +275,10 @@ class Timeline(Tab):
             # Build the line
             line = []
 
-            if c < 10:
-                cout = " " + str(c)
-            else:
-                cout = str(c)
+            #if c < 10:
+            #    cout = " " + str(c)
+            #else:
+            cout = str(c)
             line.append((cout, identicurse.colour_fields["notice_count"]))
 
             if (c - 1) == self.chosen_one:
