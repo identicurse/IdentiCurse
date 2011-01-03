@@ -23,27 +23,34 @@ class Buffer(list):
         list.__init__(self)
 
     def append(self, item):
-        '''if "\n" in item:  # sometimes there are newlines in the buffer's input, even when it's a dent. we need to remove them.
-            for line in item.split("\n"):
-                self.append(line)  # pass the line back in for further checking
-        elif "\t" in item:  # if there are tabs in the input, it will display wider than the expected number of characters. convert them to spaces.
-            item = "    ".join(item.split("\t"))
-            self.append(item)  # pass the result back in for further checking
-        else:  # we should only get here when we have a completely clean line
-            list.append(self, item)'''
-        list.append(self, item)
+        #if "\n" in item[0]:  # Remove newlines
+        #    for line in item.split("\n"):
+        #        self.append(line)
+        if "\t" in item:  # Remove tabs
+            item = ("    ".join(item[0].split("\t")), item[1])
+            self.append(item)
+        else:  # Clean line
+            list.append(self, item)
         
     def clear(self):
         self[:] = []
 
     def reflowed(self, width):
-        """return a reflowed-for-width copy of the buffer as a list"""
+        """ Return a reflowed-for-width copy of the buffer as a list. """
         reflowed_buffer = []
+
         for line in self:
-            while len(line) > width:
-                reflowed_buffer.append(line[:width])
-                line = line[width:]
-            reflowed_buffer.append(line) # append whatever part of the line wasn't already added
+            cumulative_length = 0
+            for part in line:
+                cumulative_length += len(part[0])
+                if cumulative_length > width:
+                    reflowed_buffer.append([(part[0][:width], part[1])])
+                    reflowed_buffer.append([("\n", "none")])
+                    reflowed_buffer.append([(part[0][width:], part[1])])
+
+            if cumulative_length < width:
+                reflowed_buffer.append(line)
+
         return reflowed_buffer
 
 class TabUpdater(threading.Thread):
