@@ -134,11 +134,15 @@ class Tab(object):
 
     def scrolltodent(self, n):
         maxy, maxx = self.window.getmaxyx()[0], self.window.getmaxyx()[1]
+        if n < 9:
+            nout = " " + str(n+1)
+        else:
+            nout = str(n+1)
         dent_line = 0
         found_dent = False
         for line in self.buffer.reflowed(maxx - 2):
             for block in line:
-                if block[1] == identicurse.colour_fields['notice_count'] and block[0] == str(n+1):
+                if block[1] == identicurse.colour_fields['notice_count'] and block[0] == nout:
                     found_dent = True
                     break
             if not found_dent:
@@ -275,10 +279,10 @@ class Timeline(Tab):
             # Build the line
             line = []
 
-            #if c < 10:
-            #    cout = " " + str(c)
-            #else:
-            cout = str(c)
+            if c < 10:
+                cout = " " + str(c)
+            else:
+                cout = str(c)
             line.append((cout, identicurse.colour_fields["notice_count"]))
 
             if (c - 1) == self.chosen_one:
