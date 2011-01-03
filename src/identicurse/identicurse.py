@@ -282,6 +282,13 @@ class IdentiCurse(object):
             for field in colour_fields:
                 curses.init_pair(colour_fields[field], -1, -1)
 
+            c = 50
+            for (key, value) in colours.items():
+                if key != "black":
+                    base_colours[colours[key]] = c
+                    curses.init_pair(c, -1, -1)
+                    c += 1
+
         self.redraw()
 
         self.status_bar = StatusBar(self.status_window)
