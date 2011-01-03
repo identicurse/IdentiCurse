@@ -157,7 +157,7 @@ class Help(Tab):
 
     def update_buffer(self):
         self.buffer.clear()
-        self.buffer.append(open(self.path, 'r').read())
+        #for l in open(self.path, 'r').readline():
 
 class Timeline(Tab):
     def __init__(self, conn, window, timeline, type_params={}, notice_limit=25, filters=[], compact_style=False):
@@ -322,7 +322,6 @@ class Context(Tab):
         self.buffer.clear() 
 
         c = 1
-
         maxx = self.window.getmaxyx()[1]
 
         for n in self.timeline:
@@ -345,39 +344,44 @@ class Context(Tab):
             else:
                 time_msg = time_helper.format_time(time_helper.time_since(datetime_notice))
             
-            self.buffer.append(str(c))
-            y = len(self.buffer) - 1
-
+            line = []
+            line.append((str(c), identicurse.colour_fields["notice_count"]))
+            
             if (c - 1) == self.chosen_one:
-                self.buffer[y] += ' * '
+                line.append((' * ', identicurse.colour_fields["selector"]))
             else:
-                self.buffer[y] += ' ' * 3
-            self.buffer[y] += user
+                line.append((' ' * 3, identicurse.colour_fields["selector"]))
 
+            line.append((user, identicurse.colour_fields["username"]))
+            
             if self.compact_style:
-                self.buffer[y] += ' ' * (maxx - ((len(source_msg) + len(time_msg) + len(user) + (6 + len(str(c))))))
-                self.buffer[y] += time_msg
-                self.buffer[y] += " "
-                self.buffer[y] += source_msg
+                line.append((' ' * (maxx - ((len(source_msg) + len(time_msg) + len(user) + (6 + len(str(c)))))), identicurse.colour_fields["none"]))
+                line.append((time_msg, identicurse.colour_fields["time"]))
+                line.append((' ', identicurse.colour_fields["none"]))
+                line.append((source_msg, identicurse.colour_fields["source"]))
             else:
-                self.buffer[y] += ' ' * (maxx - ((len(source_msg) + len(user) + (5 + len(str(c))))))
-                self.buffer[y] += source_msg
+                line.append((' ' * (maxx - ((len(source_msg) + len(user) + (5 + len(str(c)))))), identicurse.colour_fields["none"]))
+                line.append(source_msg, identicurse.colour_fields["source"])
+
+            self.buffer.append(line)
 
             try:
-                self.buffer.append(n['text'])
+                self.buffer.append([(n['text'], identicurse.colour_fields["notice"])])
             except UnicodeDecodeError:
-                self.buffer += "Caution: Terminal too shit to display this notice"
+                self.buffer.append([("Caution: Terminal too shit to display this notice.", identicurse.colour_fields["none"])])
 
             if not self.compact_style:
-                self.buffer.append(" " * (maxx - (len(time_msg) + 2)))
-                y = len(self.buffer) - 1
-                self.buffer[y] += time_msg
+                line = []
+                line.append((" " * (maxx - (len(time_msg) + 2)), identicurse.colour_fields["time"]))
+                line.append((time_msg, identicurse.colour_fields["none"]))
                 
-                self.buffer.append("")
-            self.buffer.append("")
+                self.buffer.append(line)
+                self.buffer.append([])
+
+            self.buffer.append([])
 
             c += 1
-
+           
 class Profile(Tab):
     def __init__(self, conn, window, id):
         self.conn = conn
