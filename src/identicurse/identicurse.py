@@ -45,14 +45,23 @@ colour_fields = {
 }
 
 colours = {
-    "red": curses.COLOR_RED,
-    "cyan": curses.COLOR_CYAN,
-    "green": curses.COLOR_GREEN,
-    "magenta": curses.COLOR_MAGENTA,
-    "yellow": curses.COLOR_YELLOW,
-    "blue": curses.COLOR_BLUE,
-    "black": curses.COLOR_BLACK,
-    "none": -1
+    "none": -1,
+    "white": 0,
+    "red": 1,
+    "green": 2,
+    "brown": 3,
+    "blue": 4,
+    "magenta": 5,
+    "cyan": 6,
+    "white": 7,
+    "grey": 8,
+    "light_red": 9,
+    "light_green": 10,
+    "yellow": 11,
+    "light_blue": 12,
+    "light_magenta": 13,
+    "light_cyan": 14,
+    "light_white": 15
 }
 
 base_colours = {}
@@ -140,8 +149,7 @@ class IdentiCurse(object):
             "/link",
             "/bugreport",
             "/featurerequest"
-            ]
-
+        ]
         
         # Set some defaults for configs that we will always need to use, but that are optional
         if not "enable_colours" in self.config:
@@ -267,6 +275,7 @@ class IdentiCurse(object):
 
         if curses.has_colors() and self.config['enable_colours'] == True:
             curses.start_color()
+
             for field, (fg, bg) in self.config['colours'].items():
                 try:
                     curses.init_pair(colour_fields[field], colours[fg], colours[bg])
