@@ -23,14 +23,19 @@ class Buffer(list):
         list.__init__(self)
 
     def append(self, item):
-        #if "\n" in item[0]:  # Remove newlines
-        #    for line in item.split("\n"):
-        #        self.append(line)
-        if "\t" in item:  # Remove tabs
-            item = ("    ".join(item[0].split("\t")), item[1])
-            self.append(item)
-        else:  # Clean line
-            list.append(self, item)
+        clean_item = []
+        for block in item:
+            clean_blocks = []
+            if "\n" in block[0]:
+                for sub_block in block[0].split("\n"):
+                    clean_blocks.append((sub_block, block[1]))
+            else:
+                clean_blocks.append(block)
+            for block in clean_blocks: 
+                if "\t" in block[0]:
+                    block = ("    ".join(block[0].split("\t")), block[1])
+                clean_item.append(block)
+        list.append(self, clean_item)
         
     def clear(self):
         self[:] = []
@@ -40,16 +45,18 @@ class Buffer(list):
         reflowed_buffer = []
 
         for line in self:
-            cumulative_length = 0
-            for part in line:
-                cumulative_length += len(part[0])
-                if cumulative_length > width:
-                    reflowed_buffer.append([(part[0][:width], part[1])])
-                    reflowed_buffer.append([("\n", "none")])
-                    reflowed_buffer.append([(part[0][width:], part[1])])
-
-            if cumulative_length < width:
-                reflowed_buffer.append(line)
+            reflowed_buffer.append([])
+            line_length = 0
+            for block in line:
+                if (len(block[0]) + line_length) > width:
+                    overlong_by = (len(block[0]) + line_length) - width
+                    reflowed_buffer[-1].append((block[0][:len(block[0])-overlong_by], block[1]))
+                    reflowed_buffer.append([])
+                    reflowed_buffer[-1].append((block[0][len(block[0])-overlong_by:], block[1]))
+                    line_length = len(reflowed_buffer[-1][-1][0])
+                else:
+                    reflowed_buffer[-1].append(block)
+                    line_length += len(block[0])
 
         return reflowed_buffer
 
@@ -129,10 +136,9 @@ class Tab(object):
         maxy, maxx = self.window.getmaxyx()[0], self.window.getmaxyx()[1]
         dent_line = 0
         found_dent = False
-        raise Exception(self.buffer.reflowed(maxx - 2))
         for line in self.buffer.reflowed(maxx - 2):
             for block in line:
-                if block[1] == identicurse.colour_fields['notice_count'] and block[0] == str(n):
+                if block[1] == identicurse.colour_fields['notice_count'] and block[0] == str(n+1):
                     found_dent = True
                     break
             if not found_dent:
