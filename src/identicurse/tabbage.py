@@ -128,11 +128,17 @@ class Tab(object):
     def scrolltodent(self, n):
         maxy, maxx = self.window.getmaxyx()[0], self.window.getmaxyx()[1]
         dent_line = 0
+        found_dent = False
+        raise Exception(self.buffer.reflowed(maxx - 2))
         for line in self.buffer.reflowed(maxx - 2):
-            if ("%d * " % (n + 1) in line) or ("%d   " % (n + 1) in line):
-                break
-            else:
+            for block in line:
+                if block[1] == identicurse.colour_fields['notice_count'] and block[0] == str(n):
+                    found_dent = True
+                    break
+            if not found_dent:
                 dent_line += 1
+            else:
+                break
         self.scrollto(dent_line, force_top=False)
 
     def display(self):
