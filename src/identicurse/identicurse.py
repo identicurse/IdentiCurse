@@ -40,7 +40,10 @@ colour_fields = {
     "time": 6,
     "source": 7,
     "notice_count": 8,
-    "notice": 9
+    "notice": 9,
+    "profile_title": 10,
+    "profile_fields": 11,
+    "profile_values": 12
 }
 
 colours = {
@@ -163,6 +166,9 @@ class IdentiCurse(object):
                 "notice": ("magenta", "black"),
                 "notice_count": ("yellow", "black"),
                 "username": ("cyan", "black"),
+                "profile_title": ("cyan", "none"),
+                "profile_fields": ("blue", "none"),
+                "profile_values": ("none", "none"),
                 "none": ("none", "none")
             }
 
