@@ -170,7 +170,8 @@ class Help(Tab):
 
     def update_buffer(self):
         self.buffer.clear()
-        #for l in open(self.path, 'r').readline():
+        for l in open(self.path, 'r').readlines():
+            self.buffer.append([(l, identicurse.colour_fields['none'])])
 
 class Timeline(Tab):
     def __init__(self, conn, window, timeline, type_params={}, notice_limit=25, filters=[], compact_style=False, user_rainbow=False):
