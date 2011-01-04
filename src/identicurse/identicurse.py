@@ -46,7 +46,7 @@ colour_fields = {
 
 colours = {
     "none": -1,
-    "white": 0,
+    "black": 0,
     "red": 1,
     "green": 2,
     "brown": 3,
@@ -283,6 +283,8 @@ class IdentiCurse(object):
                     continue
             c = 50
             for (key, value) in colours.items():
+                if (value + 1) > curses.COLORS:
+                    continue
                 if key != "black":
                     base_colours[colours[key]] = c
                     curses.init_pair(c, value, colours["none"])
