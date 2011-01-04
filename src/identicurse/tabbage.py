@@ -152,8 +152,8 @@ class Tab(object):
         maxy, maxx = self.window.getmaxyx()[0], self.window.getmaxyx()[1]
         self.window.erase()
 
-        #buffer = self.buffer.reflowed(maxx - 2)
-        for line in self.buffer[self.start_line:maxy - 3 + self.start_line]:
+        buffer = self.buffer.reflowed(maxx - 2)
+        for line in buffer[self.start_line:maxy - 3 + self.start_line]:
             for (part, attr) in line:
                 self.window.addstr(part.encode(sys.getfilesystemencoding(), "replace"), curses.color_pair(attr))
             self.window.addstr("\n")
