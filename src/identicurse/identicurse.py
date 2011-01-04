@@ -168,6 +168,9 @@ class IdentiCurse(object):
                 "notice": ("magenta", "black"),
                 "notice_count": ("yellow", "black"),
                 "username": ("cyan", "black"),
+                "profile_title": ("cyan", "none"),
+                "profile_fields": ("blue", "none"),
+                "profile_values": ("none", "none"),
                 "none": ("none", "none")
             }
 
