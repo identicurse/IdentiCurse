@@ -445,55 +445,61 @@ class Profile(Tab):
 
         self.name = "Profile (%s)" % self.id
 
+        self.fields = [
+                # display name,           internal field name,  skip a line after this field?
+                ("Real Name",             "name",               True),
+                ("Bio",                   "description",        False),
+                ("Location",              "location",           False),
+                ("URL",                   "url",                False),
+                ("User ID",               "id",                 False),
+                ("Joined at",             "created_at",         True),
+                ("Followed by",           "followers_count",    False),
+                ("Following",             "friends_count",      False),
+                ("Followed by you",       "following",          True),
+                ("Favourites",            "favourites_count",   False),
+                ("Notices",               "statuses_count",     False),
+                ("Average daily notices", "notices_per_day",    True)
+                ]
+
         Tab.__init__(self, window)
 
     def update(self):
         self.profile = self.conn.users_show(screen_name=self.id)
+
+        # numerical fields, convert them to strings to make the buffer code more clean
+        for field in ['id', 'created_at', 'followers_count', 'friends_count', 'favourites_count', 'statuses_count']:
+            self.profile[field] = str(self.profile[field])
+
+        # special handling for following
+        if self.profile['following']:
+            self.profile['following'] = "Yes"
+        else:
+            self.profile['following'] = "No"
+
+        # create this field specially
+        locale.setlocale(locale.LC_TIME, 'C')  # hacky fix because statusnet uses english timestrings regardless of locale
+        datetime_joined = datetime.datetime.strptime(self.profile['created_at'], DATETIME_FORMAT)
+        locale.setlocale(locale.LC_TIME, '') # other half of the hacky fix
+        days_since_join = time_helper.single_unit(time_helper.time_since(datetime_joined), "days")['days']
+        self.profile['notices_per_day'] = "%0.2f" % (float(self.profile['statuses_count']) / days_since_join)
+
         self.update_buffer()
 
     def update_buffer(self):
         self.buffer.clear()
-        self.buffer.append("@" + self.profile['screen_name'] + "'s Profile")
-        self.buffer.append("")
-        self.buffer.append("")
 
-        if self.profile['name']:
-            self.buffer.append("Real Name: " + self.profile['name'])
-            self.buffer.append("")
-       
-        if self.profile['description']:
-            self.buffer.append("Bio: " + self.profile['description'])
-        if self.profile['location']:
-            self.buffer.append("Location: " + self.profile['location'])
-        if self.profile['url']:
-            self.buffer.append("URL: " + self.profile['url'])
-        if self.profile['id']:
-            self.buffer.append("User ID: " + str(self.profile['id']))
-        if self.profile['created_at']:
-            self.buffer.append("Joined at: " + str(self.profile['created_at']))
+        self.buffer.append([("@" + self.profile['screen_name'] + "'s Profile", identicurse.colour_fields['profile_title'])])
+        self.buffer.append([("", identicurse.colour_fields['none'])])
 
-            self.buffer.append("")
+        for field in self.fields:
+            line = []
 
-        if self.profile['followers_count']:
-            self.buffer.append("Followed by: " + str(self.profile['followers_count']))
-        if self.profile['friends_count']:
-            self.buffer.append("Following: " + str(self.profile['friends_count']))
-        if self.profile['following']:
-            self.buffer.append("Followed by you: Yes")
-        else:
-            self.buffer.append("Followed by you: No")
+            line.append((field[0] + ":", identicurse.colour_fields['profile_fields']))
+            line.append((" ", identicurse.colour_fields['none']))
 
-        self.buffer.append("")
+            line.append((self.profile[field[1]], identicurse.colour_fields['profile_values']))
 
-        if self.profile['favourites_count']:
-            self.buffer.append("Favourites: " + str(self.profile['favourites_count']))
-        if self.profile['statuses_count']:
-            self.buffer.append("Notices: " + str(self.profile['statuses_count']))
+            self.buffer.append(line)
 
-            locale.setlocale(locale.LC_TIME, 'C')  # hacky fix because statusnet uses english timestrings regardless of locale
-            datetime_joined = datetime.datetime.strptime(self.profile['created_at'], DATETIME_FORMAT)
-            locale.setlocale(locale.LC_TIME, '') # other half of the hacky fix
-            days_since_join = time_helper.single_unit(time_helper.time_since(datetime_joined), "days")['days']
-            notices_per_day = float(self.profile['statuses_count']) / days_since_join
-
-            self.buffer.append("Average daily notices: %0.2f" % (notices_per_day))
+            if field[2]:
+                self.buffer.append([("", identicurse.colour_fields['none'])])
