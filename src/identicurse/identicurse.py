@@ -155,20 +155,26 @@ class IdentiCurse(object):
         if not "enable_colours" in self.config:
             self.config["enable_colours"] = False
         else:
+            default_colour_scheme = {
+                "timelines": ("none", "none"),
+                "statusbar": ("cyan", "none"),
+                "entry": ("red", "none"),
+                "selector": ("yellow", "none"),
+                "time": ("black", "cyan"),
+                "source": ("red", "green"),
+                "notice": ("magenta", "black"),
+                "notice_count": ("yellow", "black"),
+                "username": ("cyan", "black"),
+                "none": ("none", "none")
+            }
+
             # Default colour scheme
             if not "colours" in self.config:
-                self.config["colours"] = {
-                    "timelines": ("none", "none"),
-                    "statusbar": ("cyan", "none"),
-                    "entry": ("red", "none"),
-                    "selector": ("yellow", "none"),
-                    "time": ("black", "cyan"),
-                    "source": ("red", "green"),
-                    "notice": ("magenta", "black"),
-                    "notice_count": ("yellow", "black"),
-                    "username": ("cyan", "black"),
-                    "none": ("none", "none")
-                }
+                self.config["colours"] = default_colour_scheme
+            else:
+                for part in colour_fields:
+                    if not part in self.config["colours"]:
+                        self.config["colours"][part] = default_colour_scheme[part]
 
         if not "search_case_sensitive" in self.config:
             self.config['search_case_sensitive'] = "sensitive"
@@ -285,7 +291,8 @@ class IdentiCurse(object):
             for (key, value) in colours.items():
                 if (value + 1) > curses.COLORS:
                     continue
-                if key != "black":
+
+                if key != "black" and key != self.config['colours']['notice']:
                     base_colours[colours[key]] = c
                     curses.init_pair(c, value, colours["none"])
                     c += 1
