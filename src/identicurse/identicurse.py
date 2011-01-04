@@ -292,7 +292,7 @@ class IdentiCurse(object):
                 if (value + 1) > curses.COLORS:
                     continue
 
-                if key != "black" and key != self.config['colours']['notice']:
+                if not key in ("black", "white", "none") and key != self.config['colours']['notice']:
                     base_colours[colours[key]] = c
                     curses.init_pair(c, value, colours["none"])
                     c += 1
