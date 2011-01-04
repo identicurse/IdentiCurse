@@ -41,7 +41,10 @@ colour_fields = {
     "time": 6,
     "source": 7,
     "notice_count": 8,
-    "notice": 9
+    "notice": 9,
+    "profile_title": 10,
+    "profile_fields": 11,
+    "profile_values": 12
 }
 
 colours = {
@@ -169,6 +172,10 @@ class IdentiCurse(object):
                     "username": ("cyan", "black"),
                     "none": ("none", "none")
                 }
+            else:
+                for field in colour_fields:
+                    if not field in self.config["colours"]:
+                        self.config["colours"][field] = ("none", "none")
 
         if not "search_case_sensitive" in self.config:
             self.config['search_case_sensitive'] = "sensitive"
