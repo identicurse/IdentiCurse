@@ -293,12 +293,12 @@ class Timeline(Tab):
                 line.append((user, identicurse.colour_fields["username"]))
 
             if self.compact_style:
-                line.append((' ' * (maxx - ((len(source_msg) + len(time_msg) + len(user) + (6 + len(str(c)))))), identicurse.colour_fields["none"]))
+                line.append((' ' * (maxx - ((len(source_msg) + len(time_msg) + len(user) + (6 + len(cout))))), identicurse.colour_fields["none"]))
                 line.append((time_msg, identicurse.colour_fields["time"]))
                 line.append((' ', identicurse.colour_fields["none"]))
                 line.append((source_msg, identicurse.colour_fields["source"]))
             else:
-                line.append((' ' * (maxx - ((len(source_msg) + len(user) + (5 + len(str(c)))))), identicurse.colour_fields["none"]))
+                line.append((' ' * (maxx - ((len(source_msg) + len(user) + (5 + len(cout))))), identicurse.colour_fields["none"]))
                 line.append(source_msg, identicurse.colour_fields["source"])
 
             self.buffer.append(line)
@@ -396,7 +396,12 @@ class Context(Tab):
                 time_msg = time_helper.format_time(time_helper.time_since(datetime_notice))
             
             line = []
-            line.append((str(c), identicurse.colour_fields["notice_count"]))
+
+            if c < 10:
+                cout = " " + str(c)
+            else:
+                cout = str(c)
+            line.append((cout, identicurse.colour_fields["notice_count"]))
             
             if (c - 1) == self.chosen_one:
                 line.append((' * ', identicurse.colour_fields["selector"]))
@@ -406,12 +411,12 @@ class Context(Tab):
             line.append((user, identicurse.colour_fields["username"]))
             
             if self.compact_style:
-                line.append((' ' * (maxx - ((len(source_msg) + len(time_msg) + len(user) + (6 + len(str(c)))))), identicurse.colour_fields["none"]))
+                line.append((' ' * (maxx - ((len(source_msg) + len(time_msg) + len(user) + (6 + len(cout))))), identicurse.colour_fields["none"]))
                 line.append((time_msg, identicurse.colour_fields["time"]))
                 line.append((' ', identicurse.colour_fields["none"]))
                 line.append((source_msg, identicurse.colour_fields["source"]))
             else:
-                line.append((' ' * (maxx - ((len(source_msg) + len(user) + (5 + len(str(c)))))), identicurse.colour_fields["none"]))
+                line.append((' ' * (maxx - ((len(source_msg) + len(user) + (5 + len(cout))))), identicurse.colour_fields["none"]))
                 line.append(source_msg, identicurse.colour_fields["source"])
 
             self.buffer.append(line)
