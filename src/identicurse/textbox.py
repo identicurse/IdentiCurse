@@ -15,8 +15,9 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import curses
+import curses, identicurse
 from curses import textpad
+from curses import ascii
 
 class Textbox(textpad.Textbox):
     def __init__(self, win, poll, insert_mode=False):
@@ -33,6 +34,7 @@ class Textbox(textpad.Textbox):
 
         abort = False
         while 1:
+            insert = False
             ch = self.win.getch()
 
             if ch == 127:

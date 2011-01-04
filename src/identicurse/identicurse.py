@@ -35,7 +35,6 @@ colour_fields = {
     "none": 0,
     "statusbar": 1,
     "timelines": 2,
-    "entry": 3,
     "selector": 4,
     "username": 5,
     "time": 6,
@@ -158,7 +157,6 @@ class IdentiCurse(object):
             default_colour_scheme = {
                 "timelines": ("none", "none"),
                 "statusbar": ("cyan", "none"),
-                "entry": ("red", "none"),
                 "selector": ("yellow", "none"),
                 "time": ("red", "none"),
                 "source": ("red", "none"),
@@ -248,7 +246,6 @@ class IdentiCurse(object):
             self.entry_window = self.main_window.subwin(entry_lines, x-6, 4, 5)
         else:
             self.entry_window = self.main_window.subwin(entry_lines, x-2, 1, 1)
-        self.entry_window.bkgd(" ", curses.color_pair(colour_fields["entry"]))
 
         self.text_entry = Textbox(self.entry_window, self.validate, insert_mode=True)
 
