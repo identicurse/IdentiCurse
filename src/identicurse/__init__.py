@@ -60,7 +60,14 @@ def main():
     parser.add_option("-s", "--slogans",
             help="specify an alternative slogans file to use",
             action="store", type="string", dest="slogans_filename", metavar="FILE")
+    parser.add_option("--colour-check",
+            help="check if system curses library supports colours, and how many",
+            action="store_true", dest="colour_check")
     (options, args) = parser.parse_args()
+
+    if (options.colour_check is not None) and (options.colour_check == True):
+        colour_check()
+        return
 
     additional_config = {}
 
@@ -81,6 +88,17 @@ def main():
     print "Welcome to IdentiCurse 0.6-dev - %s" % (random.choice(slogans))
     IdentiCurse(additional_config)
 
+def colour_check():
+    import curses
+    curses.initscr()
+    if curses.has_colors():
+        curses.start_color()
+        curses.use_default_colors()
+        msg = "Your system's curses library supports %d colours." % (curses.COLORS)
+    else:
+        msg = "Your system's curses library does not support colours."
+    curses.endwin()
+    print msg
 
 if __name__ == '__main__':
     main()
