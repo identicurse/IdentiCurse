@@ -100,3 +100,15 @@ def single_unit(time_dict, unit):
     elif unit == "days":
         time_dict['days'] = (total_seconds / (60 * 60 * 24))
     return time_dict
+
+def find_split_point(text, width):
+    split_point = width - 1
+    while True:
+        if text[split_point-1] == " ":
+            break
+        else:
+            split_point -= 1
+            if split_point == 0:  # no smart split point was found, split unsmartly
+                split_point = width - 1
+                break
+    return split_point

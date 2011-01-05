@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import urllib, urllib2
+import urllib, urllib2, helpers
 try:
     import json
 except ImportError:
@@ -208,17 +208,8 @@ class StatusNet(object):
             if long_dent=="truncate":
                 params['status'] = status[:self.length_limit]
             elif long_dent=="split":
-                status_next = status[self.length_limit - 2:]
-                status = status[:self.length_limit-2]
-                while True:
-                    if len(status) == 0:
-                        raise Exception("Maximum status length exceeded by %d characters, and no split point could be found." % (len(status) - self.length_limit))
-                    elif status[-1] in [" "]:
-                        status = status.encode('utf-8') + u".."
-                        break # split point found
-                    else:
-                        status_next = status[-1] + status_next
-                        status = status[:-1]
+                status_next = status[helpers.find_split_point(status, self.length_limit - 2):]
+                status = status.encode('utf-8')[:helpers.find_split_point(status, self.length_limit - 2)] + u".."
                 if dup_first_word or (not (in_reply_to_status_id == 0)):
                     status_next = status.split(" ")[0].encode('utf-8') + " .. " + status_next
                 else:

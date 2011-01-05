@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import os.path, re, sys, threading, datetime, locale, time_helper, curses, random, identicurse
+import os.path, re, sys, threading, datetime, locale, helpers, curses, random, identicurse
 DATETIME_FORMAT = "%a %b %d %H:%M:%S +0000 %Y"
 
 class Buffer(list):
@@ -60,9 +60,10 @@ class Buffer(list):
             for block in line:
                 if (len(block[0]) + line_length) > width:
                     overlong_by = (len(block[0]) + line_length) - width
-                    reflowed_buffer[-1].append((block[0][:len(block[0])-overlong_by], block[1]))
+                    split_point = helpers.find_split_point(block[0], len(block[0]) - overlong_by + 1)
+                    reflowed_buffer[-1].append((block[0][:split_point], block[1]))
                     reflowed_buffer.append([])
-                    reflowed_buffer[-1].append((block[0][len(block[0])-overlong_by:], block[1]))
+                    reflowed_buffer[-1].append((block[0][split_point:], block[1]))
                     line_length = len(reflowed_buffer[-1][-1][0])
                 else:
                     reflowed_buffer[-1].append(block)
@@ -290,9 +291,9 @@ class Timeline(Tab):
             locale.setlocale(locale.LC_TIME, '') # other half of the hacky fix
 
             if self.compact_style:
-                time_msg = time_helper.format_time(time_helper.time_since(datetime_notice), short_form=True)
+                time_msg = helpers.format_time(helpers.time_since(datetime_notice), short_form=True)
             else:
-                time_msg = time_helper.format_time(time_helper.time_since(datetime_notice))
+                time_msg = helpers.format_time(helpers.time_since(datetime_notice))
 
             if not user in self.user_cache:
                 self.user_cache[user] = random.choice(identicurse.base_colours.items())[1]
@@ -431,9 +432,9 @@ class Context(Tab):
             datetime_notice = datetime.datetime.strptime(n['created_at'], DATETIME_FORMAT)
             locale.setlocale(locale.LC_TIME, '') # other half of the hacky fix
             if self.compact_style:
-                time_msg = time_helper.format_time(time_helper.time_since(datetime_notice), short_form=True)
+                time_msg = helpers.format_time(helpers.time_since(datetime_notice), short_form=True)
             else:
-                time_msg = time_helper.format_time(time_helper.time_since(datetime_notice))
+                time_msg = helpers.format_time(helpers.time_since(datetime_notice))
             
             if not user in self.user_cache:
                 self.user_cache[user] = random.choice(identicurse.base_colours.items())[1]
@@ -550,7 +551,7 @@ class Profile(Tab):
         locale.setlocale(locale.LC_TIME, 'C')  # hacky fix because statusnet uses english timestrings regardless of locale
         datetime_joined = datetime.datetime.strptime(self.profile['created_at'], DATETIME_FORMAT)
         locale.setlocale(locale.LC_TIME, '') # other half of the hacky fix
-        days_since_join = time_helper.single_unit(time_helper.time_since(datetime_joined), "days")['days']
+        days_since_join = helpers.single_unit(helpers.time_since(datetime_joined), "days")['days']
         self.profile['notices_per_day'] = "%0.2f" % (float(self.profile['statuses_count']) / days_since_join)
 
         self.update_buffer()
