@@ -174,7 +174,7 @@ class Help(Tab):
             self.buffer.append([(l, identicurse.colour_fields['none'])])
 
 class Timeline(Tab):
-    def __init__(self, conn, window, timeline, type_params={}, notice_limit=25, filters=[], compact_style=False, user_rainbow=False):
+    def __init__(self, conn, window, timeline, type_params={}, notice_limit=25, filters=[], compact_style=False, user_rainbow=False, expand_remote=False):
         self.conn = conn
         self.timeline = []
         self.user_cache = {}
@@ -184,6 +184,10 @@ class Timeline(Tab):
         self.filters = filters
         self.compact_style = compact_style
         self.user_rainbow = user_rainbow
+        self.expand_remote = expand_remote
+        if self.expand_remote:
+            import re
+            self.title_regex = re.compile("\<title\>(.*)\<\/title\>")
         self.chosen_one = 0
 
         if self.timeline_type == "user":
@@ -233,6 +237,15 @@ class Timeline(Tab):
                     passes_filters = False
                     break
             if passes_filters:
+                if self.expand_remote and "attachments" in notice:
+                    import urllib2
+                    for attachment in notice['attachments']:
+                        if attachment['mimetype'] != "text/html":
+                            continue
+                        req = urllib2.Request(attachment['url'])
+                        page = urllib2.urlopen(req).read()
+                        notice['text'] = self.title_regex.findall(page)[0]
+                        break
                 self.timeline.append(notice)
 
         if self.page > 1:
@@ -304,7 +317,7 @@ class Timeline(Tab):
 
             self.buffer.append(line)
 
-            if self.user_rainbow:
+            try:
                 line = []
 
                 notice_parts = re.split(r'(@(\w+))', n['text'])
@@ -319,19 +332,19 @@ class Timeline(Tab):
                         if part_list[0] == '@':
                             wtf = True
                             username = str("".join(part_list[1:]))
-                            if not username in self.user_cache:
-                                self.user_cache[username] = random.choice(identicurse.base_colours.items())[1]
-                            line.append((part, self.user_cache[username]))
+                            if self.user_rainbow:
+                                if not username in self.user_cache:
+                                    self.user_cache[username] = random.choice(identicurse.base_colours.items())[1]
+                                line.append((part, self.user_cache[username]))
+                            else:
+                                line.append((part, identicurse.colour_fields['username']))
                         else:
                             line.append((part, identicurse.colour_fields["notice"]))
 
                 self.buffer.append(line)
 
-            else:
-                try:
-                    self.buffer.append([(n['text'], identicurse.colour_fields["notice"])])
-                except UnicodeDecodeError:
-                    self.buffer.append([("Caution: Terminal too shit to display this notice.", identicurse.colour_fields["none"])])
+            except UnicodeDecodeError:
+                self.buffer.append([("Caution: Terminal too shit to display this notice.", identicurse.colour_fields["none"])])
 
             if not self.compact_style:
                 line = []
@@ -346,11 +359,13 @@ class Timeline(Tab):
             c += 1
 
 class Context(Tab):
-    def __init__(self, conn, window, notice_id, compact_style=False):
+    def __init__(self, conn, window, notice_id, compact_style=False, user_rainbow=False):
         self.conn = conn
         self.notice = notice_id
         self.timeline = []
         self.compact_style = compact_style
+        self.user_rainbow = user_rainbow
+        self.user_cache = {}
         self.chosen_one = 0
 
         self.name = "Context"
@@ -396,6 +411,9 @@ class Context(Tab):
             else:
                 time_msg = time_helper.format_time(time_helper.time_since(datetime_notice))
             
+            if not user in self.user_cache:
+                self.user_cache[user] = random.choice(identicurse.base_colours.items())[1]
+
             line = []
 
             if c < 10:
@@ -409,7 +427,10 @@ class Context(Tab):
             else:
                 line.append((' ' * 3, identicurse.colour_fields["selector"]))
 
-            line.append((user, identicurse.colour_fields["username"]))
+            if self.user_rainbow:
+                line.append((user, self.user_cache[user]))
+            else:
+                line.append((user, identicurse.colour_fields["username"]))
             
             if self.compact_style:
                 line.append((' ' * (maxx - ((len(source_msg) + len(time_msg) + len(user) + (6 + len(cout))))), identicurse.colour_fields["none"]))
@@ -423,7 +444,31 @@ class Context(Tab):
             self.buffer.append(line)
 
             try:
-                self.buffer.append([(n['text'], identicurse.colour_fields["notice"])])
+                line = []
+
+                notice_parts = re.split(r'(@(\w+))', n['text'])
+                wtf = False
+                for part in notice_parts:
+                    if wtf == True:
+                        wtf = False
+                        continue
+
+                    part_list = list(part)
+                    if len(part_list) > 0:
+                        if part_list[0] == '@':
+                            wtf = True
+                            username = str("".join(part_list[1:]))
+                            if self.user_rainbow:
+                                if not username in self.user_cache:
+                                    self.user_cache[username] = random.choice(identicurse.base_colours.items())[1]
+                                line.append((part, self.user_cache[username]))
+                            else:
+                                line.append((part, identicurse.colour_fields['username']))
+                        else:
+                            line.append((part, identicurse.colour_fields["notice"]))
+
+                self.buffer.append(line)
+
             except UnicodeDecodeError:
                 self.buffer.append([("Caution: Terminal too shit to display this notice.", identicurse.colour_fields["none"])])
 

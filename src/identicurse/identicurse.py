@@ -160,11 +160,11 @@ class IdentiCurse(object):
             default_colour_scheme = {
                 "timelines": ("none", "none"),
                 "statusbar": ("cyan", "none"),
-                "selector": ("yellow", "none"),
+                "selector": ("brown", "none"),
                 "time": ("red", "none"),
                 "source": ("red", "none"),
                 "notice": ("magenta", "black"),
-                "notice_count": ("yellow", "black"),
+                "notice_count": ("brown", "black"),
                 "username": ("cyan", "black"),
                 "profile_title": ("cyan", "none"),
                 "profile_fields": ("blue", "none"),
@@ -196,6 +196,8 @@ class IdentiCurse(object):
             self.config['compact_notices'] = True
         if not "user_rainbow" in self.config:
             self.config["user_rainbow"] = False
+        if not "expand_remote" in self.config:
+            self.config["expand_remote"] = False
         if not "keys" in self.config:
             self.config['keys'] = {}
         if not "scrollup" in self.config['keys']:
@@ -319,7 +321,7 @@ class IdentiCurse(object):
         for tabspec in self.config['initial_tabs'].split("|"):
             tab = tabspec.split(':')
             if tab[0] in ("home", "mentions", "direct", "public", "sentdirect"):
-                self.tabs.append(Timeline(self.conn, self.notice_window, tab[0], notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices'], user_rainbow=self.config['user_rainbow']))
+                self.tabs.append(Timeline(self.conn, self.notice_window, tab[0], notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices'], user_rainbow=self.config['user_rainbow'], expand_remote=self.config['expand_remote']))
             elif tab[0] == "profile":
                 screen_name = tab[1]
                 if screen_name[0] == "@":
@@ -330,24 +332,24 @@ class IdentiCurse(object):
                 if screen_name[0] == "@":
                     screen_name = screen_name[1:]
                 user_id = self.conn.users_show(screen_name=screen_name)['id']
-                self.tabs.append(Timeline(self.conn, self.notice_window, "user", {'screen_name':screen_name, 'user_id':user_id}, notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices'], user_rainbow=self.config['user_rainbow']))
+                self.tabs.append(Timeline(self.conn, self.notice_window, "user", {'screen_name':screen_name, 'user_id':user_id}, notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices'], user_rainbow=self.config['user_rainbow'], expand_remote=self.config['expand_remote']))
             elif tab[0] == "group":
                 nickname = tab[1]
                 if nickname[0] == "!":
                     nickname = nickname[1:]
                 group_id = int(self.conn.statusnet_groups_show(nickname=nickname)['id'])
-                self.tabs.append(Timeline(self.conn, self.notice_window, "group", {'nickname':nickname, 'group_id':group_id}, notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices'], user_rainbow=self.config['user_rainbow']))
+                self.tabs.append(Timeline(self.conn, self.notice_window, "group", {'nickname':nickname, 'group_id':group_id}, notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices'], user_rainbow=self.config['user_rainbow'], expand_remote=self.config['expand_remote']))
             if tab[0] == "tag":
                 tag = tab[1]
                 if tag[0] == "#":
                     tag = tag[1:]
-                self.tabs.append(Timeline(self.conn, self.notice_window, "tag", {'tag':tag}, notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices'], user_rainbow=self.config['user_rainbow']))
+                self.tabs.append(Timeline(self.conn, self.notice_window, "tag", {'tag':tag}, notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices'], user_rainbow=self.config['user_rainbow'], expand_remote=self.config['expand_remote']))
             if tab[0] == "search":
-                self.tabs.append(Timeline(self.conn, self.notice_window, "search", {'query':tab[1]}, filters=self.config['filters'], compact_style=self.config['compact_notices'], user_rainbow=self.config['user_rainbow']))
+                self.tabs.append(Timeline(self.conn, self.notice_window, "search", {'query':tab[1]}, filters=self.config['filters'], compact_style=self.config['compact_notices'], user_rainbow=self.config['user_rainbow'], expand_remote=self.config['expand_remote']))
             #not too sure why anyone would need to auto-open these last two, but it couldn't hurt to add them
             if tab[0] == "context":
                 notice_id = int(tab[1])
-                self.tabs.append(Context(self.conn, self.notice_window, notice_id, compact_style=self.config['compact_notices']))
+                self.tabs.append(Context(self.conn, self.notice_window, notice_id, compact_style=self.config['compact_notices'], user_rainbow=self.config['user_rainbow']))
             if tab[0] == "help":
                 self.tabs.append(Help(self.notice_window, self.path))
 
@@ -534,7 +536,7 @@ class IdentiCurse(object):
                     id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['retweeted_status']['id']
                 else:
                     id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['id']
-                self.tabs.append(Context(self.conn, self.notice_window, id, compact_style=self.config['compact_notices']))
+                self.tabs.append(Context(self.conn, self.notice_window, id, compact_style=self.config['compact_notices'], user_rainbow=self.config['user_rainbow']))
                 self.tabs[self.current_tab].active = False
                 self.current_tab = len(self.tabs) - 1
                 self.tabs[self.current_tab].active = True
@@ -798,7 +800,7 @@ class IdentiCurse(object):
                                 user = self.tabs[self.current_tab].timeline[int(token) - 1]["user"]["screen_name"]
                                 id = self.tabs[self.current_tab].timeline[int(token) - 1]['user']['id']
                         
-                        self.tabs.append(Timeline(self.conn, self.notice_window, "user", {'user_id':id, 'screen_name':user}, notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices']))
+                        self.tabs.append(Timeline(self.conn, self.notice_window, "user", {'user_id':id, 'screen_name':user}, notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices'], expand_remote=self.config['expand_remote']))
                         self.tabs[self.current_tab].active = False
                         self.current_tab = len(self.tabs) - 1
                         self.tabs[self.current_tab].active = True
@@ -811,7 +813,7 @@ class IdentiCurse(object):
                         else:
                             id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["id"]
     
-                        self.tabs.append(Context(self.conn, self.notice_window, id, compact_style=self.config['compact_notices']))
+                        self.tabs.append(Context(self.conn, self.notice_window, id, compact_style=self.config['compact_notices'], user_rainbow=self.config['user_rainbow']))
                         self.tabs[self.current_tab].active = False
                         self.current_tab = len(self.tabs) - 1
                         self.tabs[self.current_tab].active = True
@@ -864,7 +866,7 @@ class IdentiCurse(object):
                             group = group[1:]
                         id = int(self.conn.statusnet_groups_show(nickname=group)['id'])
     
-                        self.tabs.append(Timeline(self.conn, self.notice_window, "group", {'group_id':id, 'nickname':group}, notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices']))
+                        self.tabs.append(Timeline(self.conn, self.notice_window, "group", {'group_id':id, 'nickname':group}, notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices'], expand_remote=self.config['expand_remote']))
                         self.tabs[self.current_tab].active = False
                         self.current_tab = len(self.tabs) - 1
                         self.tabs[self.current_tab].active = True
@@ -907,7 +909,7 @@ class IdentiCurse(object):
                         if tag[0] == "#":
                             tag = tag[1:]
     
-                        self.tabs.append(Timeline(self.conn, self.notice_window, "tag", {'tag':tag}, notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices']))
+                        self.tabs.append(Timeline(self.conn, self.notice_window, "tag", {'tag':tag}, notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices'], expand_remote=self.config['expand_remote']))
                         self.tabs[self.current_tab].active = False
                         self.current_tab = len(self.tabs) - 1
                         self.tabs[self.current_tab].active = True
@@ -915,7 +917,7 @@ class IdentiCurse(object):
     
                     elif tokens[0] == "/sentdirects" and len(tokens) == 1:
                         self.status_bar.update_left("Loading Sent Directs...")
-                        self.tabs.append(Timeline(self.conn, self.notice_window, "sentdirect", notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices']))
+                        self.tabs.append(Timeline(self.conn, self.notice_window, "sentdirect", notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices'], expand_remote=self.config['expand_remote']))
                         self.tabs[self.current_tab].active = False
                         self.current_tab = len(self.tabs) - 1
                         self.tabs[self.current_tab].active = True
@@ -923,7 +925,7 @@ class IdentiCurse(object):
     
                     elif tokens[0] == "/favourites" and len(tokens) == 1:
                         self.status_bar.update_left("Loading Favourites...")
-                        self.tabs.append(Timeline(self.conn, self.notice_window, "favourites", notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices']))
+                        self.tabs.append(Timeline(self.conn, self.notice_window, "favourites", notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices'], expand_remote=self.config['expand_remote']))
                         self.tabs[self.current_tab].active = False
                         self.current_tab = len(self.tabs) - 1
                         self.tabs[self.current_tab].active = True
@@ -932,35 +934,35 @@ class IdentiCurse(object):
                     elif tokens[0] == "/search" and len(tokens) >= 2:
                         self.status_bar.update_left("Searching...")
                         query = " ".join(tokens[1:])
-                        self.tabs.append(Timeline(self.conn, self.notice_window, "search", {'query':query}, filters=self.config['filters'], compact_style=self.config['compact_notices']))
+                        self.tabs.append(Timeline(self.conn, self.notice_window, "search", {'query':query}, filters=self.config['filters'], compact_style=self.config['compact_notices'], expand_remote=self.config['expand_remote']))
                         self.tabs[self.current_tab].active = False
                         self.current_tab = len(self.tabs) - 1
                         self.tabs[self.current_tab].active = True
                         self.tab_order.insert(0, self.current_tab)
                     
                     elif tokens[0] == "/home" and len(tokens) == 1:
-                        self.tabs.append(Timeline(self.conn, self.notice_window, "home", notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices']))
+                        self.tabs.append(Timeline(self.conn, self.notice_window, "home", notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices'], expand_remote=self.config['expand_remote']))
                         self.tabs[self.current_tab].active = False
                         self.current_tab = len(self.tabs) - 1
                         self.tabs[self.current_tab].active = True
                         self.tab_order.insert(0, self.current_tab)
                     
                     elif tokens[0] == "/mentions" and len(tokens) == 1:
-                        self.tabs.append(Timeline(self.conn, self.notice_window, "mentions", notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices']))
+                        self.tabs.append(Timeline(self.conn, self.notice_window, "mentions", notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices'], expand_remote=self.config['expand_remote']))
                         self.tabs[self.current_tab].active = False
                         self.current_tab = len(self.tabs) - 1
                         self.tabs[self.current_tab].active = True
                         self.tab_order.insert(0, self.current_tab)
                     
                     elif tokens[0] == "/directs" and len(tokens) == 1:
-                        self.tabs.append(Timeline(self.conn, self.notice_window, "direct", notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices']))
+                        self.tabs.append(Timeline(self.conn, self.notice_window, "direct", notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices'], expand_remote=self.config['expand_remote']))
                         self.tabs[self.current_tab].active = False
                         self.current_tab = len(self.tabs) - 1
                         self.tabs[self.current_tab].active = True
                         self.tab_order.insert(0, self.current_tab)
                     
                     elif tokens[0] == "/public" and len(tokens) == 1:
-                        self.tabs.append(Timeline(self.conn, self.notice_window, "public", notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices']))
+                        self.tabs.append(Timeline(self.conn, self.notice_window, "public", notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices'], expand_remote=self.config['expand_remote']))
                         self.tabs[self.current_tab].active = False
                         self.current_tab = len(self.tabs) - 1
                         self.tabs[self.current_tab].active = True
