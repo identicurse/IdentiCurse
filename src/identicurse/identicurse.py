@@ -349,7 +349,7 @@ class IdentiCurse(object):
             #not too sure why anyone would need to auto-open these last two, but it couldn't hurt to add them
             if tab[0] == "context":
                 notice_id = int(tab[1])
-                self.tabs.append(Context(self.conn, self.notice_window, notice_id, compact_style=self.config['compact_notices'], user_rainbow=self.config['user_rainbow']))
+                self.tabs.append(Context(self.conn, self.notice_window, notice_id, compact_style=self.config['compact_notices'], user_rainbow=self.config['user_rainbow'], expand_remote=self.config['expand_remote']))
             if tab[0] == "help":
                 self.tabs.append(Help(self.notice_window, self.path))
 
@@ -536,7 +536,7 @@ class IdentiCurse(object):
                     id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['retweeted_status']['id']
                 else:
                     id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['id']
-                self.tabs.append(Context(self.conn, self.notice_window, id, compact_style=self.config['compact_notices'], user_rainbow=self.config['user_rainbow']))
+                self.tabs.append(Context(self.conn, self.notice_window, id, compact_style=self.config['compact_notices'], user_rainbow=self.config['user_rainbow'], expand_remote=self.config['expand_remote']))
                 self.tabs[self.current_tab].active = False
                 self.current_tab = len(self.tabs) - 1
                 self.tabs[self.current_tab].active = True
@@ -813,7 +813,7 @@ class IdentiCurse(object):
                         else:
                             id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["id"]
     
-                        self.tabs.append(Context(self.conn, self.notice_window, id, compact_style=self.config['compact_notices'], user_rainbow=self.config['user_rainbow']))
+                        self.tabs.append(Context(self.conn, self.notice_window, id, compact_style=self.config['compact_notices'], user_rainbow=self.config['user_rainbow'], expand_remote=self.config['expand_remote']))
                         self.tabs[self.current_tab].active = False
                         self.current_tab = len(self.tabs) - 1
                         self.tabs[self.current_tab].active = True

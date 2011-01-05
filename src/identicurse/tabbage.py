@@ -369,13 +369,17 @@ class Timeline(Tab):
             c += 1
 
 class Context(Tab):
-    def __init__(self, conn, window, notice_id, compact_style=False, user_rainbow=False):
+    def __init__(self, conn, window, notice_id, compact_style=False, user_rainbow=False, expand_remote=False):
         self.conn = conn
         self.notice = notice_id
         self.timeline = []
         self.compact_style = compact_style
         self.user_rainbow = user_rainbow
         self.user_cache = {}
+        self.expand_remote = expand_remote
+        if self.expand_remote:
+            import re
+            self.title_regex = re.compile("\<title\>(.*)\<\/title\>")
         self.chosen_one = 0
 
         self.name = "Context"
@@ -387,7 +391,17 @@ class Context(Tab):
         next_id = self.notice
 
         while next_id is not None:
-            self.timeline += [self.conn.statuses_show(id=next_id)]
+            notice = self.conn.statuses_show(id=next_id)
+            if self.expand_remote and "attachments" in notice:
+                import urllib2
+                for attachment in notice['attachments']:
+                    if attachment['mimetype'] != "text/html":
+                        continue
+                    req = urllib2.Request(attachment['url'])
+                    page = urllib2.urlopen(req).read()
+                    notice['text'] = self.title_regex.findall(page)[0]
+                    break
+            self.timeline.append(notice)
             if "retweeted_status" in self.timeline[-1]:
                 next_id = self.timeline[-1]['retweeted_status']['id']
             else:
