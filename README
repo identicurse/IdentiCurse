@@ -1,21 +1,29 @@
 BASIC CONFIGURATION
 
+Before using IdentiCurse, you can manually configure it with your
+account login credentials. Alternatively, since 0.6, you can simply
+start IdentiCurse, and let it walk you through a few questions to set
+up a basic config for you.  This will be saved in your home directory
+as .identicurse.
+
+If you would still rather do it manually (for example, if you would
+like to configure some of the more advanced settings that the
+automatic config doesn't touch), you can do so as follows:
+
+Edit your config file in your favourite editor, changing
+"username": "user" and "password": "test" to appropriate values.
+You can also use IdentiCurse with other StatusNet instances by
+changing "api_path" to the API home for the instance you wish to use.
+
 Important note:
 IdentiCurse looks for your config file in two locations. First it
 checks .identicurse in your home directory, and then it checks
-config.json in its installed directory. It is highly recommended that
-you copy the supplied config.json (found in conf/ in the tarball) to
-$HOME and rename it to .identicurse before modifying this copy, as
-that way future updates (which *will* overwrite config.json with the
-newest version of it) will not erase any customisation you have made.
-
-Before using IdentiCurse, you must configure it with your account
-login credentials. To do so, edit your config file in your favourite
-editor, changing "username": "user" and "password": "test" to
-appropriate values. You can also use IdentiCurse with other StatusNet
-instances by changing "api_path" to the API home for the instance you
-wish to use. However, this is not yet well tested, so expect
-breakages.
+config.json in its installed directory. It is highly recommended,
+if you intend to manually edit it, that you copy the supplied
+config.json (found in conf/ in the tarball) to $HOME and rename it to
+.identicurse before modifying this copy, as that way future updates
+(which *will* overwrite config.json with the newest version of it)
+will not erase any customisation you have made.
 
 
 USING IDENTICURSE
@@ -54,6 +62,7 @@ are at this screen, you can press various keys to do the following:
     c               View context for currently selected dent.
     s               Move selected dent down (indicated by * character).
     a               Move selected dent up (indicated by * character).
+    z               Move selected dent to first (indicated by *).
     UP or k         Scroll up one line (in the current tab).
     DOWN or j       Scroll down one line (in the current tab).
     PgUp or b       Scroll up one screen (in the current tab).
@@ -235,6 +244,17 @@ Available commands are as follows:
    There is also an alias for this: "/links [notice number]".
    (See also 'ADVANCED CONFIGURATION, Link opening' section below.)
 
+/alias [alias] [command]
+   This will create the alias given as an alias for the command
+   given. For example:
+
+        /alias /pme /profile @psquid
+        This would make "/pme" an alias for "/profile @psquid"
+
+   The / before both the alias and the resultant command is optional,
+   as it will be added if it is not present. Therefore,
+   "/alias rpt repeat" and "/alias /rpt /repeat" do exactly the same.
+
 /config [key] [value]                           (aliases: /set)
    This will set the config item with the specified key to the
    specified value. The key can also contain .s to indicate subkeys,
@@ -255,6 +275,58 @@ or press ESC to leave text entry mode without performing any action.
 
 
 ADVANCED CONFIGURATION
+
+Update interval:
+The "update_interval" config setting sets how long, in whole seconds,
+IdentiCurse should wait after an automatic refresh before starting the
+next automatic refresh.
+
+Notice limit:
+The "notice_limit" config setting sets how many notices should be
+fetched per page, on timeline types where the API allows choosing how
+many notices to send (at the time of writing, most except public do).
+
+Colours:
+To use colours, the config setting "enable_colours" must be set to
+true. This will already be the case if you first started with version
+0.6 or later. With only this setting set, a default set of colours
+will be used. If you want to configure individual colours, you will
+need to configure the "colours" setting, which uses this format:
+    
+    "colours": {
+        "fieldname": ["fg_colour", "bg_colour"],
+        "fieldname": ["fg_colour", "bg_colour"],
+        "fieldname": ["fg_colour", "bg_colour"],
+        ...
+    }
+
+The possible field names are:
+    "statusbar"       The status bar.
+    "timelines"       Any part of the timeline view not already dealt
+                          with by the fields below.
+    "selector"        The '*' current notice indicator.
+    "username"        Usernames, both in notice details and within
+                          notices themselves.
+    "time"            Notice timestamps.
+    "source"          Notice sources (e.g. 'from foo').
+    "notice_count"    Notice numbers.
+    "notice"          Notice text.
+    "profile_title"   The title in profile tabs.
+    "profile_fields"  Fields in profile tabs.
+    "profile_values"  Values in profile tabs.
+
+The possible colours differ depending on whether your system's curses
+library was compiled with 16-colour support or not. You can check by
+running identicurse with the --colour-check command-line option.
+
+As long as colour is supported at all, the following are usable:
+    "black", "red", "green", "brown", "blue", "magenta", "cyan",
+    "white", and "none" ("none" means that default terminal colours
+    should be used.)
+
+If all 16 colours *are* supported, the following are also usable:
+    "grey", "light_red", "light_green", "yellow", "light_blue",
+    "light_magenta", "light_cyan", "light_white"
 
 Initial tabs:
 The tabs that are automatically loaded on startup can be configured by
@@ -378,3 +450,14 @@ directory. In this file, you should place slogans, one per line. These
 will then be displayed on starting IdentiCurse. The default slogans
 will not be used in this case, so if there are any you want to keep,
 you will need to add them to your slogans file.
+
+
+COMMAND-LINE OPTIONS
+
+IdentiCurse takes the following command-line options:
+
+  -h, --help               show the list of available options and exit
+  -c FILE, --config=FILE   specify an alternative config file to use
+  -s FILE, --slogans=FILE  specify an alternative slogans file to use
+  --colour-check           check if system curses library supports
+                               colours, and how many

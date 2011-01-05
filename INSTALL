@@ -11,7 +11,8 @@ two-step process:
      $ cp conf/config.json ~/.identicurse
 
 And you're done! Read the README to get up to speed on configuring
-IdentiCurse to your liking, then just run "identicurse" to get going.
+IdentiCurse to your liking, or just run "identicurse" to get going
+with an automatically generated config.
 
 
 If you do not have setuptools installed, you will need to either
