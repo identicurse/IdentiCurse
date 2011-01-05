@@ -26,22 +26,25 @@ class Buffer(list):
         clean_item = []
         for block in item:
             clean_blocks = []
-            if "\n" in block[0]:
-                for sub_block in block[0].split("\n"):
-                    clean_blocks.append((sub_block, block[1]))
-            else:
-                clean_blocks.append(block)
-            for block in clean_blocks: 
-                if "\t" in block[0]:
-                    block = ("    ".join(block[0].split("\t")), block[1])
-                clean_text = ""
-                for char in block[0]:
-                    try:
-                        clean_text += char.encode(sys.getfilesystemencoding())
-                    except UnicodeEncodeError:
-                        clean_text += "?"
-                clean_block = (clean_text, block[1])
-                clean_item.append(clean_block)
+            try:
+                if "\n" in block[0]:
+                    for sub_block in block[0].split("\n"):
+                        clean_blocks.append((sub_block, block[1]))
+                else:
+                    clean_blocks.append(block)
+                for block in clean_blocks: 
+                    if "\t" in block[0]:
+                        block = ("    ".join(block[0].split("\t")), block[1])
+                    clean_text = ""
+                    for char in block[0]:
+                        try:
+                            clean_text += char.encode(sys.getfilesystemencoding())
+                        except UnicodeEncodeError:
+                            clean_text += "?"
+                    clean_block = (clean_text, block[1])
+                    clean_item.append(clean_block)
+            except TypeError:
+                raise Exception(item)
         list.append(self, clean_item)
         
     def clear(self):
@@ -545,14 +548,15 @@ class Profile(Tab):
         self.buffer.append([("", identicurse.colour_fields['none'])])
 
         for field in self.fields:
-            line = []
+            if self.profile[field[1]] is not None:
+                line = []
 
-            line.append((field[0] + ":", identicurse.colour_fields['profile_fields']))
-            line.append((" ", identicurse.colour_fields['none']))
+                line.append((field[0] + ":", identicurse.colour_fields['profile_fields']))
+                line.append((" ", identicurse.colour_fields['none']))
 
-            line.append((self.profile[field[1]], identicurse.colour_fields['profile_values']))
+                line.append((self.profile[field[1]], identicurse.colour_fields['profile_values']))
 
-            self.buffer.append(line)
+                self.buffer.append(line)
 
             if field[2]:
                 self.buffer.append([("", identicurse.colour_fields['none'])])
