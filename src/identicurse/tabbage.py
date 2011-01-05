@@ -317,7 +317,7 @@ class Timeline(Tab):
 
             self.buffer.append(line)
 
-            if self.user_rainbow:
+            try:
                 line = []
 
                 notice_parts = re.split(r'(@(\w+))', n['text'])
@@ -332,19 +332,19 @@ class Timeline(Tab):
                         if part_list[0] == '@':
                             wtf = True
                             username = str("".join(part_list[1:]))
-                            if not username in self.user_cache:
-                                self.user_cache[username] = random.choice(identicurse.base_colours.items())[1]
-                            line.append((part, self.user_cache[username]))
+                            if self.user_rainbow:
+                                if not username in self.user_cache:
+                                    self.user_cache[username] = random.choice(identicurse.base_colours.items())[1]
+                                line.append((part, self.user_cache[username]))
+                            else:
+                                line.append((part, identicurse.colour_fields['username']))
                         else:
                             line.append((part, identicurse.colour_fields["notice"]))
 
                 self.buffer.append(line)
 
-            else:
-                try:
-                    self.buffer.append([(n['text'], identicurse.colour_fields["notice"])])
-                except UnicodeDecodeError:
-                    self.buffer.append([("Caution: Terminal too shit to display this notice.", identicurse.colour_fields["none"])])
+            except UnicodeDecodeError:
+                self.buffer.append([("Caution: Terminal too shit to display this notice.", identicurse.colour_fields["none"])])
 
             if not self.compact_style:
                 line = []
