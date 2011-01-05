@@ -4,6 +4,17 @@ New for 0.6:
  - Notices can now be displayed in compact mode (new default), or non-compact mode (as in old versions), as dictated by the 'compact_notices' config option..
  - Catch typos like "/r1 foo", and automatically treat as "/r 1 foo" (favours exactly what was typed if it's interpretable as valid).
  - Added the ability to colour various parts of the application either manually or with a default colour scheme. You can turn it off.
+ - Automatic configuration is now done on first run if you don't have a config - no need to manually set up config any more.
+ - Reflowing now tries to split on word boundaries where possible - less words split over lines.
+ - Notice times given are now approximate.
+ - Config is now looked for at ~/.identicurse, then /etc/identicurse.conf. The latter is recommended only if you absolutely need more than one user to share config.
+ - New /alias command for creating aliases from within IdentiCurse.
+ - Usernames in notices are highlighted in the same colour as usernames in the notice details.
+ - User rainbow, where each user is assigned a random colour that persists wherever that user is mentioned in the timeline. Config option is "user_rainbow", possible values true or false.
+ - Experimental expansion for remote notices that were truncated due to local instance having shorter length_limit Config option is "expand_remote", possible values true or false.
+ - Bugfixes for:
+      - Time is several hours out for notices whose post time (according to the server) is ahead of local time.
+      - Profile crashes if URL, Bio or Location is not set for a user.
 
 New for 0.5:
  - New slogans.
