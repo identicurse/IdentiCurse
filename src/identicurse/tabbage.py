@@ -174,7 +174,7 @@ class Help(Tab):
             self.buffer.append([(l, identicurse.colour_fields['none'])])
 
 class Timeline(Tab):
-    def __init__(self, conn, window, timeline, type_params={}, notice_limit=25, filters=[], compact_style=False, user_rainbow=False):
+    def __init__(self, conn, window, timeline, type_params={}, notice_limit=25, filters=[], compact_style=False, user_rainbow=False, expand_remote=False):
         self.conn = conn
         self.timeline = []
         self.user_cache = {}
@@ -184,6 +184,10 @@ class Timeline(Tab):
         self.filters = filters
         self.compact_style = compact_style
         self.user_rainbow = user_rainbow
+        self.expand_remote = expand_remote
+        if self.expand_remote:
+            import re
+            self.title_regex = re.compile("\<title\>(.*)\<\/title\>")
         self.chosen_one = 0
 
         if self.timeline_type == "user":
@@ -233,6 +237,15 @@ class Timeline(Tab):
                     passes_filters = False
                     break
             if passes_filters:
+                if self.expand_remote and "attachments" in notice:
+                    import urllib2
+                    for attachment in notice['attachments']:
+                        if attachment['mimetype'] != "text/html":
+                            continue
+                        req = urllib2.Request(attachment['url'])
+                        page = urllib2.urlopen(req).read()
+                        notice['text'] = self.title_regex.findall(page)[0]
+                        break
                 self.timeline.append(notice)
 
         if self.page > 1:
