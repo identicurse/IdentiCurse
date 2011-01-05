@@ -259,7 +259,7 @@ class IdentiCurse(object):
         if self.config['border']:
             self.notice_window = self.main_window.subwin(y-6, x-4, 5 + entry_lines, 5)
         else:
-            self.notice_window = self.main_window.subwin(y-4, x, 2 + entry_lines, 1)
+            self.notice_window = self.main_window.subwin(y-5, x, 2 + entry_lines, 1)
         self.notice_window.bkgd(" ", curses.color_pair(colour_fields["timelines"]))
 
         # I don't like this, but it looks like it has to be done
