@@ -34,7 +34,14 @@ class Buffer(list):
             for block in clean_blocks: 
                 if "\t" in block[0]:
                     block = ("    ".join(block[0].split("\t")), block[1])
-                clean_item.append(block)
+                clean_text = ""
+                for char in block[0]:
+                    try:
+                        clean_text += char.encode(sys.getfilesystemencoding())
+                    except UnicodeEncodeError:
+                        clean_text += "?"
+                clean_block = (clean_text, block[1])
+                clean_item.append(clean_block)
         list.append(self, clean_item)
         
     def clear(self):
@@ -155,7 +162,7 @@ class Tab(object):
         buffer = self.buffer.reflowed(maxx - 2)
         for line in buffer[self.start_line:maxy - 3 + self.start_line]:
             for (part, attr) in line:
-                self.window.addstr(part.encode(sys.getfilesystemencoding(), "replace"), curses.color_pair(attr))
+                self.window.addstr(part, curses.color_pair(attr))
             self.window.addstr("\n")
         self.window.refresh()
 
