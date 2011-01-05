@@ -160,11 +160,11 @@ class IdentiCurse(object):
             default_colour_scheme = {
                 "timelines": ("none", "none"),
                 "statusbar": ("cyan", "none"),
-                "selector": ("yellow", "none"),
+                "selector": ("brown", "none"),
                 "time": ("red", "none"),
                 "source": ("red", "none"),
                 "notice": ("magenta", "black"),
-                "notice_count": ("yellow", "black"),
+                "notice_count": ("brown", "black"),
                 "username": ("cyan", "black"),
                 "profile_title": ("cyan", "none"),
                 "profile_fields": ("blue", "none"),
