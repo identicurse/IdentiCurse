@@ -1064,6 +1064,7 @@ class IdentiCurse(object):
         self.entry_window.clear()
         self.text_entry = Textbox(self.entry_window, self.validate, insert_mode=True)
         self.text_entry.stripspaces = 1
+        self.tabs[self.current_tab].search_highlight_line = -1
         self.display_current_tab()
         self.status_bar.update_left("Doing nothing.")
         self.insert_mode = False

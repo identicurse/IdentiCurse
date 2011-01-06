@@ -277,6 +277,9 @@ class Timeline(Tab):
             self.name = self.basename + "+%d" % (self.page - 1)
         else:
             self.name = self.basename
+
+        self.search_highlight_line = -1
+
         self.update_buffer()
 
     def update_buffer(self):
@@ -434,6 +437,8 @@ class Context(Tab):
                 next_id = self.timeline[-1]['retweeted_status']['id']
             else:
                 next_id = self.timeline[-1]['in_reply_to_status_id']
+
+        self.search_highlight_line = -1
 
         self.update_buffer()
 
