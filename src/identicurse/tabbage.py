@@ -185,19 +185,23 @@ class Help(Tab):
             self.buffer.append([(l, identicurse.colour_fields['none'])])
 
 class Timeline(Tab):
-    def __init__(self, conn, window, timeline, type_params={}, notice_limit=25, filters=[], compact_style=False, user_rainbow=False, expand_remote=False):
+    def __init__(self, conn, window, timeline, type_params={}, notice_limit=25, filters=[], compact_style=False, user_rainbow=False, tag_rainbow=False, group_rainbow=False, expand_remote=False):
         self.conn = conn
         self.timeline = []
         self.user_cache = {}
+        self.tag_cache = {}
+        self.group_cache = {}
         self.timeline_type = timeline
         self.type_params = type_params
         self.notice_limit = notice_limit
         self.filters = filters
         self.compact_style = compact_style
         self.user_rainbow = user_rainbow
+        self.tag_rainbow = tag_rainbow
+        self.group_rainbow = group_rainbow
         self.expand_remote = expand_remote
+        self.highlight_regex = re.compile(r'([@!#](\w+))')
         if self.expand_remote:
-            import re
             self.title_regex = re.compile("\<title\>(.*)\<\/title\>")
         self.chosen_one = 0
 
@@ -331,7 +335,7 @@ class Timeline(Tab):
             try:
                 line = []
 
-                notice_parts = re.split(r'(@(\w+))', n['text'])
+                notice_parts = self.highlight_regex.split(n['text'])
                 wtf = False
                 for part in notice_parts:
                     if wtf == True:
@@ -340,15 +344,30 @@ class Timeline(Tab):
 
                     part_list = list(part)
                     if len(part_list) > 0:
-                        if part_list[0] == '@':
+                        if part_list[0] in ['@', '!', '#']:
                             wtf = True
-                            username = str("".join(part_list[1:]))
-                            if self.user_rainbow:
-                                if not username in self.user_cache:
-                                    self.user_cache[username] = random.choice(identicurse.base_colours.items())[1]
-                                line.append((part, self.user_cache[username]))
-                            else:
-                                line.append((part, identicurse.colour_fields['username']))
+                            highlight_part = str("".join(part_list[1:]))
+                            if part_list[0] == '@':
+                                if self.user_rainbow:
+                                    if not highlight_part in self.user_cache:
+                                        self.user_cache[highlight_part] = random.choice(identicurse.base_colours.items())[1]
+                                    line.append((part, self.user_cache[highlight_part]))
+                                else:
+                                    line.append((part, identicurse.colour_fields['username']))
+                            elif part_list[0] == '!':
+                                if self.group_rainbow:
+                                    if not highlight_part in self.group_cache:
+                                        self.group_cache[highlight_part] = random.choice(identicurse.base_colours.items())[1]
+                                    line.append((part, self.group_cache[highlight_part]))
+                                else:
+                                    line.append((part, identicurse.colour_fields['group']))
+                            elif part_list[0] == '#':
+                                if self.tag_rainbow:
+                                    if not highlight_part in self.tag_cache:
+                                        self.tag_cache[highlight_part] = random.choice(identicurse.base_colours.items())[1]
+                                    line.append((part, self.tag_cache[highlight_part]))
+                                else:
+                                    line.append((part, identicurse.colour_fields['tag']))
                         else:
                             line.append((part, identicurse.colour_fields["notice"]))
 
@@ -370,16 +389,20 @@ class Timeline(Tab):
             c += 1
 
 class Context(Tab):
-    def __init__(self, conn, window, notice_id, compact_style=False, user_rainbow=False, expand_remote=False):
+    def __init__(self, conn, window, notice_id, compact_style=False, user_rainbow=False, tag_rainbow=False, group_rainbow=False, expand_remote=False):
         self.conn = conn
         self.notice = notice_id
         self.timeline = []
         self.compact_style = compact_style
         self.user_rainbow = user_rainbow
+        self.tag_rainbow = tag_rainbow
+        self.group_rainbow = group_rainbow
         self.user_cache = {}
+        self.tag_cache = {}
+        self.group_cache = {}
         self.expand_remote = expand_remote
+        self.highlight_regex = re.compile(r'([@!#](\w+))')
         if self.expand_remote:
-            import re
             self.title_regex = re.compile("\<title\>(.*)\<\/title\>")
         self.chosen_one = 0
 
@@ -471,7 +494,7 @@ class Context(Tab):
             try:
                 line = []
 
-                notice_parts = re.split(r'(@(\w+))', n['text'])
+                notice_parts = self.highlight_regex.split(n['text'])
                 wtf = False
                 for part in notice_parts:
                     if wtf == True:
@@ -480,15 +503,30 @@ class Context(Tab):
 
                     part_list = list(part)
                     if len(part_list) > 0:
-                        if part_list[0] == '@':
+                        if part_list[0] in ['@', '!', '#']:
                             wtf = True
-                            username = str("".join(part_list[1:]))
-                            if self.user_rainbow:
-                                if not username in self.user_cache:
-                                    self.user_cache[username] = random.choice(identicurse.base_colours.items())[1]
-                                line.append((part, self.user_cache[username]))
-                            else:
-                                line.append((part, identicurse.colour_fields['username']))
+                            highlight_part = str("".join(part_list[1:]))
+                            if part_list[0] == '@':
+                                if self.user_rainbow:
+                                    if not highlight_part in self.user_cache:
+                                        self.user_cache[highlight_part] = random.choice(identicurse.base_colours.items())[1]
+                                    line.append((part, self.user_cache[highlight_part]))
+                                else:
+                                    line.append((part, identicurse.colour_fields['username']))
+                            elif part_list[0] == '!':
+                                if self.group_rainbow:
+                                    if not highlight_part in self.group_cache:
+                                        self.group_cache[highlight_part] = random.choice(identicurse.base_colours.items())[1]
+                                    line.append((part, self.group_cache[highlight_part]))
+                                else:
+                                    line.append((part, identicurse.colour_fields['group']))
+                            elif part_list[0] == '#':
+                                if self.tag_rainbow:
+                                    if not highlight_part in self.tag_cache:
+                                        self.tag_cache[highlight_part] = random.choice(identicurse.base_colours.items())[1]
+                                    line.append((part, self.tag_cache[highlight_part]))
+                                else:
+                                    line.append((part, identicurse.colour_fields['tag']))
                         else:
                             line.append((part, identicurse.colour_fields["notice"]))
 

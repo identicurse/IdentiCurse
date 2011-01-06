@@ -307,6 +307,8 @@ The possible field names are:
     "selector"        The '*' current notice indicator.
     "username"        Usernames, both in notice details and within
                           notices themselves.
+    "group"           Groups within notices.
+    "tag"             Tags within notices.
     "time"            Notice timestamps.
     "source"          Notice sources (e.g. 'from foo').
     "notice_count"    Notice numbers.

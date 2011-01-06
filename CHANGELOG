@@ -10,7 +10,7 @@ New for 0.6:
  - Config is now looked for at ~/.identicurse, then /etc/identicurse.conf. The latter is recommended only if you absolutely need more than one user to share config.
  - New /alias command for creating aliases from within IdentiCurse.
  - Usernames in notices are highlighted in the same colour as usernames in the notice details.
- - User rainbow, where each user is assigned a random colour that persists wherever that user is mentioned in the timeline. Config option is "user_rainbow", possible values true or false.
+ - User, tag, and group rainbows, where each user/group/tag is assigned a random colour that persists wherever that user/group/tag is mentioned in the timeline. Config options are "user_rainbow", "group_rainbow", "tag_rainbow", possible values true or false.
  - Experimental expansion for remote notices that were truncated due to local instance having shorter length_limit Config option is "expand_remote", possible values true or false.
  - Bugfixes for:
       - Time is several hours out for notices whose post time (according to the server) is ahead of local time.
