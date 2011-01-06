@@ -341,7 +341,7 @@ class Timeline(Tab):
                 line.append((source_msg, identicurse.colour_fields["source"]))
             else:
                 line.append((' ' * (maxx - ((len(source_msg) + len(user) + (5 + len(cout))))), identicurse.colour_fields["none"]))
-                line.append(source_msg, identicurse.colour_fields["source"])
+                line.append((source_msg, identicurse.colour_fields["source"]))
 
             self.buffer.append(line)
 
@@ -496,7 +496,7 @@ class Context(Tab):
                 line.append((source_msg, identicurse.colour_fields["source"]))
             else:
                 line.append((' ' * (maxx - ((len(source_msg) + len(user) + (5 + len(cout))))), identicurse.colour_fields["none"]))
-                line.append(source_msg, identicurse.colour_fields["source"])
+                line.append((source_msg, identicurse.colour_fields["source"]))
 
             self.buffer.append(line)
 
