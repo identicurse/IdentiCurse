@@ -301,21 +301,23 @@ need to configure the "colours" setting, which uses this format:
     }
 
 The possible field names are:
-    "statusbar"       The status bar.
-    "timelines"       Any part of the timeline view not already dealt
-                          with by the fields below.
-    "selector"        The '*' current notice indicator.
-    "username"        Usernames, both in notice details and within
-                          notices themselves.
-    "group"           Groups within notices.
-    "tag"             Tags within notices.
-    "time"            Notice timestamps.
-    "source"          Notice sources (e.g. 'from foo').
-    "notice_count"    Notice numbers.
-    "notice"          Notice text.
-    "profile_title"   The title in profile tabs.
-    "profile_fields"  Fields in profile tabs.
-    "profile_values"  Values in profile tabs.
+    "statusbar"         The status bar.
+    "timelines"         Any part of the timeline view not already dealt
+                            with by the fields below.
+    "selector"          The '*' current notice indicator.
+    "username"          Usernames, both in notice details and within
+                            notices themselves.
+    "group"             Groups within notices.
+    "tag"               Tags within notices.
+    "time"              Notice timestamps.
+    "source"            Notice sources (e.g. 'from foo').
+    "notice_count"      Notice numbers.
+    "notice"            Notice text.
+    "profile_title"     The title in profile tabs.
+    "profile_fields"    Fields in profile tabs.
+    "profile_values"    Values in profile tabs.
+    "search_highlight"  Anything on the line of the currently
+                            highlighted search result.
 
 The possible colours differ depending on whether your system's curses
 library was compiled with 16-colour support or not. You can check by
