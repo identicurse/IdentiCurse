@@ -1081,7 +1081,7 @@ class IdentiCurse(object):
                 if self.last_page_search['viewing'] < (len(self.last_page_search['occurs']) - 1):
                     self.last_page_search['viewing'] += 1
                     self.tabs[self.current_tab].scrollto(self.last_page_search['occurs'][self.last_page_search['viewing']])
-                    self.tabs[self.current_tab].search_highlight_line = page_search['occurs'][self.last_page_search['viewing']]
+                    self.tabs[self.current_tab].search_highlight_line = self.last_page_search['occurs'][self.last_page_search['viewing']]
                     self.status_bar.update_left("Viewing result #%d for '%s'" % (self.last_page_search['viewing'] + 1, query))
                     self.display_current_tab()
                 else:
