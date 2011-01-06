@@ -576,6 +576,7 @@ class IdentiCurse(object):
                 self.redraw()
                 self.update_tab_buffers()
 
+
             self.display_current_tab()
             self.status_window.refresh()
             self.main_window.refresh()
