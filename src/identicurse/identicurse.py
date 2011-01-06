@@ -568,6 +568,8 @@ class IdentiCurse(object):
                     else:
                         self.status_bar.update_left("Viewing result #%d for '%s'" % (self.last_page_search['viewing'] + 1, self.last_page_search['query']))
                     self.display_current_tab()
+            elif input == ord("I"):
+                self.redraw()
 
             y, x = self.screen.getmaxyx()
             if y != self.y or x != self.x:
