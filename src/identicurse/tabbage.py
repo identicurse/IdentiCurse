@@ -165,13 +165,17 @@ class Tab(object):
         self.window.erase()
 
         buffer = self.buffer.reflowed(maxx - 2)
-        line_num = 0
+        line_num = self.start_line
         for line in buffer[self.start_line:maxy - 3 + self.start_line]:
+            remaining_line_length = maxx - 2
             for (part, attr) in line:
                 if line_num == self.search_highlight_line:
+                    remaining_line_length -= len(part)
                     self.window.addstr(part, curses.color_pair(identicurse.colour_fields['search_highlight']))
                 else:
                     self.window.addstr(part, curses.color_pair(attr))
+            if line_num == self.search_highlight_line:
+                self.window.addstr(" "*remaining_line_length, curses.color_pair(identicurse.colour_fields['search_highlight']))
             self.window.addstr("\n")
             line_num += 1
         self.window.refresh()
