@@ -580,7 +580,7 @@ class IdentiCurse(object):
                     else:
                         self.status_bar.update_left("Viewing result #%d for '%s'" % (self.last_page_search['viewing'] + 1, self.last_page_search['query']))
                     self.display_current_tab()
-            elif input == ord("I"):
+            elif input == curses.ascii.ctrl(ord("l")):
                 self.redraw()
 
             y, x = self.screen.getmaxyx()
