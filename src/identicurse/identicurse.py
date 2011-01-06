@@ -233,7 +233,8 @@ class IdentiCurse(object):
         curses.wrapper(self.initialise)
 
     def redraw(self):
-        self.screen.erase()
+        self.screen.clear()
+        self.screen.refresh()
         self.y, self.x = self.screen.getmaxyx()
 
         if self.config['border']:
