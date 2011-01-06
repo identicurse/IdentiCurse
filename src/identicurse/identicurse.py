@@ -662,7 +662,7 @@ class IdentiCurse(object):
                         status = "@" + user + " " + " ".join(tokens[2:])
     
                         try:
-                            update = self.conn.statuses_update(status, "IdentiCurse", int(id), long_dent=self.config['long_dent'])
+                            update = self.conn.statuses_update(status, "IdentiCurse", int(id), long_dent=self.config['long_dent'], dup_first_word=True)
                         except Exception, (errmsg):
                             self.status_bar.timed_update_left("ERROR: Couldn't post status: %s" % (errmsg))
     
