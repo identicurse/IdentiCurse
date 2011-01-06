@@ -57,6 +57,8 @@ class Textbox(textpad.Textbox):
         if abort == False:
             return self.gather()
         else:
+            self.win.clear()
+            self.win.refresh()
             return None
 
     def gather(self):
