@@ -45,7 +45,8 @@ colour_fields = {
     "profile_fields": 11,
     "profile_values": 12,
     "group": 13,
-    "tag": 14
+    "tag": 14,
+    "search_highlight": 15
 }
 
 colours = {
@@ -173,6 +174,7 @@ class IdentiCurse(object):
                 "profile_title": ("cyan", "none"),
                 "profile_fields": ("blue", "none"),
                 "profile_values": ("none", "none"),
+                "search_highlight": ("white", "blue"),
                 "none": ("none", "none")
             }
 
@@ -559,6 +561,7 @@ class IdentiCurse(object):
                     else:
                         self.last_page_search['viewing'] = 0
                     self.tabs[self.current_tab].scrollto(self.last_page_search['occurs'][self.last_page_search['viewing']])
+                    self.tabs[self.current_tab].search_highlight_line = self.last_page_search['occurs'][self.last_page_search['viewing']]
                     if self.last_page_search['viewing'] == 0:
                         self.status_bar.update_left("Viewing result #%d for '%s' (search hit BOTTOM, continuing at TOP)" % (self.last_page_search['viewing'] + 1, self.last_page_search['query']))
                     else:
@@ -571,6 +574,7 @@ class IdentiCurse(object):
                     else:
                         self.last_page_search['viewing'] = len(self.last_page_search['occurs']) - 1
                     self.tabs[self.current_tab].scrollto(self.last_page_search['occurs'][self.last_page_search['viewing']])
+                    self.tabs[self.current_tab].search_highlight_line = self.last_page_search['occurs'][self.last_page_search['viewing']]
                     if self.last_page_search['viewing'] == (len(self.last_page_search['occurs']) - 1):
                         self.status_bar.update_left("Viewing result #%d for '%s' (search hit TOP, continuing at BOTTOM)" % (self.last_page_search['viewing'] + 1, self.last_page_search['query']))
                     else:
@@ -1076,9 +1080,11 @@ class IdentiCurse(object):
                 if self.last_page_search['viewing'] < (len(self.last_page_search['occurs']) - 1):
                     self.last_page_search['viewing'] += 1
                     self.tabs[self.current_tab].scrollto(self.last_page_search['occurs'][self.last_page_search['viewing']])
+                    self.tabs[self.current_tab].search_highlight_line = page_search['occurs'][self.last_page_search['viewing']]
                     self.status_bar.update_left("Viewing result #%d for '%s'" % (self.last_page_search['viewing'] + 1, query))
                     self.display_current_tab()
                 else:
+                    self.tabs[self.current_tab].search_highlight_line = -1
                     self.status_bar.update_left("No more results for '%s'" % (query))
             else:
                 # new search
@@ -1103,9 +1109,11 @@ class IdentiCurse(object):
 
                 if len(page_search['occurs']) > 0:
                     self.tabs[self.current_tab].scrollto(page_search['occurs'][0])
+                    self.tabs[self.current_tab].search_highlight_line = page_search['occurs'][0]
                     self.status_bar.update_left("Viewing result #1 for '%s'" % (query))
                     self.last_page_search = page_search  # keep this search
                 else:
+                    self.tabs[self.current_tab].search_highlight_line = -1
                     self.status_bar.update_left("No results for '%s'" % (query))
                     self.last_page_search = {'query':"", 'occurs':[], 'viewing':0, 'tab':-1}  # reset to no search
         else:

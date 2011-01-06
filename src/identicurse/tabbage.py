@@ -95,6 +95,7 @@ class Tab(object):
         self.start_line = 0
         self.html_regex = re.compile("<(.|\n)*?>")
         self.page = 1
+        self.search_highlight_line = -1
         self.active = False
         
     def prevpage(self, n=1):
@@ -164,10 +165,15 @@ class Tab(object):
         self.window.erase()
 
         buffer = self.buffer.reflowed(maxx - 2)
+        line_num = 0
         for line in buffer[self.start_line:maxy - 3 + self.start_line]:
             for (part, attr) in line:
-                self.window.addstr(part, curses.color_pair(attr))
+                if line_num == self.search_highlight_line:
+                    self.window.addstr(part, curses.color_pair(identicurse.colour_fields['search_highlight']))
+                else:
+                    self.window.addstr(part, curses.color_pair(attr))
             self.window.addstr("\n")
+            line_num += 1
         self.window.refresh()
 
 class Help(Tab):
@@ -200,7 +206,7 @@ class Timeline(Tab):
         self.tag_rainbow = tag_rainbow
         self.group_rainbow = group_rainbow
         self.expand_remote = expand_remote
-        self.highlight_regex = re.compile(r'([@!#](\w+))')
+        self.highlight_regex = re.compile(r'([@!#]\w+)')
         if self.expand_remote:
             self.title_regex = re.compile("\<title\>(.*)\<\/title\>")
         self.chosen_one = 0
@@ -336,16 +342,10 @@ class Timeline(Tab):
                 line = []
 
                 notice_parts = self.highlight_regex.split(n['text'])
-                wtf = False
                 for part in notice_parts:
-                    if wtf == True:
-                        wtf = False
-                        continue
-
                     part_list = list(part)
                     if len(part_list) > 0:
                         if part_list[0] in ['@', '!', '#']:
-                            wtf = True
                             highlight_part = str("".join(part_list[1:]))
                             if part_list[0] == '@':
                                 if self.user_rainbow:
@@ -401,7 +401,7 @@ class Context(Tab):
         self.tag_cache = {}
         self.group_cache = {}
         self.expand_remote = expand_remote
-        self.highlight_regex = re.compile(r'([@!#](\w+))')
+        self.highlight_regex = re.compile(r'([@!#]\w+)')
         if self.expand_remote:
             self.title_regex = re.compile("\<title\>(.*)\<\/title\>")
         self.chosen_one = 0
@@ -497,14 +497,9 @@ class Context(Tab):
                 notice_parts = self.highlight_regex.split(n['text'])
                 wtf = False
                 for part in notice_parts:
-                    if wtf == True:
-                        wtf = False
-                        continue
-
                     part_list = list(part)
                     if len(part_list) > 0:
                         if part_list[0] in ['@', '!', '#']:
-                            wtf = True
                             highlight_part = str("".join(part_list[1:]))
                             if part_list[0] == '@':
                                 if self.user_rainbow:
