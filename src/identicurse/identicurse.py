@@ -1080,12 +1080,18 @@ class IdentiCurse(object):
                 page_search = {'query':query, 'occurs':[], 'viewing':0, 'tab':self.current_tab}
                 
                 for line_index in range(len(search_buffer)):
-                    if self.config['search_case_sensitive'] == "sensitive":
-                        if query in search_buffer[line_index]:
-                            page_search['occurs'].append(line_index)
-                    else:
-                        if query.upper() in search_buffer[line_index].upper():
-                            page_search['occurs'].append(line_index)
+                    match_found = False
+                    for block in search_buffer[line_index]:
+                        if self.config['search_case_sensitive'] == "sensitive":
+                            if query in block[0]:
+                                match_found = True
+                                break
+                        else:
+                            if query.upper() in block[0].upper():
+                                match_found = True
+                                break
+                    if match_found:
+                        page_search['occurs'].append(line_index)
 
                 if len(page_search['occurs']) > 0:
                     self.tabs[self.current_tab].scrollto(page_search['occurs'][0])
