@@ -158,7 +158,7 @@ class IdentiCurse(object):
         
         # Set some defaults for configs that we will always need to use, but that are optional
         if not "enable_colours" in self.config:
-            self.config["enable_colours"] = False
+            self.config["enable_colours"] = True
         else:
             default_colour_scheme = {
                 "timelines": ("none", "none"),
