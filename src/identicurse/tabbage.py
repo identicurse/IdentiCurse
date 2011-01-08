@@ -144,7 +144,7 @@ class Tab(object):
         else:
             self.start_line = n
 
-    def scrolltodent(self, n):
+    def scrolltodent(self, n, smooth_scroll=False):
         maxy, maxx = self.window.getmaxyx()[0], self.window.getmaxyx()[1]
         if n < 9:
             nout = " " + str(n+1)
@@ -155,10 +155,9 @@ class Tab(object):
         for line in self.buffer.reflowed(maxx - 2):
             for block in line:
                 if block[1] == identicurse.colour_fields['notice_count'] and block[0] == nout:
-                    self.scrollto(dent_line, force_top=False)
+                    self.scrollto(dent_line, force_top=smooth_scroll)
                     return
             dent_line += 1
-        self.scrollto(dent_line, force_top=False)
 
     def display(self):
         maxy, maxx = self.window.getmaxyx()[0], self.window.getmaxyx()[1]

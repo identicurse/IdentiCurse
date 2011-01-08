@@ -209,6 +209,8 @@ class IdentiCurse(object):
             self.config["tag_rainbow"] = False
         if not "expand_remote" in self.config:
             self.config["expand_remote"] = False
+        if not "smooth_cscroll" in self.config:
+            self.config["smooth_cscroll"] = False
         if not "keys" in self.config:
             self.config['keys'] = {}
         if not "scrollup" in self.config['keys']:
@@ -509,12 +511,12 @@ class IdentiCurse(object):
                 if self.tabs[self.current_tab].chosen_one != (len(self.tabs[self.current_tab].timeline) - 1):
                     self.tabs[self.current_tab].chosen_one += 1
                     self.tabs[self.current_tab].update_buffer()
-                    self.tabs[self.current_tab].scrolltodent(self.tabs[self.current_tab].chosen_one)
+                    self.tabs[self.current_tab].scrolltodent(self.tabs[self.current_tab].chosen_one, smooth_scroll=self.config["smooth_cscroll"])
             elif input == ord("a") or input in [ord(key) for key in self.config['keys']['cprev']]:
                 if self.tabs[self.current_tab].chosen_one != 0:
                     self.tabs[self.current_tab].chosen_one -= 1
                     self.tabs[self.current_tab].update_buffer()
-                    self.tabs[self.current_tab].scrolltodent(self.tabs[self.current_tab].chosen_one)
+                    self.tabs[self.current_tab].scrolltodent(self.tabs[self.current_tab].chosen_one, smooth_scroll=self.config["smooth_cscroll"])
             elif input == ord("z") or input in [ord(key) for key in self.config['keys']['cfirst']]:
                 if self.tabs[self.current_tab].chosen_one != 0:
                     self.tabs[self.current_tab].chosen_one = 0
