@@ -135,14 +135,17 @@ class Tab(object):
         else:
             self.start_line = len(self.buffer.reflowed(maxx - 2)) - (maxy - 3)
 
-    def scrollto(self, n, force_top=True):  # attempt to get line number n as close to the top as possible (unless already visible, if force_top==False) - this is less clean than the relative scrolls, so don't call it unless you *need* to go to a specific line.
+    def scrollto(self, n, force_top=True):  # attempt to get line number n onto the screen (to the top if force_top==True) - this is less clean than the relative scrolls, so don't call it unless you *need* to go to a specific line.
         maxy, maxx = self.window.getmaxyx()[0], self.window.getmaxyx()[1]
         if (n >= self.start_line) and (n < (maxy - 3 + self.start_line)) and not force_top:  # if the line is already visible and force_top==False, bail out
             return
-        if (n > self.start_line) and (n > len(self.buffer.reflowed(maxx - 2)) - (maxy - 3)):
+        if (n > self.start_line) and (n > len(self.buffer.reflowed(maxx - 2)) - (maxy - 3)) and force_top:
             self.start_line = len(self.buffer.reflowed(maxx - 2)) - (maxy - 3)
-        else:
+        elif n < self.start_line or force_top:
             self.start_line = n
+        else:
+            self.start_line = n - (maxy - 4)
+
 
     def scrolltodent(self, n, smooth_scroll=False):
         maxy, maxx = self.window.getmaxyx()[0], self.window.getmaxyx()[1]
@@ -155,7 +158,20 @@ class Tab(object):
         for line in self.buffer.reflowed(maxx - 2):
             for block in line:
                 if block[1] == identicurse.colour_fields['notice_count'] and block[0] == nout:
-                    self.scrollto(dent_line, force_top=smooth_scroll)
+                    if smooth_scroll and (dent_line >= (maxy - 3 + self.start_line)):
+                        buffer_cache = self.buffer.reflowed(maxx - 2)
+                        while True:
+                            if dent_line == len(buffer_cache) - 1:
+                                break
+                            line_length = 0
+                            for block in buffer_cache[dent_line+1]:
+                                line_length += len(block[0])
+                            if line_length == 0:
+                                break
+                            dent_line += 1
+                        self.scrollto(dent_line, force_top=False)
+                    elif (dent_line >= (maxy - 3 + self.start_line)) or (dent_line < self.start_line):
+                        self.scrollto(dent_line, force_top=True)
                     return
             dent_line += 1
 

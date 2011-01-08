@@ -210,7 +210,7 @@ class IdentiCurse(object):
         if not "expand_remote" in self.config:
             self.config["expand_remote"] = False
         if not "smooth_cscroll" in self.config:
-            self.config["smooth_cscroll"] = False
+            self.config["smooth_cscroll"] = True
         if not "keys" in self.config:
             self.config['keys'] = {}
         if not "scrollup" in self.config['keys']:
