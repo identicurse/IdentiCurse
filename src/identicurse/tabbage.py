@@ -213,6 +213,7 @@ class Timeline(Tab):
     def __init__(self, conn, window, timeline, type_params={}, notice_limit=25, filters=[], compact_style=False, user_rainbow=False, tag_rainbow=False, group_rainbow=False, expand_remote=False):
         self.conn = conn
         self.timeline = []
+        self.raw_timeline = []
         self.user_cache = {}
         self.tag_cache = {}
         self.group_cache = {}
@@ -253,6 +254,8 @@ class Timeline(Tab):
             raw_timeline = self.conn.statuses_home_timeline(count=get_count, page=self.page)
         elif self.timeline_type == "mentions":
             raw_timeline = self.conn.statuses_mentions(count=get_count, page=self.page)
+            if raw_timeline != self.raw_timeline:
+                curses.flash()
         elif self.timeline_type == "direct":
             raw_timeline = self.conn.direct_messages(count=get_count, page=self.page)
         elif self.timeline_type == "user":
@@ -269,6 +272,8 @@ class Timeline(Tab):
             raw_timeline = self.conn.favorites(page=self.page)
         elif self.timeline_type == "search":
             raw_timeline = self.conn.search(self.type_params['query'], page=self.page, standardise=True)
+
+        self.raw_timeline = raw_timeline
 
         for notice in raw_timeline:
             passes_filters = True
