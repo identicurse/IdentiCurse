@@ -44,6 +44,16 @@ class Textbox(textpad.Textbox):
             elif ch == 9 or ch == 27:
                 abort = True
                 break
+            elif ch == curses.KEY_HOME:
+                self.win.move(0, 0)
+            elif ch == curses.KEY_END:
+                for y in range(self.maxy+1):
+                    if y == self.maxy:
+                        self.win.move(y, self._end_of_line(y))
+                        break
+                    if self._end_of_line(y+1) == 0:
+                        self.win.move(y, self._end_of_line(y))
+                        break
             elif ch == curses.KEY_DC:
                 self.win.delch()
             elif not ch:
