@@ -1050,9 +1050,10 @@ class IdentiCurse(object):
                             original_id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['retweeted_status']['id']
                         else:
                             original_id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['id']
-                        original_status = self.conn.statuses_show(original_id)['text']
+                        original_status = self.conn.statuses_show(original_id)
+                        new_status_base = "RD @%s %s" % (original_status['user']['screen_name'], original_status['text'])
 
-                        status = self.text_entry.edit(original_status)
+                        status = self.text_entry.edit(new_status_base)
                         self.quote_mode = False
 
                         if status is None:
