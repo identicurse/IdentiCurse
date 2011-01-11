@@ -153,7 +153,8 @@ class IdentiCurse(object):
             "/alias",
             "/link",
             "/bugreport",
-            "/featurerequest"
+            "/featurerequest",
+            "/quote"
         ]
         
         # Set some defaults for configs that we will always need to use, but that are optional
@@ -243,6 +244,7 @@ class IdentiCurse(object):
 
         self.insert_mode = False
         self.search_mode = False
+        self.quote_mode = False
         curses.wrapper(self.initialise)
 
     def redraw(self):
@@ -599,16 +601,21 @@ class IdentiCurse(object):
         self.quit();
 
     def validate(self, character_count):
-        if not self.search_mode:
+        if self.quote_mode:
             if self.conn.length_limit == 0:
-                self.status_bar.update_left("Insert Mode: " + str(character_count))
+                self.status_bar.update_left("Quote Mode: " + str(character_count))
             else:
-                self.status_bar.update_left("Insert Mode: " + str(self.conn.length_limit - character_count))
-        else:
+                self.status_bar.update_left("Quote Mode: " + str(self.conn.length_limit - character_count))
+        elif self.search_mode:
             if self.last_page_search['query'] != "":
                 self.status_bar.update_left("In-page Search (last search: '%s')" % (self.last_page_search['query']))
             else:
                 self.status_bar.update_left("In-page Search")
+        else:
+            if self.conn.length_limit == 0:
+                self.status_bar.update_left("Insert Mode: " + str(character_count))
+            else:
+                self.status_bar.update_left("Insert Mode: " + str(self.conn.length_limit - character_count))
 
     def parse_input(self, input):
         update = False
@@ -1035,6 +1042,24 @@ class IdentiCurse(object):
     
                         status = "#icurserequest " + " ".join(tokens[1:])
                         update = self.conn.statuses_update(status, "IdentiCurse", long_dent=self.config['long_dent'], dup_first_word=True)
+
+                    elif tokens[0] == "/quote" and len(tokens) == 2:
+                        self.quote_mode = True
+
+                        if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
+                            original_id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['retweeted_status']['id']
+                        else:
+                            original_id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['id']
+                        original_status = self.conn.statuses_show(original_id)['text']
+
+                        status = self.text_entry.edit(original_status)
+                        self.quote_mode = False
+
+                        if status is None:
+                            status = ""
+                        if len(status) > 0:
+                            self.status_bar.update_left("Posting Notice...")
+                            update = self.conn.statuses_update(status, "IdentiCurse", original_id, long_dent=self.config['long_dent'])
    
                 except StatusNetError, e:
                     self.status_bar.timed_update_left("Status.Net error %d: %s" % (e.errcode, e.details))
