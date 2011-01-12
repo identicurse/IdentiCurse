@@ -99,6 +99,15 @@ class IdentiCurse(object):
             self.config['password'] = getpass.getpass("Password: ")
             api_path = raw_input("API path [%s]: " % (self.config['api_path']))
             if api_path != "":
+                if api_path[:7] != "http://" and api_path[:8] != "https://":
+                    api_path = "http://" + api_path
+                if api_path[:5] != "https":
+                    https_api_path = "https" + api_path[4:]
+                    response = raw_input("You have not used an https URL. This means everything you do with IdentiCurse will travel over your connection _unencrypted_. Would you rather use '%s' as your API path [Y/n]? " % (https_api_path)).upper()
+                    if response == "":
+                        response = "Y"
+                    if response[0] == "Y":
+                        api_path = https_api_path
                 self.config['api_path'] = api_path
             update_interval = raw_input("Auto-refresh interval (in whole seconds) [%d]: " % (self.config['update_interval']))
             if update_interval != "":
