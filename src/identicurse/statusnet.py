@@ -31,6 +31,8 @@ class StatusNet(object):
     def __init__(self, api_path, username="", password="", use_auth=True):
         import base64
         self.api_path = api_path
+        if self.api_path[-1] == "/":  # We don't want a surplus / when creating request URLs. Sure, most servers will handle it well, but why take the chance?
+            self.api_path == self.api_path[:-1]
         self.use_auth = use_auth
         if self.use_auth:
             self.auth_string = base64.encodestring('%s:%s' % (username, password))[:-1]
