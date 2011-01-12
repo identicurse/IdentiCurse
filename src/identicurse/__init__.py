@@ -14,40 +14,44 @@
 # 
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
+"""
+Initial module for IdentiCurse. Parses options and displays slogan,
+then hands off control to the main identicurse.py module.
+"""
 
 from identicurse import IdentiCurse
 from optparse import OptionParser
 import random, os
 
-preset_slogans = [
-            "100% hippy-approved",
-            "powered by hatred",
-            "we don't get OAuth either",
-            "don't drink and dent",
-            "@psquid can't spell hippy",
-            "Stupid sexy Flanders",
-            "curry in the i-webs",
-            "Got GNOME git commit access",
-            "YOUR SOUL TO THE HOMOSEXUAL AGENDA",
-            "Bullshit Bingo",
-            "trying to do teh frees",
-            "coming and coming and coming and coming",
-            "Do you store your passwords in the back yard?",
-            "Let's neuter this bullshit!",
-            "it's probably just recycled bullshit.",
-            "I'm on a rampage and kill everyone.",
-            "a Tragedie in three parts.",
-            "#metamicroblogging",
-            "#metametamicroblogging",
-            "EXCEPT IN NEBRASKA",
-            "ATTENTION SNOW: GTFO ITS TOO WARM FOR YOU!",
-            "eating paracetamol sandwiches.",
-            "Do not operate heavy machinery while using IdentiCurse.",
-            "39% the same as bathing in fine grape juice.",
-            "DOT MATRIX WITH STEREO SOUND",
-            "oh god how did this get here I am not good with computer",
-            "Pregnant women and those with heart conditions are advised against using this software.",
-          ]
+PRESET_SLOGANS = [
+    "100% hippy-approved",
+    "powered by hatred",
+    "we don't get OAuth either",
+    "don't drink and dent",
+    "@psquid can't spell hippy",
+    "Stupid sexy Flanders",
+    "curry in the i-webs",
+    "Got GNOME git commit access",
+    "YOUR SOUL TO THE HOMOSEXUAL AGENDA",
+    "Bullshit Bingo",
+    "trying to do teh frees",
+    "coming and coming and coming and coming",
+    "Do you store your passwords in the back yard?",
+    "Let's neuter this bullshit!",
+    "it's probably just recycled bullshit.",
+    "I'm on a rampage and kill everyone.",
+    "a Tragedie in three parts.",
+    "#metamicroblogging",
+    "#metametamicroblogging",
+    "EXCEPT IN NEBRASKA",
+    "ATTENTION SNOW: GTFO ITS TOO WARM FOR YOU!",
+    "eating paracetamol sandwiches.",
+    "Do not operate heavy machinery while using IdentiCurse.",
+    "39% the same as bathing in fine grape juice.",
+    "DOT MATRIX WITH STEREO SOUND",
+    "oh god how did this get here I am not good with computer",
+    "Pregnant women and those with heart conditions are advised against using this software.",
+    ]
 
 def main():
     """
@@ -55,15 +59,15 @@ def main():
     """
     parser = OptionParser()
     parser.add_option("-c", "--config",
-            help="specify an alternative config file to use",
-            action="store", type="string", dest="config_filename", metavar="FILE")
+        help="specify an alternative config file to use", action="store",
+        type="string", dest="config_filename", metavar="FILE")
     parser.add_option("-s", "--slogans",
-            help="specify an alternative slogans file to use",
-            action="store", type="string", dest="slogans_filename", metavar="FILE")
+        help="specify an alternative slogans file to use", action="store",
+        type="string", dest="slogans_filename", metavar="FILE")
     parser.add_option("--colour-check",
-            help="check if system curses library supports colours, and how many",
-            action="store_true", dest="colour_check")
-    (options, args) = parser.parse_args()
+        help="check if system curses library supports colours, and how many",
+        action="store_true", dest="colour_check")
+    options = parser.parse_args()[0]
 
     if (options.colour_check is not None) and (options.colour_check == True):
         colour_check()
@@ -74,29 +78,35 @@ def main():
     if options.slogans_filename is not None:
         user_slogans_file = os.path.expanduser(options.slogans_filename)
     else:
-        user_slogans_file = os.path.join(os.path.expanduser("~"), ".identicurse_slogans")
+        user_slogans_file = os.path.join(os.path.expanduser("~"),
+                                             ".identicurse_slogans")
     
     if options.config_filename is not None:
         additional_config['config_filename'] = options.config_filename
 
     try:
         user_slogans_raw = open(user_slogans_file).read()
-        user_slogans = [slogan for slogan in user_slogans_raw.split("\n") if slogan.strip() != ""]
+        user_slogans = [slogan for slogan in user_slogans_raw.split("\n")
+                                                    if slogan.strip() != ""]
         slogans = user_slogans
-    except:
-        slogans = preset_slogans
+    except IOError:
+        slogans = PRESET_SLOGANS
     print "Welcome to IdentiCurse 0.7-dev - %s" % (random.choice(slogans))
     IdentiCurse(additional_config)
 
 def colour_check():
+    """
+    Display brief message informing user how many colours their system's
+    curses library supports.
+    """
     import curses
     curses.initscr()
     if curses.has_colors():
         curses.start_color()
         curses.use_default_colors()
-        msg = "Your system's curses library supports %d colours." % (curses.COLORS)
+        msg = "System curses library supports %d colours." % (curses.COLORS)
     else:
-        msg = "Your system's curses library does not support colours."
+        msg = "System curses library does not support colours."
     curses.endwin()
     print msg
 

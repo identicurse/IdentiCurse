@@ -22,8 +22,6 @@ Standard build script.
 
 __docformat__ = 'restructuredtext'
 
-import os.path
-
 from setuptools import setup, find_packages
 
 setup(
