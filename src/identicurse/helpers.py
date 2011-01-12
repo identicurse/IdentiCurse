@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import time, datetime
+import time, datetime, htmlentitydefs, re
 
 def time_since(datetime_then):
     if datetime_then > datetime.datetime.utcnow():
@@ -115,3 +115,29 @@ def find_split_point(text, width):
         else:
             split_point -= 1
     return split_point
+
+def html_unescape_block(block):
+    block_text = block.group(0)
+    block_codepoint = None
+
+    if block_text[:2] == "&#":  # codepoint
+        try:
+            if block_text[2] == "x":  # hexadecimal codepoint
+                block_codepoint = int(block_text[3:-1], 16)
+            else:  # decimal codepoint
+                block_codepoint = int(block_text[2:-1])
+        except ValueError:  # codepoint was mangled/invalid, don't bother trying to interpret it
+            pass
+    else:  # named character
+        try:
+            block_codepoint = htmlentitydefs.name2codepoint[block_text[1:-1]]
+        except KeyError:  # name was invalid, don't try to interpret
+            pass
+
+    if block_codepoint is not None:
+        return unichr(block_codepoint)
+    else:
+        return block_text
+
+def html_unescape_string(escaped_string):
+    return re.sub("&#?\w+;", html_unescape_block, escaped_string)

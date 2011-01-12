@@ -288,7 +288,7 @@ class Timeline(Tab):
                             continue
                         req = urllib2.Request(attachment['url'])
                         page = urllib2.urlopen(req).read()
-                        notice['text'] = self.title_regex.findall(page)[0]
+                        notice['text'] = helpers.html_unescape_string(self.title_regex.findall(page)[0].decode(sys.getfilesystemencoding()))
                         break
                 self.timeline.append(notice)
 
@@ -449,7 +449,7 @@ class Context(Tab):
                         continue
                     req = urllib2.Request(attachment['url'])
                     page = urllib2.urlopen(req).read()
-                    notice['text'] = self.title_regex.findall(page)[0]
+                    notice['text'] = helpers.html_unescape_string(self.title_regex.findall(page)[0].decode(sys.getfilesystemencoding()))
                     break
             self.timeline.append(notice)
             if "retweeted_status" in self.timeline[-1]:
