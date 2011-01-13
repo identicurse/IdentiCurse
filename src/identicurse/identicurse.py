@@ -539,7 +539,10 @@ class IdentiCurse(object):
                     id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['retweeted_status']['id']
                 else:
                     id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['id']
-                self.conn.favorites_create(id)
+                try:
+                    self.conn.favorites_create(id)
+                except StatusNetError, e:
+                    self.status_bar.timed_update_left("Status.Net error %d: %s" % (e.errcode, e.details))
                 self.status_bar.update_left("Doing Nothing.")
             elif input == ord("e") or input in [ord(key) for key in self.config['keys']['crepeat']]:
                 self.status_bar.update_left("Repeating Notice...")
@@ -547,13 +550,16 @@ class IdentiCurse(object):
                     id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['retweeted_status']['id']
                 else:
                     id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['id']
-                update = self.conn.statuses_retweet(id, source="IdentiCurse")
-                if isinstance(update, list):
-                    for notice in update:
-                        self.tabs[self.current_tab].timeline.insert(0, notice)
-                else:
-                    self.tabs[self.current_tab].timeline.insert(0, update)
-                self.tabs[self.current_tab].update_buffer()
+                try:
+                    update = self.conn.statuses_retweet(id, source="IdentiCurse")
+                    if isinstance(update, list):
+                        for notice in update:
+                            self.tabs[self.current_tab].timeline.insert(0, notice)
+                    else:
+                        self.tabs[self.current_tab].timeline.insert(0, update)
+                    self.tabs[self.current_tab].update_buffer()
+                except StatusNetError, e:
+                    self.status_bar.timed_update_left("Status.Net error %d: %s" % (e.errcode, e.details))
                 self.status_bar.update_left("Doing Nothing.")
             elif input == ord("c") or input in [ord(key) for key in self.config['keys']['ccontext']]:
                 self.status_bar.update_left("Loading Context...")
