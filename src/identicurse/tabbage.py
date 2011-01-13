@@ -59,12 +59,14 @@ class Buffer(list):
             line_length = 0
             for block in line:
                 if (len(block[0]) + line_length) > width:
-                    overlong_by = (len(block[0]) + line_length) - width
-                    split_point = helpers.find_split_point(block[0], len(block[0]) - overlong_by + 1)
+                    split_point = helpers.find_split_point(block[0], width - line_length)
                     reflowed_buffer[-1].append((block[0][:split_point], block[1]))
-                    reflowed_buffer.append([])
-                    reflowed_buffer[-1].append((block[0][split_point:], block[1]))
-                    line_length = len(reflowed_buffer[-1][-1][0])
+                    block = (block[0][split_point:], block[1])
+                    while len(block[0]) > width:
+                        split_point = helpers.find_split_point(block[0], width)
+                        reflowed_buffer.append([(block[0][:split_point], block[1])])
+                        block = (block[0][split_point:], block[1])
+                    reflowed_buffer.append([(block[0][:split_point], block[1])])
                 else:
                     reflowed_buffer[-1].append(block)
                     line_length += len(block[0])
