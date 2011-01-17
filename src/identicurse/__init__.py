@@ -51,6 +51,7 @@ PRESET_SLOGANS = [
     "DOT MATRIX WITH STEREO SOUND",
     "oh god how did this get here I am not good with computer",
     "Pregnant women and those with heart conditions are advised against using this software.",
+    "because some vpn won't run with the cool friends",
     ]
 
 def main():
