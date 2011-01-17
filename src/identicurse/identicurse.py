@@ -28,6 +28,8 @@ from statusnet import StatusNet, StatusNetError
 from tabbage import *
 from statusbar import StatusBar
 
+import config
+
 locale.setlocale(locale.LC_ALL, '')
 code = locale.getpreferredencoding()
 
@@ -79,55 +81,54 @@ class IdentiCurse(object):
         self.qreply = False
         
         if "config_filename" in additional_config:
-            self.config_file = os.path.expanduser(additional_config['config_filename'])
+            config.config.filename = os.path.expanduser(additional_config['config_filename'])
         else:
-            self.config_file = os.path.join(os.path.expanduser("~") ,".identicurse")
+            config.config.filename = os.path.join(os.path.expanduser("~") ,".identicurse")
 
         try:
-            if os.path.exists(self.config_file):
-                self.config = json.loads(open(self.config_file).read())
+            if os.path.exists(config.config.filename) or os.path.exists(os.path.join("/etc", "identicurse.conf")):
+                if not config.config.load():
+                    config.config.load(os.path.join("/etc", "identicurse.conf"))
             else:
-                self.config = json.loads(open(os.path.join("/etc", "identicurse.conf")).read())
+                import getpass, time
+                # no config yet, so let's build one
+                config.config.load(os.path.join(self.path, "config.json"))
+                print "No config was found, so we will now run through a few quick questions to set up a basic config for you (which will be saved as %s so you can manually edit it later). If the default (where defaults are available, they're stated in []) is already fine for any question, just press Enter without typing anything, and the default will be used." % (config.config.filename)
+                print config.config
+                config.config['username'] = raw_input("Username: ")
+                config.config['password'] = getpass.getpass("Password: ")
+                api_path = raw_input("API path [%s]: " % (config.config['api_path']))
+                if api_path != "":
+                    if api_path[:7] != "http://" and api_path[:8] != "https://":
+                        api_path = "http://" + api_path
+                    if api_path[:5] != "https":
+                        https_api_path = "https" + api_path[4:]
+                        response = raw_input("You have not used an https URL. This means everything you do with IdentiCurse will travel over your connection _unencrypted_. Would you rather use '%s' as your API path [Y/n]? " % (https_api_path)).upper()
+                        if response == "":
+                            response = "Y"
+                        if response[0] == "Y":
+                            api_path = https_api_path
+                    config.config['api_path'] = api_path
+                update_interval = raw_input("Auto-refresh interval (in whole seconds) [%d]: " % (config.config['update_interval']))
+                if update_interval != "":
+                    try:
+                        config.config['update_interval'] = int(update_interval)
+                    except ValueError:
+                        print "Sorry, you entered an invalid interval. The default of %d will be used instead." % (config.config['update_interval'])
+                notice_limit = raw_input("Number of notices to fetch per timeline page [%d]: " % (config.config['notice_limit']))
+                if notice_limit != "":
+                    try:
+                        config.config['notice_limit'] = int(notice_limit)
+                    except ValueError:
+                        print "Sorry, you entered an invalid number of notices. The default of %d will be used instead." % (config.config['notice_limit'])
+                try:
+                    temp_conn = StatusNet(config.config['api_path'], config.config['username'], config.config['password'])
+                except Exception, (errmsg):
+                    sys.exit("Couldn't establish connection with provided credentials: %s" % (errmsg))
+                print "Okay! Everything seems good! Your new config will now be saved, then IdentiCurse will start properly."
+                config.config.save()
         except ValueError:
             sys.exit("ERROR: Your config file could not be succesfully loaded due to JSON syntax error(s). Please fix it.")
-        except IOError:
-            import getpass, time
-            # no config yet, so let's build one
-            self.config = json.loads(open(os.path.join(self.path, "config.json"), "r").read())  # get the base config
-            print "No config was found, so we will now run through a few quick questions to set up a basic config for you (which will be saved as %s so you can manually edit it later). If the default (where defaults are available, they're stated in []) is already fine for any question, just press Enter without typing anything, and the default will be used." % (self.config_file)
-            self.config['username'] = raw_input("Username: ")
-            self.config['password'] = getpass.getpass("Password: ")
-            api_path = raw_input("API path [%s]: " % (self.config['api_path']))
-            if api_path != "":
-                if api_path[:7] != "http://" and api_path[:8] != "https://":
-                    api_path = "http://" + api_path
-                if api_path[:5] != "https":
-                    https_api_path = "https" + api_path[4:]
-                    response = raw_input("You have not used an https URL. This means everything you do with IdentiCurse will travel over your connection _unencrypted_. Would you rather use '%s' as your API path [Y/n]? " % (https_api_path)).upper()
-                    if response == "":
-                        response = "Y"
-                    if response[0] == "Y":
-                        api_path = https_api_path
-                self.config['api_path'] = api_path
-            update_interval = raw_input("Auto-refresh interval (in whole seconds) [%d]: " % (self.config['update_interval']))
-            if update_interval != "":
-                try:
-                    self.config['update_interval'] = int(update_interval)
-                except ValueError:
-                    print "Sorry, you entered an invalid interval. The default of %d will be used instead." % (self.config['update_interval'])
-            notice_limit = raw_input("Number of notices to fetch per timeline page [%d]: " % (self.config['notice_limit']))
-            if notice_limit != "":
-                try:
-                    self.config['notice_limit'] = int(notice_limit)
-                except ValueError:
-                    print "Sorry, you entered an invalid number of notices. The default of %d will be used instead." % (self.config['notice_limit'])
-            try:
-                temp_conn = StatusNet(self.config['api_path'], self.config['username'], self.config['password'])
-            except Exception, (errmsg):
-                sys.exit("Couldn't establish connection with provided credentials: %s" % (errmsg))
-            print "Okay! Everything seems good! Your new config will now be saved, then IdentiCurse will start properly."
-            open(self.config_file, "w").write(json.dumps(self.config, indent=4))
-            time.sleep(1)
 
         self.last_page_search = {'query':"", 'occurs':[], 'viewing':0, 'tab':-1}
 
@@ -167,10 +168,10 @@ class IdentiCurse(object):
         ]
         
         # Set some defaults for configs that we will always need to use, but that are optional
-        if not "enable_colours" in self.config:
-            self.config["enable_colours"] = True
+        if not "enable_colours" in config.config:
+            config.config["enable_colours"] = True
 
-        if self.config["enable_colours"]:
+        if config.config["enable_colours"]:
             default_colour_scheme = {
                 "timelines": ("none", "none"),
                 "statusbar": ("black", "white"),
@@ -190,51 +191,51 @@ class IdentiCurse(object):
             }
 
             # Default colour scheme
-            if not "colours" in self.config:
-                self.config["colours"] = default_colour_scheme
+            if not "colours" in config.config:
+                config.config["colours"] = default_colour_scheme
             else:
                 for part in colour_fields:
-                    if not part in self.config["colours"]:
-                        self.config["colours"][part] = default_colour_scheme[part]
+                    if not part in config.config["colours"]:
+                        config.config["colours"][part] = default_colour_scheme[part]
 
-        if not "search_case_sensitive" in self.config:
-            self.config['search_case_sensitive'] = "sensitive"
-        if not "long_dent" in self.config:
-            self.config['long_dent'] = "split"
-        if not "filters" in self.config:
-            self.config['filters'] = []
-        if not "notice_limit" in self.config:
-            self.config['notice_limit'] = 25
-        if not "browser" in self.config:
-            self.config['browser'] = "xdg-open '%s'"
-        if not "border" in self.config:
-            self.config['border'] = True
-        if not "compact_notices" in self.config:
-            self.config['compact_notices'] = True
-        if not "user_rainbow" in self.config:
-            self.config["user_rainbow"] = False
-        if not "group_rainbow" in self.config:
-            self.config["group_rainbow"] = False
-        if not "tag_rainbow" in self.config:
-            self.config["tag_rainbow"] = False
-        if not "expand_remote" in self.config:
-            self.config["expand_remote"] = False
-        if not "smooth_cscroll" in self.config:
-            self.config["smooth_cscroll"] = True
-        if not "keys" in self.config:
-            self.config['keys'] = {}
-        if not "scrollup" in self.config['keys']:
-            self.config['keys']['scrollup'] = ['k']
-        if not "scrolltop" in self.config['keys']:
-            self.config['keys']['scrolltop'] = ['g']
-        if not "pageup" in self.config['keys']:
-            self.config['keys']['pageup'] = ['b']
-        if not "scrolldown" in self.config['keys']:
-            self.config['keys']['scrolldown'] = ['j']
-        if not "scrollbottom" in self.config['keys']:
-            self.config['keys']['scrollbottom'] = ['G']
-        if not "pagedown" in self.config['keys']:
-            self.config['keys']['pagedown'] = [' ']
+        if not "search_case_sensitive" in config.config:
+            config.config['search_case_sensitive'] = "sensitive"
+        if not "long_dent" in config.config:
+            config.config['long_dent'] = "split"
+        if not "filters" in config.config:
+            config.config['filters'] = []
+        if not "notice_limit" in config.config:
+            config.config['notice_limit'] = 25
+        if not "browser" in config.config:
+            config.config['browser'] = "xdg-open '%s'"
+        if not "border" in config.config:
+            config.config['border'] = True
+        if not "compact_notices" in config.config:
+            config.config['compact_notices'] = True
+        if not "user_rainbow" in config.config:
+            config.config["user_rainbow"] = False
+        if not "group_rainbow" in config.config:
+            config.config["group_rainbow"] = False
+        if not "tag_rainbow" in config.config:
+            config.config["tag_rainbow"] = False
+        if not "expand_remote" in config.config:
+            config.config["expand_remote"] = False
+        if not "smooth_cscroll" in config.config:
+            config.config["smooth_cscroll"] = True
+        if not "keys" in config.config:
+            config.config['keys'] = {}
+        if not "scrollup" in config.config['keys']:
+            config.config['keys']['scrollup'] = ['k']
+        if not "scrolltop" in config.config['keys']:
+            config.config['keys']['scrolltop'] = ['g']
+        if not "pageup" in config.config['keys']:
+            config.config['keys']['pageup'] = ['b']
+        if not "scrolldown" in config.config['keys']:
+            config.config['keys']['scrolldown'] = ['j']
+        if not "scrollbottom" in config.config['keys']:
+            config.config['keys']['scrollbottom'] = ['G']
+        if not "pagedown" in config.config['keys']:
+            config.config['keys']['pagedown'] = [' ']
 
         empty_default_keys = ("firstpage", "newerpage", "olderpage", "refresh",
             "input", "search", "quit", "closetab", "help", "nexttab", "prevtab",
@@ -242,12 +243,12 @@ class IdentiCurse(object):
             "cfirst", "nextmatch", "prevmatch")
 
         for k in empty_default_keys:
-            self.config['keys'][k] = []
+            config.config['keys'][k] = []
         
         self.url_regex = re.compile("http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+")
 
         try:
-            self.conn = StatusNet(self.config['api_path'], self.config['username'], self.config['password'])
+            self.conn = StatusNet(config.config['api_path'], config.config['username'], config.config['password'])
         except Exception, (errmsg):
             sys.exit("ERROR: Couldn't establish connection: %s" % (errmsg))
 
@@ -261,7 +262,7 @@ class IdentiCurse(object):
         self.screen.refresh()
         self.y, self.x = self.screen.getmaxyx()
 
-        if self.config['border']:
+        if config.config['border']:
             if self.screen.getmaxyx() == (self.y, self.x):
                 self.main_window = self.screen.subwin(self.y-3, self.x-3, 2, 2)
             else:
@@ -283,7 +284,7 @@ class IdentiCurse(object):
         else:
             entry_lines = (self.conn.length_limit / x) + 1
 
-        if self.config['border']:
+        if config.config['border']:
             if self.screen.getmaxyx() == (self.y, self.x):
                 self.entry_window = self.main_window.subwin(entry_lines, x-6, 4, 5)
             else:
@@ -297,7 +298,7 @@ class IdentiCurse(object):
         self.text_entry = Textbox(self.entry_window, self.validate, insert_mode=True)
 
         self.text_entry.stripspaces = 1
-        if self.config['border']:
+        if config.config['border']:
             if self.screen.getmaxyx() == (self.y, self.x):
                 self.notice_window = self.main_window.subwin(y-6, x-4, 5 + entry_lines, 5)
             else:
@@ -314,7 +315,7 @@ class IdentiCurse(object):
             for tab in self.tabs:
                 tab.window = self.notice_window
 
-        if self.config['border']:
+        if config.config['border']:
             if self.screen.getmaxyx() == (self.y, self.x):
                 self.status_window = self.main_window.subwin(1, x-5, y, 5)
             else:
@@ -337,10 +338,10 @@ class IdentiCurse(object):
         curses.cbreak()
         curses.use_default_colors()
 
-        if curses.has_colors() and self.config['enable_colours'] == True:
+        if curses.has_colors() and config.config['enable_colours'] == True:
             curses.start_color()
 
-            for field, (fg, bg) in self.config['colours'].items():
+            for field, (fg, bg) in config.config['colours'].items():
                 try:
                     curses.init_pair(colour_fields[field], colours[fg], colours[bg])
                 except:
@@ -350,7 +351,7 @@ class IdentiCurse(object):
                 if (value + 1) > curses.COLORS:
                     continue
 
-                if not key in ("black", "white", "none") and key != self.config['colours']['notice']:
+                if not key in ("black", "white", "none") and key != config.config['colours']['notice']:
                     base_colours[colours[key]] = c
                     curses.init_pair(c, value, colours["none"])
                     c += 1
@@ -371,10 +372,10 @@ class IdentiCurse(object):
         self.status_bar.update_left("Welcome to IdentiCurse")
         
         self.tabs = []
-        for tabspec in self.config['initial_tabs'].split("|"):
+        for tabspec in config.config['initial_tabs'].split("|"):
             tab = tabspec.split(':')
             if tab[0] in ("home", "mentions", "direct", "public", "sentdirect"):
-                self.tabs.append(Timeline(self.conn, self.notice_window, tab[0], notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices'], user_rainbow=self.config['user_rainbow'], group_rainbow=self.config['group_rainbow'], tag_rainbow=self.config['tag_rainbow'], expand_remote=self.config['expand_remote']))
+                self.tabs.append(Timeline(self.conn, self.notice_window, tab[0], notice_limit=config.config['notice_limit'], filters=config.config['filters'], compact_style=config.config['compact_notices'], user_rainbow=config.config['user_rainbow'], group_rainbow=config.config['group_rainbow'], tag_rainbow=config.config['tag_rainbow'], expand_remote=config.config['expand_remote']))
             elif tab[0] == "profile":
                 screen_name = tab[1]
                 if screen_name[0] == "@":
@@ -385,28 +386,28 @@ class IdentiCurse(object):
                 if screen_name[0] == "@":
                     screen_name = screen_name[1:]
                 user_id = self.conn.users_show(screen_name=screen_name)['id']
-                self.tabs.append(Timeline(self.conn, self.notice_window, "user", {'screen_name':screen_name, 'user_id':user_id}, notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices'], user_rainbow=self.config['user_rainbow'], group_rainbow=self.config['group_rainbow'], tag_rainbow=self.config['tag_rainbow'], expand_remote=self.config['expand_remote']))
+                self.tabs.append(Timeline(self.conn, self.notice_window, "user", {'screen_name':screen_name, 'user_id':user_id}, notice_limit=config.config['notice_limit'], filters=config.config['filters'], compact_style=config.config['compact_notices'], user_rainbow=config.config['user_rainbow'], group_rainbow=config.config['group_rainbow'], tag_rainbow=config.config['tag_rainbow'], expand_remote=config.config['expand_remote']))
             elif tab[0] == "group":
                 nickname = tab[1]
                 if nickname[0] == "!":
                     nickname = nickname[1:]
                 group_id = int(self.conn.statusnet_groups_show(nickname=nickname)['id'])
-                self.tabs.append(Timeline(self.conn, self.notice_window, "group", {'nickname':nickname, 'group_id':group_id}, notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices'], user_rainbow=self.config['user_rainbow'], group_rainbow=self.config['group_rainbow'], tag_rainbow=self.config['tag_rainbow'], expand_remote=self.config['expand_remote']))
+                self.tabs.append(Timeline(self.conn, self.notice_window, "group", {'nickname':nickname, 'group_id':group_id}, notice_limit=config.config['notice_limit'], filters=config.config['filters'], compact_style=config.config['compact_notices'], user_rainbow=config.config['user_rainbow'], group_rainbow=config.config['group_rainbow'], tag_rainbow=config.config['tag_rainbow'], expand_remote=config.config['expand_remote']))
             if tab[0] == "tag":
                 tag = tab[1]
                 if tag[0] == "#":
                     tag = tag[1:]
-                self.tabs.append(Timeline(self.conn, self.notice_window, "tag", {'tag':tag}, notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices'], user_rainbow=self.config['user_rainbow'], group_rainbow=self.config['group_rainbow'], tag_rainbow=self.config['tag_rainbow'], expand_remote=self.config['expand_remote']))
+                self.tabs.append(Timeline(self.conn, self.notice_window, "tag", {'tag':tag}, notice_limit=config.config['notice_limit'], filters=config.config['filters'], compact_style=config.config['compact_notices'], user_rainbow=config.config['user_rainbow'], group_rainbow=config.config['group_rainbow'], tag_rainbow=config.config['tag_rainbow'], expand_remote=config.config['expand_remote']))
             if tab[0] == "search":
-                self.tabs.append(Timeline(self.conn, self.notice_window, "search", {'query':tab[1]}, filters=self.config['filters'], compact_style=self.config['compact_notices'], user_rainbow=self.config['user_rainbow'], group_rainbow=self.config['group_rainbow'], tag_rainbow=self.config['tag_rainbow'], expand_remote=self.config['expand_remote']))
+                self.tabs.append(Timeline(self.conn, self.notice_window, "search", {'query':tab[1]}, filters=config.config['filters'], compact_style=config.config['compact_notices'], user_rainbow=config.config['user_rainbow'], group_rainbow=config.config['group_rainbow'], tag_rainbow=config.config['tag_rainbow'], expand_remote=config.config['expand_remote']))
             #not too sure why anyone would need to auto-open these last two, but it couldn't hurt to add them
             if tab[0] == "context":
                 notice_id = int(tab[1])
-                self.tabs.append(Context(self.conn, self.notice_window, notice_id, compact_style=self.config['compact_notices'], user_rainbow=self.config['user_rainbow'], group_rainbow=self.config['group_rainbow'], tag_rainbow=self.config['tag_rainbow'], expand_remote=self.config['expand_remote']))
+                self.tabs.append(Context(self.conn, self.notice_window, notice_id, compact_style=config.config['compact_notices'], user_rainbow=config.config['user_rainbow'], group_rainbow=config.config['group_rainbow'], tag_rainbow=config.config['tag_rainbow'], expand_remote=config.config['expand_remote']))
             if tab[0] == "help":
                 self.tabs.append(Help(self.notice_window, self.path))
 
-        self.update_timer = Timer(self.config['update_interval'], self.update_tabs)
+        self.update_timer = Timer(config.config['update_interval'], self.update_tabs)
         self.update_timer.start()
 
         self.current_tab = 0
@@ -424,12 +425,12 @@ class IdentiCurse(object):
             self.status_bar.update_left("Updating Timelines...")
             TabUpdater(self.tabs, self, 'end_update_tabs').start()
         else:
-            self.update_timer = Timer(self.config['update_interval'], self.update_tabs)
+            self.update_timer = Timer(config.config['update_interval'], self.update_tabs)
 
     def end_update_tabs(self):
         self.display_current_tab()
         self.status_bar.update_left("Doing nothing.")
-        self.update_timer = Timer(self.config['update_interval'], self.update_tabs)
+        self.update_timer = Timer(config.config['update_interval'], self.update_tabs)
         self.update_timer.start()
 
     def update_tab_buffers(self):
@@ -465,10 +466,10 @@ class IdentiCurse(object):
                 for x in range(0, len(self.tabs)):
                     if input == ord(str(x+1)):
                         switch_to_tab = x
-                if input == ord(">") or input in [ord(key) for key in self.config['keys']['nexttab']]:
+                if input == ord(">") or input in [ord(key) for key in config.config['keys']['nexttab']]:
                     if self.current_tab < (len(self.tabs) - 1):
                         switch_to_tab = self.current_tab + 1
-                elif input == ord("<") or input in [ord(key) for key in self.config['keys']['prevtab']]:
+                elif input == ord("<") or input in [ord(key) for key in config.config['keys']['prevtab']]:
                     if self.current_tab >= 1:
                         switch_to_tab = self.current_tab - 1
 
@@ -485,83 +486,83 @@ class IdentiCurse(object):
                         self.parse_input(self.text_entry.edit("/r " + str(x) + " "))
                 self.qreply = False
             
-            if input == curses.KEY_UP or input in [ord(key) for key in self.config['keys']['scrollup']]:
+            if input == curses.KEY_UP or input in [ord(key) for key in config.config['keys']['scrollup']]:
                 self.tabs[self.current_tab].scrollup(1)
                 self.display_current_tab()
-            elif input == curses.KEY_HOME or input in [ord(key) for key in self.config['keys']['scrolltop']]:
+            elif input == curses.KEY_HOME or input in [ord(key) for key in config.config['keys']['scrolltop']]:
                 self.tabs[self.current_tab].scrollup(0)
                 self.display_current_tab()
-            elif input == curses.KEY_PPAGE or input in [ord(key) for key in self.config['keys']['pageup']]:
+            elif input == curses.KEY_PPAGE or input in [ord(key) for key in config.config['keys']['pageup']]:
                 self.tabs[self.current_tab].scrollup(self.main_window.getmaxyx()[0] - 11) # the 11 offset gives 2 lines of overlap between the pre-scroll view and post-scroll view
                 self.display_current_tab()
-            elif input == curses.KEY_DOWN or input in [ord(key) for key in self.config['keys']['scrolldown']]:
+            elif input == curses.KEY_DOWN or input in [ord(key) for key in config.config['keys']['scrolldown']]:
                 self.tabs[self.current_tab].scrolldown(1)
                 self.display_current_tab()
-            elif input == curses.KEY_END or input in [ord(key) for key in self.config['keys']['scrollbottom']]:
+            elif input == curses.KEY_END or input in [ord(key) for key in config.config['keys']['scrollbottom']]:
                 self.tabs[self.current_tab].scrolldown(0)
                 self.display_current_tab()
-            elif input == curses.KEY_NPAGE or input in [ord(key) for key in self.config['keys']['pagedown']]:
+            elif input == curses.KEY_NPAGE or input in [ord(key) for key in config.config['keys']['pagedown']]:
                 self.tabs[self.current_tab].scrolldown(self.main_window.getmaxyx()[0] - 11) # as above
                 self.display_current_tab()
-            elif input == ord("=") or input in [ord(key) for key in self.config['keys']['firstpage']]:
+            elif input == ord("=") or input in [ord(key) for key in config.config['keys']['firstpage']]:
                 if self.tabs[self.current_tab].prevpage(0):
                     self.status_bar.update_left("Moving to first page...")
                     self.tabs[self.current_tab].update()
                     self.status_bar.update_left("Doing nothing.")
-            elif input == curses.KEY_LEFT or input in [ord(key) for key in self.config['keys']['newerpage']]:
+            elif input == curses.KEY_LEFT or input in [ord(key) for key in config.config['keys']['newerpage']]:
                 if self.tabs[self.current_tab].prevpage():
                     self.status_bar.update_left("Moving to newer page...")
                     self.tabs[self.current_tab].update()
                     self.status_bar.update_left("Doing nothing.")
-            elif input == curses.KEY_RIGHT or input in [ord(key) for key in self.config['keys']['olderpage']]:
+            elif input == curses.KEY_RIGHT or input in [ord(key) for key in config.config['keys']['olderpage']]:
                 if self.tabs[self.current_tab].nextpage():
                     self.status_bar.update_left("Moving to older page...")
                     self.tabs[self.current_tab].update()
                     self.status_bar.update_left("Doing nothing.")
-            elif input == ord("r") or input in [ord(key) for key in self.config['keys']['refresh']]:
+            elif input == ord("r") or input in [ord(key) for key in config.config['keys']['refresh']]:
                 self.update_tabs()
-            elif input == ord("i") or input in [ord(key) for key in self.config['keys']['input']]:
+            elif input == ord("i") or input in [ord(key) for key in config.config['keys']['input']]:
                 self.update_timer.cancel()
                 self.insert_mode = True
                 self.parse_input(self.text_entry.edit())
-            elif input == ord("/") or input in [ord(key) for key in self.config['keys']['search']]:
+            elif input == ord("/") or input in [ord(key) for key in config.config['keys']['search']]:
                 self.update_timer.cancel()
                 self.insert_mode = True
                 self.search_mode = True
                 self.parse_search(self.text_entry.edit())
-            elif input == ord("q") or input in [ord(key) for key in self.config['keys']['quit']]:
+            elif input == ord("q") or input in [ord(key) for key in config.config['keys']['quit']]:
                 running = False
-            elif input == ord("x") or input in [ord(key) for key in self.config['keys']['closetab']]:
+            elif input == ord("x") or input in [ord(key) for key in config.config['keys']['closetab']]:
                 self.close_current_tab()
-            elif input == ord("h") or input in [ord(key) for key in self.config['keys']['help']]:
+            elif input == ord("h") or input in [ord(key) for key in config.config['keys']['help']]:
                 self.tabs.append(Help(self.notice_window, self.path))
                 self.tabs[self.current_tab].active = False
                 self.current_tab = len(self.tabs) - 1
                 self.tabs[self.current_tab].active = True
                 self.tab_order.insert(0, self.current_tab)
                 self.tabs[self.current_tab].update()
-            elif input == ord("l") or input in [ord(key) for key in self.config['keys']['qreply']]:
+            elif input == ord("l") or input in [ord(key) for key in config.config['keys']['qreply']]:
                 self.qreply = True
-            elif input == ord("d") or input in [ord(key) for key in self.config['keys']['creply']]:
+            elif input == ord("d") or input in [ord(key) for key in config.config['keys']['creply']]:
                 self.update_timer.cancel()
                 self.insert_mode = True
                 self.parse_input(self.text_entry.edit("/r " + str(self.tabs[self.current_tab].chosen_one + 1) + " "))
-            elif input == ord("s") or input in [ord(key) for key in self.config['keys']['cnext']]:
+            elif input == ord("s") or input in [ord(key) for key in config.config['keys']['cnext']]:
                 if self.tabs[self.current_tab].chosen_one != (len(self.tabs[self.current_tab].timeline) - 1):
                     self.tabs[self.current_tab].chosen_one += 1
                     self.tabs[self.current_tab].update_buffer()
-                    self.tabs[self.current_tab].scrolltodent(self.tabs[self.current_tab].chosen_one, smooth_scroll=self.config["smooth_cscroll"])
-            elif input == ord("a") or input in [ord(key) for key in self.config['keys']['cprev']]:
+                    self.tabs[self.current_tab].scrolltodent(self.tabs[self.current_tab].chosen_one, smooth_scroll=config.config["smooth_cscroll"])
+            elif input == ord("a") or input in [ord(key) for key in config.config['keys']['cprev']]:
                 if self.tabs[self.current_tab].chosen_one != 0:
                     self.tabs[self.current_tab].chosen_one -= 1
                     self.tabs[self.current_tab].update_buffer()
-                    self.tabs[self.current_tab].scrolltodent(self.tabs[self.current_tab].chosen_one, smooth_scroll=self.config["smooth_cscroll"])
-            elif input == ord("z") or input in [ord(key) for key in self.config['keys']['cfirst']]:
+                    self.tabs[self.current_tab].scrolltodent(self.tabs[self.current_tab].chosen_one, smooth_scroll=config.config["smooth_cscroll"])
+            elif input == ord("z") or input in [ord(key) for key in config.config['keys']['cfirst']]:
                 if self.tabs[self.current_tab].chosen_one != 0:
                     self.tabs[self.current_tab].chosen_one = 0
                     self.tabs[self.current_tab].update_buffer()
                     self.tabs[self.current_tab].scrolltodent(self.tabs[self.current_tab].chosen_one)
-            elif input == ord("f") or input in [ord(key) for key in self.config['keys']['cfav']]:
+            elif input == ord("f") or input in [ord(key) for key in config.config['keys']['cfav']]:
                 self.status_bar.update_left("Favouriting Notice...")
                 if "retweeted_status" in self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]:
                     id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['retweeted_status']['id']
@@ -572,7 +573,7 @@ class IdentiCurse(object):
                 except StatusNetError, e:
                     self.status_bar.timed_update_left("Status.Net error %d: %s" % (e.errcode, e.details))
                 self.status_bar.update_left("Doing Nothing.")
-            elif input == ord("e") or input in [ord(key) for key in self.config['keys']['crepeat']]:
+            elif input == ord("e") or input in [ord(key) for key in config.config['keys']['crepeat']]:
                 self.status_bar.update_left("Repeating Notice...")
                 if "retweeted_status" in self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]:
                     id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['retweeted_status']['id']
@@ -589,20 +590,20 @@ class IdentiCurse(object):
                 except StatusNetError, e:
                     self.status_bar.timed_update_left("Status.Net error %d: %s" % (e.errcode, e.details))
                 self.status_bar.update_left("Doing Nothing.")
-            elif input == ord("c") or input in [ord(key) for key in self.config['keys']['ccontext']]:
+            elif input == ord("c") or input in [ord(key) for key in config.config['keys']['ccontext']]:
                 self.status_bar.update_left("Loading Context...")
                 if "retweeted_status" in self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]:
                     id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['retweeted_status']['id']
                 else:
                     id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['id']
-                self.tabs.append(Context(self.conn, self.notice_window, id, compact_style=self.config['compact_notices'], user_rainbow=self.config['user_rainbow'], group_rainbow=self.config['group_rainbow'], tag_rainbow=self.config['tag_rainbow'], expand_remote=self.config['expand_remote']))
+                self.tabs.append(Context(self.conn, self.notice_window, id, compact_style=config.config['compact_notices'], user_rainbow=config.config['user_rainbow'], group_rainbow=config.config['group_rainbow'], tag_rainbow=config.config['tag_rainbow'], expand_remote=config.config['expand_remote']))
                 self.tabs[self.current_tab].active = False
                 self.current_tab = len(self.tabs) - 1
                 self.tabs[self.current_tab].active = True
                 self.tab_order.insert(0, self.current_tab)
                 self.tabs[self.current_tab].update()
                 self.status_bar.update_left("Doing Nothing.")
-            elif input == ord("n") or input in [ord(key) for key in self.config['keys']['nextmatch']]:
+            elif input == ord("n") or input in [ord(key) for key in config.config['keys']['nextmatch']]:
                 if (self.last_page_search['query'] != "") and (self.last_page_search['tab'] == self.current_tab):
                     if self.last_page_search['viewing'] < (len(self.last_page_search['occurs']) - 1):
                         self.last_page_search['viewing'] += 1
@@ -615,7 +616,7 @@ class IdentiCurse(object):
                     else:
                         self.status_bar.update_left("Viewing result #%d for '%s'" % (self.last_page_search['viewing'] + 1, self.last_page_search['query']))
                     self.display_current_tab()
-            elif input == ord("N") or input in [ord(key) for key in self.config['keys']['prevmatch']]:
+            elif input == ord("N") or input in [ord(key) for key in config.config['keys']['prevmatch']]:
                 if (self.last_page_search['query'] != "") and (self.last_page_search['tab'] == self.current_tab):
                     if self.last_page_search['viewing'] > 0:
                         self.last_page_search['viewing'] -= 1
@@ -671,19 +672,19 @@ class IdentiCurse(object):
 
             tokens = [token for token in input.split(" ") if token != ""]
 
-            if tokens[0][0] == "i" and ((tokens[0][1:] in self.known_commands) or (tokens[0][1:] in self.config["aliases"])):
+            if tokens[0][0] == "i" and ((tokens[0][1:] in self.known_commands) or (tokens[0][1:] in config.config["aliases"])):
                 tokens[0] = tokens[0][1:]  # avoid doing the wrong thing when people accidentally submit stuff like "i/r 2 blabla"
 
             # catch mistakes like "/r1" - the last condition is so that, for example, "/directs" is not mistakenly converted to "/direct s"
             for command in self.known_commands:
-                if (tokens[0][:len(command)] == command) and (tokens[0] != command) and not (tokens[0] in self.known_commands) and not (tokens[0] in self.config['aliases']):
+                if (tokens[0][:len(command)] == command) and (tokens[0] != command) and not (tokens[0] in self.known_commands) and not (tokens[0] in config.config['aliases']):
                     tokens[:1] = [command, tokens[0].replace(command, "")]
-            for alias in self.config['aliases']:
-                if (tokens[0][:len(alias)] == alias) and (tokens[0] != alias) and not (tokens[0] in self.known_commands) and not (tokens[0] in self.config['aliases']):
+            for alias in config.config['aliases']:
+                if (tokens[0][:len(alias)] == alias) and (tokens[0] != alias) and not (tokens[0] in self.known_commands) and not (tokens[0] in config.config['aliases']):
                     tokens[:1] = [alias, tokens[0].replace(alias, "")]
 
-            if tokens[0] in self.config["aliases"]:
-                tokens = self.config["aliases"][tokens[0]].split(" ") + tokens[1:]
+            if tokens[0] in config.config["aliases"]:
+                tokens = config.config["aliases"][tokens[0]].split(" ") + tokens[1:]
 
             try:
                 if ("direct" in self.tabs[self.current_tab].timeline_type) and (tokens[0] == "/reply"):
@@ -715,7 +716,7 @@ class IdentiCurse(object):
                         status = "@" + user + " " + " ".join(tokens[2:])
     
                         try:
-                            update = self.conn.statuses_update(status, "IdentiCurse", int(id), long_dent=self.config['long_dent'], dup_first_word=True)
+                            update = self.conn.statuses_update(status, "IdentiCurse", int(id), long_dent=config.config['long_dent'], dup_first_word=True)
                         except Exception, (errmsg):
                             self.status_bar.timed_update_left("ERROR: Couldn't post status: %s" % (errmsg))
     
@@ -869,7 +870,7 @@ class IdentiCurse(object):
                                 user = self.tabs[self.current_tab].timeline[int(token) - 1]["user"]["screen_name"]
                                 id = self.tabs[self.current_tab].timeline[int(token) - 1]['user']['id']
                         
-                        self.tabs.append(Timeline(self.conn, self.notice_window, "user", {'user_id':id, 'screen_name':user}, notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices'], user_rainbow=self.config['user_rainbow'], group_rainbow=self.config['group_rainbow'], tag_rainbow=self.config['tag_rainbow'], expand_remote=self.config['expand_remote']))
+                        self.tabs.append(Timeline(self.conn, self.notice_window, "user", {'user_id':id, 'screen_name':user}, notice_limit=config.config['notice_limit'], filters=config.config['filters'], compact_style=config.config['compact_notices'], user_rainbow=config.config['user_rainbow'], group_rainbow=config.config['group_rainbow'], tag_rainbow=config.config['tag_rainbow'], expand_remote=config.config['expand_remote']))
                         self.tabs[self.current_tab].active = False
                         self.current_tab = len(self.tabs) - 1
                         self.tabs[self.current_tab].active = True
@@ -882,7 +883,7 @@ class IdentiCurse(object):
                         else:
                             id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["id"]
     
-                        self.tabs.append(Context(self.conn, self.notice_window, id, compact_style=self.config['compact_notices'], user_rainbow=self.config['user_rainbow'], group_rainbow=self.config['group_rainbow'], tag_rainbow=self.config['tag_rainbow'], expand_remote=self.config['expand_remote']))
+                        self.tabs.append(Context(self.conn, self.notice_window, id, compact_style=config.config['compact_notices'], user_rainbow=config.config['user_rainbow'], group_rainbow=config.config['group_rainbow'], tag_rainbow=config.config['tag_rainbow'], expand_remote=config.config['expand_remote']))
                         self.tabs[self.current_tab].active = False
                         self.current_tab = len(self.tabs) - 1
                         self.tabs[self.current_tab].active = True
@@ -935,7 +936,7 @@ class IdentiCurse(object):
                             group = group[1:]
                         id = int(self.conn.statusnet_groups_show(nickname=group)['id'])
     
-                        self.tabs.append(Timeline(self.conn, self.notice_window, "group", {'group_id':id, 'nickname':group}, notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices'], user_rainbow=self.config['user_rainbow'], group_rainbow=self.config['group_rainbow'], tag_rainbow=self.config['tag_rainbow'], expand_remote=self.config['expand_remote']))
+                        self.tabs.append(Timeline(self.conn, self.notice_window, "group", {'group_id':id, 'nickname':group}, notice_limit=config.config['notice_limit'], filters=config.config['filters'], compact_style=config.config['compact_notices'], user_rainbow=config.config['user_rainbow'], group_rainbow=config.config['group_rainbow'], tag_rainbow=config.config['tag_rainbow'], expand_remote=config.config['expand_remote']))
                         self.tabs[self.current_tab].active = False
                         self.current_tab = len(self.tabs) - 1
                         self.tabs[self.current_tab].active = True
@@ -965,7 +966,7 @@ class IdentiCurse(object):
                         if group[0] == "!":
                             group = group[1:]
                         group_id = int(self.conn.statusnet_groups_show(nickname=group)['id'])
-                        user_id = int(self.conn.users_show(screen_name=self.config['username'])['id'])
+                        user_id = int(self.conn.users_show(screen_name=config.config['username'])['id'])
 
                         if self.conn.statusnet_groups_is_member(user_id, group_id):
                             self.status_bar.timed_update_left("You are a member of !%s." % (group))
@@ -978,7 +979,7 @@ class IdentiCurse(object):
                         if tag[0] == "#":
                             tag = tag[1:]
     
-                        self.tabs.append(Timeline(self.conn, self.notice_window, "tag", {'tag':tag}, notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices'], user_rainbow=self.config['user_rainbow'], group_rainbow=self.config['group_rainbow'], tag_rainbow=self.config['tag_rainbow'], expand_remote=self.config['expand_remote']))
+                        self.tabs.append(Timeline(self.conn, self.notice_window, "tag", {'tag':tag}, notice_limit=config.config['notice_limit'], filters=config.config['filters'], compact_style=config.config['compact_notices'], user_rainbow=config.config['user_rainbow'], group_rainbow=config.config['group_rainbow'], tag_rainbow=config.config['tag_rainbow'], expand_remote=config.config['expand_remote']))
                         self.tabs[self.current_tab].active = False
                         self.current_tab = len(self.tabs) - 1
                         self.tabs[self.current_tab].active = True
@@ -986,7 +987,7 @@ class IdentiCurse(object):
     
                     elif tokens[0] == "/sentdirects" and len(tokens) == 1:
                         self.status_bar.update_left("Loading Sent Directs...")
-                        self.tabs.append(Timeline(self.conn, self.notice_window, "sentdirect", notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices'], user_rainbow=self.config['user_rainbow'], tag_rainbow=self.config['tag_rainbow'], group_rainbow=self.config['group_rainbow']))
+                        self.tabs.append(Timeline(self.conn, self.notice_window, "sentdirect", notice_limit=config.config['notice_limit'], filters=config.config['filters'], compact_style=config.config['compact_notices'], user_rainbow=config.config['user_rainbow'], tag_rainbow=config.config['tag_rainbow'], group_rainbow=config.config['group_rainbow']))
                         self.tabs[self.current_tab].active = False
                         self.current_tab = len(self.tabs) - 1
                         self.tabs[self.current_tab].active = True
@@ -994,7 +995,7 @@ class IdentiCurse(object):
     
                     elif tokens[0] == "/favourites" and len(tokens) == 1:
                         self.status_bar.update_left("Loading Favourites...")
-                        self.tabs.append(Timeline(self.conn, self.notice_window, "favourites", notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices'], user_rainbow=self.config['user_rainbow'], tag_rainbow=self.config['tag_rainbow'], group_rainbow=self.config['group_rainbow'], expand_remote=self.config['expand_remote']))
+                        self.tabs.append(Timeline(self.conn, self.notice_window, "favourites", notice_limit=config.config['notice_limit'], filters=config.config['filters'], compact_style=config.config['compact_notices'], user_rainbow=config.config['user_rainbow'], tag_rainbow=config.config['tag_rainbow'], group_rainbow=config.config['group_rainbow'], expand_remote=config.config['expand_remote']))
                         self.tabs[self.current_tab].active = False
                         self.current_tab = len(self.tabs) - 1
                         self.tabs[self.current_tab].active = True
@@ -1003,35 +1004,35 @@ class IdentiCurse(object):
                     elif tokens[0] == "/search" and len(tokens) >= 2:
                         self.status_bar.update_left("Searching...")
                         query = " ".join(tokens[1:])
-                        self.tabs.append(Timeline(self.conn, self.notice_window, "search", {'query':query}, filters=self.config['filters'], compact_style=self.config['compact_notices'], user_rainbow=self.config['user_rainbow'], tag_rainbow=self.config['tag_rainbow'], group_rainbow=self.config['group_rainbow'], expand_remote=self.config['expand_remote']))
+                        self.tabs.append(Timeline(self.conn, self.notice_window, "search", {'query':query}, filters=config.config['filters'], compact_style=config.config['compact_notices'], user_rainbow=config.config['user_rainbow'], tag_rainbow=config.config['tag_rainbow'], group_rainbow=config.config['group_rainbow'], expand_remote=config.config['expand_remote']))
                         self.tabs[self.current_tab].active = False
                         self.current_tab = len(self.tabs) - 1
                         self.tabs[self.current_tab].active = True
                         self.tab_order.insert(0, self.current_tab)
                     
                     elif tokens[0] == "/home" and len(tokens) == 1:
-                        self.tabs.append(Timeline(self.conn, self.notice_window, "home", notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices'], user_rainbow=self.config['user_rainbow'], tag_rainbow=self.config['tag_rainbow'], group_rainbow=self.config['group_rainbow'], expand_remote=self.config['expand_remote']))
+                        self.tabs.append(Timeline(self.conn, self.notice_window, "home", notice_limit=config.config['notice_limit'], filters=config.config['filters'], compact_style=config.config['compact_notices'], user_rainbow=config.config['user_rainbow'], tag_rainbow=config.config['tag_rainbow'], group_rainbow=config.config['group_rainbow'], expand_remote=config.config['expand_remote']))
                         self.tabs[self.current_tab].active = False
                         self.current_tab = len(self.tabs) - 1
                         self.tabs[self.current_tab].active = True
                         self.tab_order.insert(0, self.current_tab)
                     
                     elif tokens[0] == "/mentions" and len(tokens) == 1:
-                        self.tabs.append(Timeline(self.conn, self.notice_window, "mentions", notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices'], user_rainbow=self.config['user_rainbow'], tag_rainbow=self.config['tag_rainbow'], group_rainbow=self.config['group_rainbow'], expand_remote=self.config['expand_remote']))
+                        self.tabs.append(Timeline(self.conn, self.notice_window, "mentions", notice_limit=config.config['notice_limit'], filters=config.config['filters'], compact_style=config.config['compact_notices'], user_rainbow=config.config['user_rainbow'], tag_rainbow=config.config['tag_rainbow'], group_rainbow=config.config['group_rainbow'], expand_remote=config.config['expand_remote']))
                         self.tabs[self.current_tab].active = False
                         self.current_tab = len(self.tabs) - 1
                         self.tabs[self.current_tab].active = True
                         self.tab_order.insert(0, self.current_tab)
                     
                     elif tokens[0] == "/directs" and len(tokens) == 1:
-                        self.tabs.append(Timeline(self.conn, self.notice_window, "direct", notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices'], user_rainbow=self.config['user_rainbow'], tag_rainbow=self.config['tag_rainbow'], group_rainbow=self.config['group_rainbow']))
+                        self.tabs.append(Timeline(self.conn, self.notice_window, "direct", notice_limit=config.config['notice_limit'], filters=config.config['filters'], compact_style=config.config['compact_notices'], user_rainbow=config.config['user_rainbow'], tag_rainbow=config.config['tag_rainbow'], group_rainbow=config.config['group_rainbow']))
                         self.tabs[self.current_tab].active = False
                         self.current_tab = len(self.tabs) - 1
                         self.tabs[self.current_tab].active = True
                         self.tab_order.insert(0, self.current_tab)
                     
                     elif tokens[0] == "/public" and len(tokens) == 1:
-                        self.tabs.append(Timeline(self.conn, self.notice_window, "public", notice_limit=self.config['notice_limit'], filters=self.config['filters'], compact_style=self.config['compact_notices'], user_rainbow=self.config['user_rainbow'], tag_rainbow=self.config['tag_rainbow'], group_rainbow=self.config['group_rainbow'], expand_remote=self.config['expand_remote']))
+                        self.tabs.append(Timeline(self.conn, self.notice_window, "public", notice_limit=config.config['notice_limit'], filters=config.config['filters'], compact_style=config.config['compact_notices'], user_rainbow=config.config['user_rainbow'], tag_rainbow=config.config['tag_rainbow'], group_rainbow=config.config['group_rainbow'], expand_remote=config.config['expand_remote']))
                         self.tabs[self.current_tab].active = False
                         self.current_tab = len(self.tabs) - 1
                         self.tabs[self.current_tab].active = True
@@ -1040,10 +1041,10 @@ class IdentiCurse(object):
                     elif tokens[0] == "/config" and len(tokens) >= 3:
                         keys, value = tokens[1].split('.'), " ".join(tokens[2:])
                         if len(keys) == 2:      # there has to be a clean way to avoid hardcoded len checks, but I can't think what right now, and technically it works for all currently valid config keys
-                            self.config[keys[0]][keys[1]] = value
+                            config.config[keys[0]][keys[1]] = value
                         else:
-                            self.config[keys[0]] = value
-                        open(self.config_file, 'w').write(json.dumps(self.config, indent=4))
+                            config.config[keys[0]] = value
+                        config.config.save()
     
                     elif tokens[0] == "/alias" and len(tokens) >= 3:
                         self.status_bar.update_left("Creating alias...")
@@ -1052,8 +1053,8 @@ class IdentiCurse(object):
                             alias = "/" + alias
                         if command[0] != "/":
                             command = "/" + command
-                        self.config["aliases"][alias] = command
-                        open(self.config_file, 'w').write(json.dumps(self.config, indent=4))
+                        config.config["aliases"][alias] = command
+                        config.config.save()
 
                     elif tokens[0] == "/link":
                         dent_index = int(tokens[2]) - 1
@@ -1061,10 +1062,10 @@ class IdentiCurse(object):
                             self.status_bar.update_left("Opening links...")
                             if "retweeted_status" in self.tabs[self.current_tab].timeline[dent_index]:
                                 for target_url in self.url_regex.findall(self.tabs[self.current_tab].timeline[dent_index]['retweeted_status']['text']):
-                                    subprocess.Popen(self.config['browser'] % (target_url), shell=True, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
+                                    subprocess.Popen(config.config['browser'] % (target_url), shell=True, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
                             else:
                                 for target_url in self.url_regex.findall(self.tabs[self.current_tab].timeline[dent_index]['text']):
-                                    subprocess.Popen(self.config['browser'] % (target_url), shell=True, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
+                                    subprocess.Popen(config.config['browser'] % (target_url), shell=True, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
                         else:
                             self.status_bar.update_left("Opening link...")
                             link_index = int(tokens[1]) - 1
@@ -1072,19 +1073,19 @@ class IdentiCurse(object):
                                 target_url = self.url_regex.findall(self.tabs[self.current_tab].timeline[dent_index]['retweeted_status']['text'])[link_index]
                             else:
                                 target_url = self.url_regex.findall(self.tabs[self.current_tab].timeline[dent_index]['text'])[link_index]
-                            subprocess.Popen(self.config['browser'] % (target_url), shell=True, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
+                            subprocess.Popen(config.config['browser'] % (target_url), shell=True, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
 
                     elif tokens[0] == "/bugreport" and len(tokens) >= 2:
                         self.status_bar.update_left("Reporting bug...")
     
                         status = "#icursebug " + " ".join(tokens[1:])
-                        update = self.conn.statuses_update(status, "IdentiCurse", long_dent=self.config['long_dent'], dup_first_word=True)
+                        update = self.conn.statuses_update(status, "IdentiCurse", long_dent=config.config['long_dent'], dup_first_word=True)
    
                     elif tokens[0] == "/featurerequest" and len(tokens) >= 2:
                         self.status_bar.update_left("Posting feature request...")
     
                         status = "#icurserequest " + " ".join(tokens[1:])
-                        update = self.conn.statuses_update(status, "IdentiCurse", long_dent=self.config['long_dent'], dup_first_word=True)
+                        update = self.conn.statuses_update(status, "IdentiCurse", long_dent=config.config['long_dent'], dup_first_word=True)
 
                     elif tokens[0] == "/quote" and len(tokens) == 2:
                         self.quote_mode = True
@@ -1103,14 +1104,14 @@ class IdentiCurse(object):
                             status = ""
                         if len(status) > 0:
                             self.status_bar.update_left("Posting Notice...")
-                            update = self.conn.statuses_update(status, "IdentiCurse", original_id, long_dent=self.config['long_dent'])
+                            update = self.conn.statuses_update(status, "IdentiCurse", original_id, long_dent=config.config['long_dent'])
    
                 except StatusNetError, e:
                     self.status_bar.timed_update_left("Status.Net error %d: %s" % (e.errcode, e.details))
             else:
                 self.status_bar.update_left("Posting Notice...")
                 try:
-                    update = self.conn.statuses_update(input, source="IdentiCurse", long_dent=self.config['long_dent'])
+                    update = self.conn.statuses_update(input, source="IdentiCurse", long_dent=config.config['long_dent'])
                 except Exception, (errmsg):
                     self.status_bar.timed_update_left("ERROR: Couldn't post status: %s" % (errmsg))
 
@@ -1140,7 +1141,7 @@ class IdentiCurse(object):
         self.display_current_tab()
         self.status_bar.update_left("Doing nothing.")
         self.insert_mode = False
-        self.update_timer = Timer(self.config['update_interval'], self.update_tabs)
+        self.update_timer = Timer(config.config['update_interval'], self.update_tabs)
         self.update_timer.start()
 
     def parse_search(self, query):
@@ -1169,7 +1170,7 @@ class IdentiCurse(object):
                 for line_index in range(len(search_buffer)):
                     match_found = False
                     for block in search_buffer[line_index]:
-                        if self.config['search_case_sensitive'] == "sensitive":
+                        if config.config['search_case_sensitive'] == "sensitive":
                             if query in block[0]:
                                 match_found = True
                                 break
@@ -1198,7 +1199,7 @@ class IdentiCurse(object):
         self.display_current_tab()
         self.insert_mode = False
         self.search_mode = False
-        self.update_timer = Timer(self.config['update_interval'], self.update_tabs)
+        self.update_timer = Timer(config.config['update_interval'], self.update_tabs)
         self.update_timer.start()
 
     def quit(self):
