@@ -27,6 +27,7 @@ import urllib2
 from statusnet import StatusNet, StatusNetError
 from tabbage import *
 from statusbar import StatusBar
+from tabbar import TabBar
 
 import config
 
@@ -48,7 +49,8 @@ colour_fields = {
     "profile_values": 12,
     "group": 13,
     "tag": 14,
-    "search_highlight": 15
+    "search_highlight": 15,
+    "tabbar": 16
 }
 
 colours = {
@@ -175,6 +177,7 @@ class IdentiCurse(object):
             default_colour_scheme = {
                 "timelines": ("none", "none"),
                 "statusbar": ("black", "white"),
+                "tabbar": ("white", "blue"),
                 "selector": ("brown", "none"),
                 "time": ("brown", "none"),
                 "source": ("green", "none"),
@@ -300,12 +303,12 @@ class IdentiCurse(object):
         self.text_entry.stripspaces = 1
         if config.config['border']:
             if self.screen.getmaxyx() == (self.y, self.x):
-                self.notice_window = self.main_window.subwin(y-6, x-4, 5 + entry_lines, 5)
+                self.notice_window = self.main_window.subwin(y-7, x-4, 5 + entry_lines, 5)
             else:
                 return self.redraw()
         else:
             if self.screen.getmaxyx() == (self.y, self.x):
-                self.notice_window = self.main_window.subwin(y-5, x, 2 + entry_lines, 1)
+                self.notice_window = self.main_window.subwin(y-6, x, 2 + entry_lines, 1)
             else:
                 return self.redraw()
         self.notice_window.bkgd(" ", curses.color_pair(colour_fields["timelines"]))
@@ -317,19 +320,24 @@ class IdentiCurse(object):
 
         if config.config['border']:
             if self.screen.getmaxyx() == (self.y, self.x):
-                self.status_window = self.main_window.subwin(1, x-5, y, 5)
+                self.status_window = self.main_window.subwin(1, x-5, y-1, 5)
+                self.tab_bar_window = self.main_window.subwin(1, x-5, y, 5)
             else:
                 return self.redraw()
         else:
             if self.screen.getmaxyx() == (self.y, self.x):
-                self.status_window = self.main_window.subwin(1, x, y-1, 1)
+                self.status_window = self.main_window.subwin(1, x, y-2, 1)
+                self.tab_bar_window = self.main_window.subwin(1, x, y-1, 1)
             else:
                 return self.redraw()
 
         if hasattr(self, 'status_bar'):
             self.status_bar.window = self.status_window
+        if hasattr(self, 'tab_bar'):
+            self.tab_bar.window = self.tab_bar_window
 
         self.status_window.bkgd(" ", curses.color_pair(colour_fields["statusbar"]))
+        self.tab_bar_window.bkgd(" ", curses.color_pair(colour_fields["tabbar"]))
 
     def initialise(self, screen):
         self.screen = screen
@@ -414,6 +422,11 @@ class IdentiCurse(object):
         self.tabs[self.current_tab].active = True
         self.tab_order = range(len(self.tabs))
 
+        self.tab_bar = TabBar(self.tab_bar_window)
+        self.tab_bar.tabs = [tab.name for tab in self.tabs]
+        self.tab_bar.current_tab = self.current_tab
+        self.tab_bar.update()
+        
         self.update_tabs()
         self.display_current_tab()
 
@@ -423,6 +436,9 @@ class IdentiCurse(object):
         self.update_timer.cancel()
         if self.insert_mode == False:
             self.status_bar.update_left("Updating Timelines...")
+            self.tab_bar.tabs = [tab.name for tab in self.tabs]
+            self.tab_bar.current_tab = self.current_tab
+            self.tab_bar.update()
             TabUpdater(self.tabs, self, 'end_update_tabs').start()
         else:
             self.update_timer = Timer(config.config['update_interval'], self.update_tabs)
@@ -430,6 +446,9 @@ class IdentiCurse(object):
     def end_update_tabs(self):
         self.display_current_tab()
         self.status_bar.update_left("Doing nothing.")
+        self.tab_bar.tabs = [tab.name for tab in self.tabs]
+        self.tab_bar.current_tab = self.current_tab
+        self.tab_bar.update()
         self.update_timer = Timer(config.config['update_interval'], self.update_tabs)
         self.update_timer.start()
 
@@ -440,6 +459,9 @@ class IdentiCurse(object):
     def display_current_tab(self):
         self.tabs[self.current_tab].display()
         self.status_bar.update_right("Tab " + str(self.current_tab + 1) + ": " + self.tabs[self.current_tab].name)
+        self.tab_bar.tabs = [tab.name for tab in self.tabs]
+        self.tab_bar.current_tab = self.current_tab
+        self.tab_bar.update()
 
     def close_current_tab(self):
         if len(self.tabs) == 1:
@@ -464,6 +486,8 @@ class IdentiCurse(object):
             if self.qreply == False:
                 switch_to_tab = None
                 for x in range(0, len(self.tabs)):
+                    if x >= 9:
+                        break
                     if input == ord(str(x+1)):
                         switch_to_tab = x
                 if input == ord(">") or input in [ord(key) for key in config.config['keys']['nexttab']]:
