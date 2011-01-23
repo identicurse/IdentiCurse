@@ -377,7 +377,7 @@ class Timeline(Tab):
                     part_list = list(part)
                     if len(part_list) > 0:
                         if part_list[0] in ['@', '!', '#']:
-                            highlight_part = str("".join(part_list[1:]))
+                            highlight_part = "".join(part_list[1:])
                             if part_list[0] == '@':
                                 if self.user_rainbow:
                                     if not highlight_part in self.user_cache:
@@ -533,7 +533,7 @@ class Context(Tab):
                     part_list = list(part)
                     if len(part_list) > 0:
                         if part_list[0] in ['@', '!', '#']:
-                            highlight_part = str("".join(part_list[1:]))
+                            highlight_part = "".join(part_list[1:])
                             if part_list[0] == '@':
                                 if self.user_rainbow:
                                     if not highlight_part in self.user_cache:
