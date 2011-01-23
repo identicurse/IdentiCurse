@@ -215,7 +215,7 @@ class Help(Tab):
             self.buffer.append([(l, identicurse.colour_fields['none'])])
 
 class Timeline(Tab):
-    def __init__(self, conn, window, timeline, type_params={}, notice_limit=25, filters=[], compact_style=False, user_rainbow=False, tag_rainbow=False, group_rainbow=False, expand_remote=False):
+    def __init__(self, conn, window, timeline, type_params={}):
         self.conn = conn
         self.timeline = []
         self.raw_mentions_timeline = []
@@ -224,15 +224,8 @@ class Timeline(Tab):
         self.group_cache = {}
         self.timeline_type = timeline
         self.type_params = type_params
-        self.notice_limit = notice_limit
-        self.filters = filters
-        self.compact_style = compact_style
-        self.user_rainbow = user_rainbow
-        self.tag_rainbow = tag_rainbow
-        self.group_rainbow = group_rainbow
-        self.expand_remote = expand_remote
         self.highlight_regex = re.compile(r'([@!#]\w+)')
-        if self.expand_remote:
+        if config.config['expand_remote']:
             self.title_regex = re.compile("\<title\>(.*)\<\/title\>")
         self.chosen_one = 0
 
@@ -254,7 +247,7 @@ class Timeline(Tab):
 
     def update(self):
         self.timeline = []
-        get_count = self.notice_limit - len(self.timeline)
+        get_count = config.config['notice_limit'] - len(self.timeline)
         if self.timeline_type == "home":
             raw_timeline = self.conn.statuses_home_timeline(count=get_count, page=self.page)
         elif self.timeline_type == "mentions":
@@ -281,12 +274,12 @@ class Timeline(Tab):
 
         for notice in raw_timeline:
             passes_filters = True
-            for filter_item in self.filters:
+            for filter_item in config.config['filters']:
                 if filter_item.lower() in notice['text'].lower():
                     passes_filters = False
                     break
             if passes_filters:
-                if self.expand_remote and "attachments" in notice:
+                if config.config['expand_remote'] and "attachments" in notice:
                     import urllib2
                     for attachment in notice['attachments']:
                         if attachment['mimetype'] != "text/html":
@@ -331,7 +324,7 @@ class Timeline(Tab):
             datetime_notice = datetime.datetime.strptime(n['created_at'], DATETIME_FORMAT)
             locale.setlocale(locale.LC_TIME, '') # other half of the hacky fix
 
-            if self.compact_style:
+            if config.config['compact_notices']:
                 time_msg = helpers.format_time(helpers.time_since(datetime_notice), short_form=True)
             else:
                 time_msg = helpers.format_time(helpers.time_since(datetime_notice))
@@ -353,12 +346,12 @@ class Timeline(Tab):
             else:
                 line.append((' ' * 3, identicurse.colour_fields["selector"]))
 
-            if self.user_rainbow:
+            if config.config['user_rainbow']:
                 line.append((user, self.user_cache[user]))
             else:
                 line.append((user, identicurse.colour_fields["username"]))
 
-            if self.compact_style:
+            if config.config['compact_notices']:
                 line.append((' ' * (maxx - ((len(source_msg) + len(time_msg) + len(user) + (6 + len(cout))))), identicurse.colour_fields["none"]))
                 line.append((time_msg, identicurse.colour_fields["time"]))
                 line.append((' ', identicurse.colour_fields["none"]))
@@ -379,21 +372,21 @@ class Timeline(Tab):
                         if part_list[0] in ['@', '!', '#']:
                             highlight_part = "".join(part_list[1:])
                             if part_list[0] == '@':
-                                if self.user_rainbow:
+                                if config.config['user_rainbow']:
                                     if not highlight_part in self.user_cache:
                                         self.user_cache[highlight_part] = random.choice(identicurse.base_colours.items())[1]
                                     line.append((part, self.user_cache[highlight_part]))
                                 else:
                                     line.append((part, identicurse.colour_fields['username']))
                             elif part_list[0] == '!':
-                                if self.group_rainbow:
+                                if config.config['group_rainbow']:
                                     if not highlight_part in self.group_cache:
                                         self.group_cache[highlight_part] = random.choice(identicurse.base_colours.items())[1]
                                     line.append((part, self.group_cache[highlight_part]))
                                 else:
                                     line.append((part, identicurse.colour_fields['group']))
                             elif part_list[0] == '#':
-                                if self.tag_rainbow:
+                                if config.config['tag_rainbow']:
                                     if not highlight_part in self.tag_cache:
                                         self.tag_cache[highlight_part] = random.choice(identicurse.base_colours.items())[1]
                                     line.append((part, self.tag_cache[highlight_part]))
@@ -407,7 +400,7 @@ class Timeline(Tab):
             except UnicodeDecodeError:
                 self.buffer.append([("Caution: Terminal too shit to display this notice.", identicurse.colour_fields["none"])])
 
-            if not self.compact_style:
+            if not config.config['compact_notices']:
                 line = []
                 line.append((" " * (maxx - (len(time_msg) + 2)), identicurse.colour_fields["time"]))
                 line.append((time_msg, identicurse.colour_fields["none"]))
