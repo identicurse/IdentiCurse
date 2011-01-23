@@ -16,6 +16,8 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import time, datetime, htmlentitydefs, re
+DATETIME_FORMAT = "%a %b %d %H:%M:%S +0000 %Y"
+offset_regex = re.compile("[+-][0-9]{4}")
 
 def time_since(datetime_then):
     if datetime_then > datetime.datetime.utcnow():
@@ -100,6 +102,15 @@ def single_unit(time_dict, unit):
     elif unit == "days":
         time_dict['days'] = (total_seconds / (60 * 60 * 24))
     return time_dict
+
+def utc_offset(time_string):
+    offset = offset_regex.findall(time_string)[0]
+    offset_hours = int(offset[1:3])
+    offset_minutes = int(offset[3:])
+    if offset[0] == "-":
+        offset_hours = 0 - offset_hours
+        offset_minutes = 0 - offset_minutes
+    return datetime.timedelta(hours=offset_hours,minutes=offset_minutes)
 
 def find_split_point(text, width):
     split_point = width - 1

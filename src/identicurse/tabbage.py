@@ -15,8 +15,8 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+from helpers import DATETIME_FORMAT
 import os.path, re, sys, threading, datetime, locale, helpers, curses, random, identicurse, config
-DATETIME_FORMAT = "%a %b %d %H:%M:%S +0000 %Y"
 
 class Buffer(list):
     def __init__(self):
@@ -324,7 +324,7 @@ class Timeline(Tab):
                 if n["in_reply_to_status_id"] is not None:
                     source_msg += " [+]"
             locale.setlocale(locale.LC_TIME, 'C')  # hacky fix because statusnet uses english timestrings regardless of locale
-            datetime_notice = datetime.datetime.strptime(n['created_at'], DATETIME_FORMAT)
+            datetime_notice = datetime.datetime.strptime(n['created_at'], DATETIME_FORMAT) + helpers.utc_offset(n['created_at'])
             locale.setlocale(locale.LC_TIME, '') # other half of the hacky fix
 
             if config.config['compact_notices']:
@@ -479,7 +479,7 @@ class Context(Tab):
             elif "retweeted_status" in n:
                 source_msg += " [~]"
             locale.setlocale(locale.LC_TIME, 'C')  # hacky fix because statusnet uses english timestrings regardless of locale
-            datetime_notice = datetime.datetime.strptime(n['created_at'], DATETIME_FORMAT)
+            datetime_notice = datetime.datetime.strptime(n['created_at'], DATETIME_FORMAT) + helpers.utc_offset(n['created_at'])
             locale.setlocale(locale.LC_TIME, '') # other half of the hacky fix
             if config.config['compact_notices']:
                 time_msg = helpers.format_time(helpers.time_since(datetime_notice), short_form=True)
