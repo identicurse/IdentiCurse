@@ -233,13 +233,13 @@ class Timeline(Tab):
         self.chosen_one = 0
 
         if self.timeline_type == "user":
-            self.basename = "User (%s)" % self.type_params['screen_name']
+            self.basename = "@%s" % self.type_params['screen_name']
         elif self.timeline_type == "tag":
-            self.basename = "Tag (%s)" % self.type_params['tag']
+            self.basename = "#%s" % self.type_params['tag']
         elif self.timeline_type == "group":
-            self.basename = "Group (%s)" % self.type_params['nickname']
+            self.basename = "!%s" % self.type_params['nickname']
         elif self.timeline_type == "search":
-            self.basename = "Search (%s)" % self.type_params['query']
+            self.basename = "Search: '%s'" % self.type_params['query']
         elif self.timeline_type == "sentdirect":
             self.basename = "Sent Directs"
         else:
