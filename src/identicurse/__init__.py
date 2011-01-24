@@ -47,7 +47,7 @@ PRESET_SLOGANS = [
     "ATTENTION SNOW: GTFO ITS TOO WARM FOR YOU!",
     "eating paracetamol sandwiches.",
     "Do not operate heavy machinery while using IdentiCurse.",
-    "39% the same as bathing in fine grape juice.",
+    "44% the same as bathing in fine grape juice.",
     "DOT MATRIX WITH STEREO SOUND",
     "oh god how did this get here I am not good with computer",
     "Pregnant women and those with heart conditions are advised against using this software.",
