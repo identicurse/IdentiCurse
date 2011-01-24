@@ -460,7 +460,7 @@ class IdentiCurse(object):
 
     def display_current_tab(self):
         self.tabs[self.current_tab].display()
-        self.status_bar.update_right("Tab " + str(self.current_tab + 1) + ": " + self.tabs[self.current_tab].name)
+        #self.status_bar.update_right("Tab " + str(self.current_tab + 1) + ": " + self.tabs[self.current_tab].name)
         self.tab_bar.tabs = [tab.name for tab in self.tabs]
         self.tab_bar.current_tab = self.current_tab
         self.tab_bar.update()
