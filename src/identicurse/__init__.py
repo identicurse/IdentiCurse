@@ -52,6 +52,7 @@ PRESET_SLOGANS = [
     "oh god how did this get here I am not good with computer",
     "Pregnant women and those with heart conditions are advised against using this software.",
     "because some vpn won't run with the cool friends",
+    "Making \"git pull\" fun again, since 2010.",
     ]
 
 def main():
