@@ -50,7 +50,8 @@ colour_fields = {
     "group": 13,
     "tag": 14,
     "search_highlight": 15,
-    "tabbar": 16
+    "tabbar": 16,
+    "tabbar_active": 17,
 }
 
 colours = {
@@ -178,6 +179,7 @@ class IdentiCurse(object):
                 "timelines": ("none", "none"),
                 "statusbar": ("black", "white"),
                 "tabbar": ("white", "blue"),
+                "tabbar_active": ("blue", "white"),
                 "selector": ("brown", "none"),
                 "time": ("brown", "none"),
                 "source": ("green", "none"),

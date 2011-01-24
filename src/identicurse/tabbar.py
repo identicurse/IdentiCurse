@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import curses
+import curses, identicurse
 
 class TabBar(object):
     def __init__(self, window):
@@ -25,19 +25,21 @@ class TabBar(object):
 
     def update(self):
         self.window.erase()
-        tab_string = ""
+        tab_list = []
+        total_length = 0
         for tab_num in xrange(len(self.tabs)):
+            tab_list.append((" "*2, identicurse.colour_fields['tabbar']))
             if tab_num == self.current_tab:
-                prefix = " > "
-                postfix = " < "
+                attr = identicurse.colour_fields['tabbar_active']
             else:
-                prefix = "   "
-                postfix = "   "
-            tab_string = tab_string + prefix + self.tabs[tab_num] + postfix
-        tab_string = tab_string.rstrip()  # removes the spare whitespace of the final prefix
+                attr = identicurse.colour_fields['tabbar']
+            tab_list.append((self.tabs[tab_num], attr))
+            total_length += (1 + len(self.tabs[tab_num]))
         maxx = self.window.getmaxyx()[1]
-        if len(tab_string) >= (maxx - 1):  # if the full tab list would be wider than the available display area
-            self.window.addstr(0, 1, tab_string[:maxx-2])
+        if total_length >= (maxx - 1):  # if the full tab list would be wider than the available display area
+            # TODO: handle this
+            pass
         else:
-            self.window.addstr(0, 1, tab_string)
+            for block in tab_list:
+                self.window.addstr(block[0], curses.color_pair(block[1]))
         self.window.refresh()
