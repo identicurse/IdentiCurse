@@ -242,6 +242,15 @@ class IdentiCurse(object):
         if not "pagedown" in config.config['keys']:
             config.config['keys']['pagedown'] = [' ']
 
+        if not "ui_order" in config.config:
+            config.config['ui_order'] = ["divider", "entry", "divider", "notices", "statusbar", "tabbar"]  # this will recreate the same layout as the old UI
+
+        for ui_item in ["entry", "notices", "statusbar", "tabbar"]:  # ensure no UI element is ommitted by appending any missing ones to the end
+            if not ui_item in config.config['ui_order']:
+                config.config['ui_order'].append(ui_item)
+            while config.config['ui_order'].count(ui_item) > 1:  # if item listed more than once, remove all but the last occurence
+                config.config['ui_order'].remove(ui_item)
+
         empty_default_keys = ("firstpage", "newerpage", "olderpage", "refresh",
             "input", "search", "quit", "closetab", "help", "nexttab", "prevtab",
             "qreply", "creply", "cfav", "ccontext", "crepeat", "cnext", "cprev",
@@ -283,55 +292,87 @@ class IdentiCurse(object):
         self.main_window.keypad(1)
 
         y, x = self.main_window.getmaxyx()
+        current_y = 0
+        if config.config['border']:
+            current_y += 3
+            y -= 3
 
         if self.conn.length_limit == 0:
             entry_lines = 3
         else:
             entry_lines = (self.conn.length_limit / x) + 1
 
-        if config.config['border']:
-            if self.screen.getmaxyx() == (self.y, self.x):
-                self.entry_window = self.main_window.subwin(entry_lines, x-6, 4, 5)
-            else:
-                return self.redraw()
-        else:
-            if self.screen.getmaxyx() == (self.y, self.x):
-                self.entry_window = self.main_window.subwin(entry_lines, x-2, 1, 1)
-            else:
-                return self.redraw()
+        divider_count = 0
+        import random
+        for part in config.config['ui_order']:
+            if part == "divider":
+                current_y += 1
+                divider_count += 1
+            elif part == "entry":
+                if config.config['border']:
+                    if self.screen.getmaxyx() == (self.y, self.x):
+                        self.entry_window = self.main_window.subwin(entry_lines, x-6, current_y, 5)
+                        current_y += entry_lines
+                    else:
+                        return self.redraw()
+                else:
+                    if self.screen.getmaxyx() == (self.y, self.x):
+                        self.entry_window = self.main_window.subwin(entry_lines, x-2, current_y, 1)
+                        current_y += entry_lines
+                    else:
+                        return self.redraw()
 
-        self.text_entry = Textbox(self.entry_window, self.validate, insert_mode=True)
+                self.text_entry = Textbox(self.entry_window, self.validate, insert_mode=True)
 
-        self.text_entry.stripspaces = 1
-        if config.config['border']:
-            if self.screen.getmaxyx() == (self.y, self.x):
-                self.notice_window = self.main_window.subwin(y-7, x-4, 5 + entry_lines, 5)
-            else:
-                return self.redraw()
-        else:
-            if self.screen.getmaxyx() == (self.y, self.x):
-                self.notice_window = self.main_window.subwin(y-6, x, 2 + entry_lines, 1)
-            else:
-                return self.redraw()
-        self.notice_window.bkgd(" ", curses.color_pair(colour_fields["timelines"]))
+                self.text_entry.stripspaces = 1
 
-        # I don't like this, but it looks like it has to be done
-        if hasattr(self, 'tabs'):
-            for tab in self.tabs:
-                tab.window = self.notice_window
+            elif part == "notices":
+                if config.config['border']:
+                    if self.screen.getmaxyx() == (self.y, self.x):
+                        self.notice_window = self.main_window.subwin(y-(entry_lines + 1 + divider_count), x-4, current_y, 5)
+                        current_y += y - (entry_lines + 1 + divider_count)
+                    else:
+                        return self.redraw()
+                else:
+                    if self.screen.getmaxyx() == (self.y, self.x):
+                        self.notice_window = self.main_window.subwin(y-(entry_lines + 1 + divider_count), x, current_y, 1)
+                        current_y += y - (entry_lines + 1 + divider_count)
+                    else:
+                        return self.redraw()
+                self.notice_window.bkgd(" ", curses.color_pair(colour_fields["timelines"]))
 
-        if config.config['border']:
-            if self.screen.getmaxyx() == (self.y, self.x):
-                self.status_window = self.main_window.subwin(1, x-5, y-1, 5)
-                self.tab_bar_window = self.main_window.subwin(1, x-5, y, 5)
-            else:
-                return self.redraw()
-        else:
-            if self.screen.getmaxyx() == (self.y, self.x):
-                self.status_window = self.main_window.subwin(1, x, y-2, 1)
-                self.tab_bar_window = self.main_window.subwin(1, x, y-1, 1)
-            else:
-                return self.redraw()
+                # I don't like this, but it looks like it has to be done
+                if hasattr(self, 'tabs'):
+                    for tab in self.tabs:
+                        tab.window = self.notice_window
+
+            elif part == "statusbar":
+                if config.config['border']:
+                    if self.screen.getmaxyx() == (self.y, self.x):
+                        self.status_window = self.main_window.subwin(1, x-5, current_y, 5)
+                        current_y += 1
+                    else:
+                        return self.redraw()
+                else:
+                    if self.screen.getmaxyx() == (self.y, self.x):
+                        self.status_window = self.main_window.subwin(1, x, current_y, 1)
+                        current_y += 1
+                    else:
+                        return self.redraw()
+
+            elif part == "tabbar":
+                if config.config['border']:
+                    if self.screen.getmaxyx() == (self.y, self.x):
+                        self.tab_bar_window = self.main_window.subwin(1, x-5, current_y, 5)
+                        current_y += 1
+                    else:
+                        return self.redraw()
+                else:
+                    if self.screen.getmaxyx() == (self.y, self.x):
+                        self.tab_bar_window = self.main_window.subwin(1, x, current_y, 1)
+                        current_y += 1
+                    else:
+                        return self.redraw()
 
         if hasattr(self, 'status_bar'):
             self.status_bar.window = self.status_window
