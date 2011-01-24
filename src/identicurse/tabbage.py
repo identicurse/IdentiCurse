@@ -324,7 +324,8 @@ class Timeline(Tab):
                 if n["in_reply_to_status_id"] is not None:
                     source_msg += " [+]"
             locale.setlocale(locale.LC_TIME, 'C')  # hacky fix because statusnet uses english timestrings regardless of locale
-            datetime_notice = datetime.datetime.strptime(n['created_at'], DATETIME_FORMAT) + helpers.utc_offset(n['created_at'])
+            created_at_no_offset = helpers.offset_regex.sub("+0000", n['created_at'])
+            datetime_notice = datetime.datetime.strptime(created_at_no_offset, DATETIME_FORMAT) + helpers.utc_offset(n['created_at'])
             locale.setlocale(locale.LC_TIME, '') # other half of the hacky fix
 
             if config.config['compact_notices']:
@@ -479,7 +480,8 @@ class Context(Tab):
             elif "retweeted_status" in n:
                 source_msg += " [~]"
             locale.setlocale(locale.LC_TIME, 'C')  # hacky fix because statusnet uses english timestrings regardless of locale
-            datetime_notice = datetime.datetime.strptime(n['created_at'], DATETIME_FORMAT) + helpers.utc_offset(n['created_at'])
+            created_at_no_offset = helpers.offset_regex.sub("+0000", n['created_at'])
+            datetime_notice = datetime.datetime.strptime(created_at_no_offset, DATETIME_FORMAT) + helpers.utc_offset(n['created_at'])
             locale.setlocale(locale.LC_TIME, '') # other half of the hacky fix
             if config.config['compact_notices']:
                 time_msg = helpers.format_time(helpers.time_since(datetime_notice), short_form=True)
