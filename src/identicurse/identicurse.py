@@ -426,7 +426,14 @@ class IdentiCurse(object):
         for tabspec in config.config['initial_tabs'].split("|"):
             tab = tabspec.split(':')
             if tab[0] in ("home", "mentions", "direct", "public", "sentdirect"):
-                self.tabs.append(Timeline(self.conn, self.notice_window, tab[0]))
+                already_have_one = False
+                for tab_obj in self.tabs:  # awkward name, but we already have a tab variable
+                    if hasattr(tab_obj, 'timeline_type'):
+                        if tab_obj.timeline_type == tab[0]:
+                            already_have_one = True
+                            break
+                if not already_have_one:
+                    self.tabs.append(Timeline(self.conn, self.notice_window, tab[0]))
             elif tab[0] == "profile":
                 screen_name = tab[1]
                 if screen_name[0] == "@":
@@ -1059,20 +1066,34 @@ class IdentiCurse(object):
                         self.tab_order.insert(0, self.current_tab)
     
                     elif tokens[0] == "/sentdirects" and len(tokens) == 1:
-                        self.status_bar.update_left("Loading Sent Directs...")
-                        self.tabs.append(Timeline(self.conn, self.notice_window, "sentdirect"))
-                        self.tabs[self.current_tab].active = False
-                        self.current_tab = len(self.tabs) - 1
-                        self.tabs[self.current_tab].active = True
-                        self.tab_order.insert(0, self.current_tab)
+                        already_have_one = False
+                        for tab in self.tabs:
+                            if hasattr(tab, 'timeline_type'):
+                                if tab.timeline_type == "sentdirect":
+                                    already_have_one = True
+                                    break
+                        if not already_have_one:
+                            self.status_bar.update_left("Loading Sent Directs...")
+                            self.tabs.append(Timeline(self.conn, self.notice_window, "sentdirect"))
+                            self.tabs[self.current_tab].active = False
+                            self.current_tab = len(self.tabs) - 1
+                            self.tabs[self.current_tab].active = True
+                            self.tab_order.insert(0, self.current_tab)
     
                     elif tokens[0] == "/favourites" and len(tokens) == 1:
-                        self.status_bar.update_left("Loading Favourites...")
-                        self.tabs.append(Timeline(self.conn, self.notice_window, "favourites"))
-                        self.tabs[self.current_tab].active = False
-                        self.current_tab = len(self.tabs) - 1
-                        self.tabs[self.current_tab].active = True
-                        self.tab_order.insert(0, self.current_tab)
+                        already_have_one = False
+                        for tab in self.tabs:
+                            if hasattr(tab, 'timeline_type'):
+                                if tab.timeline_type == "favourites":
+                                    already_have_one = True
+                                    break
+                        if not already_have_one:
+                            self.status_bar.update_left("Loading Favourites...")
+                            self.tabs.append(Timeline(self.conn, self.notice_window, "favourites"))
+                            self.tabs[self.current_tab].active = False
+                            self.current_tab = len(self.tabs) - 1
+                            self.tabs[self.current_tab].active = True
+                            self.tab_order.insert(0, self.current_tab)
                         
                     elif tokens[0] == "/search" and len(tokens) >= 2:
                         self.status_bar.update_left("Searching...")
@@ -1084,32 +1105,60 @@ class IdentiCurse(object):
                         self.tab_order.insert(0, self.current_tab)
                     
                     elif tokens[0] == "/home" and len(tokens) == 1:
-                        self.tabs.append(Timeline(self.conn, self.notice_window, "home"))
-                        self.tabs[self.current_tab].active = False
-                        self.current_tab = len(self.tabs) - 1
-                        self.tabs[self.current_tab].active = True
-                        self.tab_order.insert(0, self.current_tab)
+                        already_have_one = False
+                        for tab in self.tabs:
+                            if hasattr(tab, 'timeline_type'):
+                                if tab.timeline_type == "home":
+                                    already_have_one = True
+                                    break
+                        if not already_have_one:
+                            self.tabs.append(Timeline(self.conn, self.notice_window, "home"))
+                            self.tabs[self.current_tab].active = False
+                            self.current_tab = len(self.tabs) - 1
+                            self.tabs[self.current_tab].active = True
+                            self.tab_order.insert(0, self.current_tab)
                     
                     elif tokens[0] == "/mentions" and len(tokens) == 1:
-                        self.tabs.append(Timeline(self.conn, self.notice_window, "mentions"))
-                        self.tabs[self.current_tab].active = False
-                        self.current_tab = len(self.tabs) - 1
-                        self.tabs[self.current_tab].active = True
-                        self.tab_order.insert(0, self.current_tab)
+                        already_have_one = False
+                        for tab in self.tabs:
+                            if hasattr(tab, 'timeline_type'):
+                                if tab.timeline_type == "mentions":
+                                    already_have_one = True
+                                    break
+                        if not already_have_one:
+                            self.tabs.append(Timeline(self.conn, self.notice_window, "mentions"))
+                            self.tabs[self.current_tab].active = False
+                            self.current_tab = len(self.tabs) - 1
+                            self.tabs[self.current_tab].active = True
+                            self.tab_order.insert(0, self.current_tab)
                     
                     elif tokens[0] == "/directs" and len(tokens) == 1:
-                        self.tabs.append(Timeline(self.conn, self.notice_window, "direct"))
-                        self.tabs[self.current_tab].active = False
-                        self.current_tab = len(self.tabs) - 1
-                        self.tabs[self.current_tab].active = True
-                        self.tab_order.insert(0, self.current_tab)
+                        already_have_one = False
+                        for tab in self.tabs:
+                            if hasattr(tab, 'timeline_type'):
+                                if tab.timeline_type == "direct":
+                                    already_have_one = True
+                                    break
+                        if not already_have_one:
+                            self.tabs.append(Timeline(self.conn, self.notice_window, "direct"))
+                            self.tabs[self.current_tab].active = False
+                            self.current_tab = len(self.tabs) - 1
+                            self.tabs[self.current_tab].active = True
+                            self.tab_order.insert(0, self.current_tab)
                     
                     elif tokens[0] == "/public" and len(tokens) == 1:
-                        self.tabs.append(Timeline(self.conn, self.notice_window, "public"))
-                        self.tabs[self.current_tab].active = False
-                        self.current_tab = len(self.tabs) - 1
-                        self.tabs[self.current_tab].active = True
-                        self.tab_order.insert(0, self.current_tab)
+                        already_have_one = False
+                        for tab in self.tabs:
+                            if hasattr(tab, 'timeline_type'):
+                                if tab.timeline_type == "public":
+                                    already_have_one = True
+                                    break
+                        if not already_have_one:
+                            self.tabs.append(Timeline(self.conn, self.notice_window, "public"))
+                            self.tabs[self.current_tab].active = False
+                            self.current_tab = len(self.tabs) - 1
+                            self.tabs[self.current_tab].active = True
+                            self.tab_order.insert(0, self.current_tab)
                         
                     elif tokens[0] == "/config" and len(tokens) >= 3:
                         keys, value = tokens[1].split('.'), " ".join(tokens[2:])
@@ -1189,13 +1238,17 @@ class IdentiCurse(object):
                     self.status_bar.timed_update_left("ERROR: Couldn't post status: %s" % (errmsg))
 
         if hasattr(self.tabs[self.current_tab], 'timeline_type'):
-            if update != False and (self.tabs[self.current_tab].timeline_type == 'home' or self.tabs[self.current_tab].timeline_type == 'mentions'):
-                if isinstance(update, list):
-                    for notice in update:
-                        self.tabs[self.current_tab].timeline.insert(0, notice)
-                else:
-                    self.tabs[self.current_tab].timeline.insert(0, update)
-                self.tabs[self.current_tab].update_buffer()
+            if update != False:
+                for tab in self.tabs:
+                    if not hasattr(tab, 'timeline_type'):
+                        continue
+                    if tab.timeline_type == "home":
+                        if isinstance(update, list):
+                            for notice in update:
+                                tab.timeline.insert(0, notice)
+                        else:
+                            tab.timeline.insert(0, update)
+                        tab.update_buffer()
                 self.status_bar.update_left("Doing nothing.")
             else:
                 self.tabs[self.current_tab].update()
