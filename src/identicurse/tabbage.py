@@ -101,7 +101,7 @@ class Tab(object):
         self.active = False
         
     def prevpage(self, n=1):
-        if self.hasattr("timeline"):
+        if hasattr(self, "timeline"):
             if n > 0:
                 self.page -= n
                 if self.page < 1:
@@ -121,7 +121,7 @@ class Tab(object):
             return False
     
     def nextpage(self):
-        if self.hasattr("timeline"):
+        if hasattr(self, "timeline"):
             self.page += 1
             self.scrollup(0)  # as in prevpage, only the other way around
             self.chosen_one = 0
