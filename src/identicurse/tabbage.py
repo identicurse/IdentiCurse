@@ -225,6 +225,7 @@ class Timeline(Tab):
         self.conn = conn
         self.timeline = []
         self.raw_mentions_timeline = []
+        self.raw_directs_timeline = []
         if not hasattr(config.session_store, 'user_cache'):
             config.session_store.user_cache = {}
         if not hasattr(config.session_store, 'tag_cache'):
@@ -266,6 +267,9 @@ class Timeline(Tab):
             self.raw_mentions_timeline = raw_timeline
         elif self.timeline_type == "direct":
             raw_timeline = self.conn.direct_messages(count=get_count, page=self.page)
+            if (len(self.raw_directs_timeline) > 0) and ([n['id'] for n in raw_timeline] != [n['id'] for n in self.raw_directs_timeline]):
+                curses.flash()
+            self.raw_directs_timeline = raw_timeline
         elif self.timeline_type == "user":
             raw_timeline = self.conn.statuses_user_timeline(user_id=self.type_params['user_id'], screen_name=self.type_params['screen_name'], count=get_count, page=self.page)
         elif self.timeline_type == "group":
