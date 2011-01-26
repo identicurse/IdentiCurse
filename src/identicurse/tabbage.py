@@ -101,27 +101,33 @@ class Tab(object):
         self.active = False
         
     def prevpage(self, n=1):
-        if n > 0:
-            self.page -= n
-            if self.page < 1:
-                self.page = 1
-                return False
-            self.scrolldown(0)  # scroll to the end of the newer page, so the dent immediately after the start of the last page can be seen
-            self.chosen_one = len(self.timeline) - 1
-        else:
-            if self.page == 1:
-                return False
+        if self.hasattr("timeline"):
+            if n > 0:
+                self.page -= n
+                if self.page < 1:
+                    self.page = 1
+                    return False
+                self.scrolldown(0)  # scroll to the end of the newer page, so the dent immediately after the start of the last page can be seen
+                self.chosen_one = len(self.timeline) - 1
             else:
-                self.page = 1
-                self.scrollup(0)
-                self.chosen_one = 0
-        return True
+                if self.page == 1:
+                    return False
+                else:
+                    self.page = 1
+                    self.scrollup(0)
+                    self.chosen_one = 0
+            return True
+        else:
+            return False
     
     def nextpage(self):
-        self.page += 1
-        self.scrollup(0)  # as in prevpage, only the other way around
-        self.chosen_one = 0
-        return True
+        if self.hasattr("timeline"):
+            self.page += 1
+            self.scrollup(0)  # as in prevpage, only the other way around
+            self.chosen_one = 0
+            return True
+        else:
+            return False
     
     def scrollup(self, n):  # n == 0 indicates maximum scroll-up, i.e., scroll right to the top
         if not (n == 0):
