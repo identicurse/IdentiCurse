@@ -97,7 +97,6 @@ class IdentiCurse(object):
                 # no config yet, so let's build one
                 config.config.load(os.path.join(self.path, "config.json"))
                 print "No config was found, so we will now run through a few quick questions to set up a basic config for you (which will be saved as %s so you can manually edit it later). If the default (where defaults are available, they're stated in []) is already fine for any question, just press Enter without typing anything, and the default will be used." % (config.config.filename)
-                print config.config
                 config.config['username'] = raw_input("Username: ")
                 config.config['password'] = getpass.getpass("Password: ")
                 api_path = raw_input("API path [%s]: " % (config.config['api_path']))
