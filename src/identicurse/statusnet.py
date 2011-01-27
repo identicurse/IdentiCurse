@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import urllib, urllib2, helpers
+import urllib, urllib2, helpers, config, time
 try:
     import json
 except ImportError:
@@ -28,40 +28,155 @@ class StatusNetError(Exception):
         Exception.__init__(self, "Error %d: %s" % (self.errcode, self.details))
 
 class StatusNet(object):
-    def __init__(self, api_path, username="", password="", use_auth=True):
+    def __init__(self, api_path, username="", password="", use_auth=True, auth_type="basic", consumer_key=None, consumer_secret=None):
         import base64
         self.api_path = api_path
         if self.api_path[-1] == "/":  # We don't want a surplus / when creating request URLs. Sure, most servers will handle it well, but why take the chance?
             self.api_path == self.api_path[:-1]
         self.use_auth = use_auth
+        self.auth_type = auth_type
+        self.auth_string = None
         if self.use_auth:
-            self.auth_string = base64.encodestring('%s:%s' % (username, password))[:-1]
-            if not self.account_verify_credentials():
-                raise Exception("Invalid credentials")
-        else:
-            self.auth_string = None
+            if auth_type == "basic":
+                self.auth_string = base64.encodestring('%s:%s' % (username, password))[:-1]
+                if not self.account_verify_credentials():
+                    raise Exception("Invalid credentials")
+            elif auth_type == "oauth":
+                self.consumer_key = consumer_key
+                self.consumer_secret = consumer_secret
+                self.oauth_initialize()
+                if not self.account_verify_credentials():
+                    raise Exception("OAuth authentication failed")
         self.server_config = self.statusnet_config()
         self.length_limit = int(self.server_config["site"]["textlimit"]) # this will be 0 on unlimited instances
         self.tz = self.server_config["site"]["timezone"]
-    
+
+    def oauth_initialize(self):
+        if not ("oauth_token" in config.config and "oauth_token_secret" in config.config):  # we've never run with oauth before, or we failed, so we'll need to authenticate
+            request_tokens_raw = self.oauth_request_token()
+            request_tokens = {}
+            for item in request_tokens_raw.split("&"):
+                key, value = item.split("=")
+                request_tokens[key] = value
+
+            verifier = self.oauth_authorize(request_tokens["oauth_token"])
+
+            access_tokens_raw = self.oauth_access_token(request_tokens["oauth_token"], request_tokens["oauth_token_secret"], verifier)
+            access_tokens = {}
+            for item in access_tokens_raw.split("&"):
+                key, value = item.split("=")
+                access_tokens[key] = value
+
+            config.config['oauth_token'] = access_tokens['oauth_token']
+            config.config['oauth_token_secret'] = access_tokens['oauth_token_secret']
+            config.config.save()
+
+        self.oauth_token = config.config['oauth_token']
+        self.oauth_token_secret = config.config['oauth_token_secret']
+
+    def oauth_nonce(self, length=16):
+        import random
+        if not hasattr(config.session_store, "nonces"):
+            config.session_store.nonces = []
+        valid_chars = [chr(c) for c in range(ord("A"), ord("Z")+1)] + [chr(c) for c in range(ord("a"), ord("z")+1)] + [chr(c) for c in range(ord("0"), ord("9")+1)]
+        valid_nonce = False
+        while not valid_nonce:
+            nonce = ""
+            for n in xrange(length):
+                nonce += random.choice(valid_chars)
+            if not nonce in config.session_store.nonces:
+                config.session_store.nonces.append(nonce)
+                valid_nonce = True
+        return nonce
+
+    def oauth_sign_request(self, request, oauth_tokens, raw_params):
+        oauth_params = {
+                "oauth_consumer_key": oauth_tokens['consumer'],
+                "oauth_nonce": self.oauth_nonce(),
+                "oauth_timestamp": str(int(time.time())),
+                "oauth_signature_method": "HMAC-SHA1",
+                "oauth_version": "1.0",
+                "oauth_callback": "oob",
+                }
+        if "token" in oauth_tokens:
+            oauth_params["oauth_token"] = oauth_tokens["token"]
+        if "verifier" in oauth_tokens:
+            oauth_params["oauth_verifier"] = oauth_tokens["verifier"]
+
+        raw_signature_data = [
+                urllib.quote(request.get_method(), safe='~'),
+                urllib.quote(request.get_full_url(), safe='~'),
+                ]
+        
+        for key, value in oauth_params.iteritems():
+            raw_params[key] = value
+
+        params = ""
+        for key in sorted(raw_params.keys()):
+            params += "&%s=%s" % (urllib.quote(key, safe='~'), urllib.quote(str(raw_params[key]), safe='~'))
+        raw_signature_data.append(urllib.quote(params[1:], safe='~'))
+
+        signature_key = "%s&" % urllib.quote(oauth_tokens["consumer_secret"], safe='~')
+        if "token_secret" in oauth_tokens:
+                signature_key = "%s%s" % (signature_key, urllib.quote(oauth_tokens["token_secret"], safe='~'))
+        signature_data = "&".join(raw_signature_data)
+
+        import hmac, binascii
+        try:
+            import hashlib.sha1 as sha
+        except ImportError:
+            import sha  # 2.4 and earlier
+        signature_raw = hmac.new(signature_key, signature_data, sha)
+        signature = binascii.b2a_base64(signature_raw.digest())[:-1]
+
+        oauth_params["oauth_signature"] = signature
+        
+        request.add_header("Authorization", "OAuth %s" % (", ".join(["%s=%s" % (urllib.quote(key, safe='~'), urllib.quote(value, safe='~')) for key, value in oauth_params.iteritems()])))
+        
     def __makerequest(self, resource_path, raw_params={}):
         params = urllib.urlencode(raw_params)
         
+        if not resource_path in ["oauth/request_token", "oauth/access_token"]:
+            resource_path = "%s.json" % (resource_path)
+
         if len(params) > 0:
-            request = urllib2.Request("%s/%s.json" % (self.api_path, resource_path), params)
+            request = urllib2.Request("%s/%s" % (self.api_path, resource_path), params)
         else:
-            request = urllib2.Request("%s/%s.json" % (self.api_path, resource_path))
-        if self.auth_string is not None:
-            request.add_header("Authorization", "Basic %s" % (self.auth_string))
+            request = urllib2.Request("%s/%s" % (self.api_path, resource_path))
+        if self.auth_type == "basic":
+            if self.auth_string is not None:
+                request.add_header("Authorization", "Basic %s" % (self.auth_string))
+        elif self.auth_type == "oauth":
+            tokens = {
+                    "consumer": self.consumer_key,
+                    "consumer_secret": self.consumer_secret,
+                    }
+            if resource_path == "oauth/request_token":
+                pass  # no other tokens to add
+            elif resource_path == "oauth/access_token":
+                tokens["token"] = self.request_token
+                tokens["token_secret"] = self.request_token_secret
+                tokens["verifier"] = self.verifier
+            else:
+                tokens["token"] = self.oauth_token
+                tokens["token_secret"] = self.oauth_token_secret
+            self.oauth_sign_request(request, tokens, raw_params)
         
         try:
             response = urllib2.urlopen(request)
         except urllib2.HTTPError, e:
-            err_details = json.loads(e.read())['error']
+            raw_details = e.read()
+            try:
+                err_details = json.loads(raw_details)['error']
+            except ValueError:  # not JSON, use raw
+                err_details = raw_details
             raise StatusNetError(e.code, err_details)
         content = response.read()
         
-        return json.loads(content)
+        try:
+            return json.loads(content)
+        except ValueError:  # it wasn't JSON data, return it raw
+            return content
 
 
 ##############################
@@ -436,12 +551,17 @@ class StatusNet(object):
 ######## OAuth resources ########
 # will not be implemented unless this module moves to using OAuth instead of basic
 
-    # oauth/request_token
+    def oauth_request_token(self):
+        return self.__makerequest("oauth/request_token")
     
-    # oauth/authorize
+    def oauth_authorize(self, request_token):
+        return raw_input("To authorize IdentiCurse to access your account, you must go to %s/oauth/authorize?oauth_token=%s in your web browser.\nPlease enter the verification code you receive there: " % (self.api_path, request_token))
 
-    # oauth/access_token
-
+    def oauth_access_token(self, request_token, request_token_secret, verifier):
+        self.request_token = request_token
+        self.request_token_secret = request_token_secret
+        self.verifier = verifier
+        return self.__makerequest("oauth/access_token")
 
 ######## Search ########
 

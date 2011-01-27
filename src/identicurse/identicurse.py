@@ -76,6 +76,9 @@ colours = {
 
 base_colours = {}
 
+OAUTH_CONSUMER_KEY = "d4f54e34af11ff8d35b79b7557ad771c"
+OAUTH_CONSUMER_SECRET = "8fb75c0a9bbca78fe0e85acc62a9169c"
+
 class IdentiCurse(object):
     """Contains Main IdentiCurse application"""
     
@@ -97,8 +100,17 @@ class IdentiCurse(object):
                 # no config yet, so let's build one
                 config.config.load(os.path.join(self.path, "config.json"))
                 print "No config was found, so we will now run through a few quick questions to set up a basic config for you (which will be saved as %s so you can manually edit it later). If the default (where defaults are available, they're stated in []) is already fine for any question, just press Enter without typing anything, and the default will be used." % (config.config.filename)
-                config.config['username'] = raw_input("Username: ")
-                config.config['password'] = getpass.getpass("Password: ")
+                print "This version of IdentiCurse supports OAuth login. Using OAuth to log in means that you do not need to enter your username and password."
+                use_oauth = raw_input("Use OAuth [Y/n]? ").upper()
+                if use_oauth == "":
+                    use_oauth = "Y"
+                if use_oauth[0] == "Y":
+                    config.config['use_oauth'] = True
+                else:
+                    config.config['use_oauth'] = False
+                if not config.config['use_oauth']:
+                    config.config['username'] = raw_input("Username: ")
+                    config.config['password'] = getpass.getpass("Password: ")
                 api_path = raw_input("API path [%s]: " % (config.config['api_path']))
                 if api_path != "":
                     if api_path[:7] != "http://" and api_path[:8] != "https://":
@@ -124,9 +136,12 @@ class IdentiCurse(object):
                     except ValueError:
                         print "Sorry, you entered an invalid number of notices. The default of %d will be used instead." % (config.config['notice_limit'])
                 try:
-                    temp_conn = StatusNet(config.config['api_path'], config.config['username'], config.config['password'])
+                    if config.config['use_oauth']:
+                        temp_conn = StatusNet(config.config['api_path'], auth_type="oauth", consumer_key=OAUTH_CONSUMER_KEY, consumer_secret=OAUTH_CONSUMER_SECRET)
+                    else:
+                        temp_conn = StatusNet(config.config['api_path'], config.config['username'], config.config['password'])
                 except Exception, (errmsg):
-                    sys.exit("Couldn't establish connection with provided credentials: %s" % (errmsg))
+                    sys.exit("Couldn't establish connection: %s" % (errmsg))
                 print "Okay! Everything seems good! Your new config will now be saved, then IdentiCurse will start properly."
                 config.config.save()
         except ValueError:
@@ -226,6 +241,12 @@ class IdentiCurse(object):
             config.config["expand_remote"] = False
         if not "smooth_cscroll" in config.config:
             config.config["smooth_cscroll"] = True
+        if not "use_oauth" in config.config:
+            config.config["use_oauth"] = False
+        if not "username" in config.config:
+            config.config["username"] = ""
+        if not "password" in config.config:
+            config.config["password"] = ""
         if not "keys" in config.config:
             config.config['keys'] = {}
         if not "scrollup" in config.config['keys']:
@@ -261,7 +282,10 @@ class IdentiCurse(object):
         self.url_regex = re.compile("http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+")
 
         try:
-            self.conn = StatusNet(config.config['api_path'], config.config['username'], config.config['password'])
+            if config.config["use_oauth"]:
+                self.conn = StatusNet(config.config['api_path'], auth_type="oauth", consumer_key=OAUTH_CONSUMER_KEY, consumer_secret=OAUTH_CONSUMER_SECRET)
+            else:
+                self.conn = StatusNet(config.config['api_path'], config.config['username'], config.config['password'])
         except Exception, (errmsg):
             sys.exit("ERROR: Couldn't establish connection: %s" % (errmsg))
 
