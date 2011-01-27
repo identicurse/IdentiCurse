@@ -26,7 +26,7 @@ import random, os
 PRESET_SLOGANS = [
     "100% hippy-approved",
     "powered by hatred",
-    "we don't get OAuth either",
+    "we get OAuth now",
     "don't drink and dent",
     "@psquid can't spell hippy",
     "Stupid sexy Flanders",
