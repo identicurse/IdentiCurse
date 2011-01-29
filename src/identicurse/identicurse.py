@@ -325,12 +325,10 @@ class IdentiCurse(object):
         else:
             entry_lines = (self.conn.length_limit / x) + 1
 
-        divider_count = 0
         import random
         for part in config.config['ui_order']:
             if part == "divider":
                 current_y += 1
-                divider_count += 1
             elif part == "entry":
                 if config.config['border']:
                     if self.screen.getmaxyx() == (self.y, self.x):
@@ -352,14 +350,14 @@ class IdentiCurse(object):
             elif part == "notices":
                 if config.config['border']:
                     if self.screen.getmaxyx() == (self.y, self.x):
-                        self.notice_window = self.main_window.subwin(y-(entry_lines + 1 + divider_count), x-4, current_y, 5)
-                        current_y += y - (entry_lines + 1 + divider_count)
+                        self.notice_window = self.main_window.subwin(y-(entry_lines + 1 + config.config['ui_order'].count("divider")), x-4, current_y, 5)
+                        current_y += y - (entry_lines + 1 + config.config['ui_order'].count("divider"))
                     else:
                         return self.redraw()
                 else:
                     if self.screen.getmaxyx() == (self.y, self.x):
-                        self.notice_window = self.main_window.subwin(y-(entry_lines + 1 + divider_count), x, current_y, 1)
-                        current_y += y - (entry_lines + 1 + divider_count)
+                        self.notice_window = self.main_window.subwin(y-(entry_lines + 1 + config.config['ui_order'].count("divider")), x, current_y, 1)
+                        current_y += y - (entry_lines + 1 + config.config['ui_order'].count("divider"))
                     else:
                         return self.redraw()
                 self.notice_window.bkgd(" ", curses.color_pair(colour_fields["timelines"]))
