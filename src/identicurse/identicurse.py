@@ -272,7 +272,7 @@ class IdentiCurse(object):
                 config.config['ui_order'].remove(ui_item)
 
         empty_default_keys = ("firstpage", "newerpage", "olderpage", "refresh",
-            "input", "search", "quit", "closetab", "help", "nexttab", "prevtab",
+            "input", "commandinput", "search", "quit", "closetab", "help", "nexttab", "prevtab",
             "qreply", "creply", "cfav", "ccontext", "crepeat", "cnext", "cprev",
             "cfirst", "nextmatch", "prevmatch")
 
@@ -622,6 +622,10 @@ class IdentiCurse(object):
                 self.update_timer.cancel()
                 self.insert_mode = True
                 self.parse_input(self.text_entry.edit())
+            elif input == ord(":") or input in [ord(key) for key in config.config['keys']['commandinput']]:
+                self.update_timer.cancel()
+                self.insert_mode = True
+                self.parse_input(self.text_entry.edit("/"))
             elif input == ord("/") or input in [ord(key) for key in config.config['keys']['search']]:
                 self.update_timer.cancel()
                 self.insert_mode = True
