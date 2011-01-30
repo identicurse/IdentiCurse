@@ -29,7 +29,7 @@ class StatusBar(object):
     def update(self, text):
         if self.timed_update_restore_value is None:
             self.window.erase()
-            maxx = self.window.getmaxyx()[1] - 1
+            maxx = self.window.getmaxyx()[1] - 2
             if len(text) >= (maxx):  # if the left text would end up too near the right text
                 self.window.addstr(0, 1, text[:maxx-3].strip() + "...")
             else:
