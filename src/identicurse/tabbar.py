@@ -43,6 +43,10 @@ class TabBar(object):
             # TODO: handle this
             pass
         else:
+            remaining_line_length = maxx - 2
             for block in tab_list:
                 self.window.addstr(block[0], curses.color_pair(block[1]))
+                remaining_line_length -= len(block[0])
+            if remaining_line_length > 0:
+                self.window.addstr(" "*remaining_line_length, curses.color_pair(identicurse.colour_fields['tabbar']))
         self.window.refresh()
