@@ -441,7 +441,7 @@ class IdentiCurse(object):
         self.redraw()
 
         self.status_bar = StatusBar(self.status_window)
-        self.status_bar.update_left("Welcome to IdentiCurse")
+        self.status_bar.update("Welcome to IdentiCurse")
         
         self.tabs = []
         for tabspec in config.config['initial_tabs'].split("|"):
@@ -506,7 +506,7 @@ class IdentiCurse(object):
     def update_tabs(self):
         self.update_timer.cancel()
         if self.insert_mode == False:
-            self.status_bar.update_left("Updating Timelines...")
+            self.status_bar.update("Updating Timelines...")
             self.tab_bar.tabs = [tab.name for tab in self.tabs]
             self.tab_bar.current_tab = self.current_tab
             self.tab_bar.update()
@@ -516,7 +516,7 @@ class IdentiCurse(object):
 
     def end_update_tabs(self):
         self.display_current_tab()
-        self.status_bar.update_left("Doing nothing.")
+        self.status_bar.update("Doing nothing.")
         self.tab_bar.tabs = [tab.name for tab in self.tabs]
         self.tab_bar.current_tab = self.current_tab
         self.tab_bar.update()
@@ -529,7 +529,6 @@ class IdentiCurse(object):
 
     def display_current_tab(self):
         self.tabs[self.current_tab].display()
-        #self.status_bar.update_right("Tab " + str(self.current_tab + 1) + ": " + self.tabs[self.current_tab].name)
         self.tab_bar.tabs = [tab.name for tab in self.tabs]
         self.tab_bar.current_tab = self.current_tab
         self.tab_bar.update()
@@ -601,19 +600,19 @@ class IdentiCurse(object):
                 self.display_current_tab()
             elif input == ord("=") or input in [ord(key) for key in config.config['keys']['firstpage']]:
                 if self.tabs[self.current_tab].prevpage(0):
-                    self.status_bar.update_left("Moving to first page...")
+                    self.status_bar.update("Moving to first page...")
                     self.tabs[self.current_tab].update()
-                    self.status_bar.update_left("Doing nothing.")
+                    self.status_bar.update("Doing nothing.")
             elif input == curses.KEY_LEFT or input in [ord(key) for key in config.config['keys']['newerpage']]:
                 if self.tabs[self.current_tab].prevpage():
-                    self.status_bar.update_left("Moving to newer page...")
+                    self.status_bar.update("Moving to newer page...")
                     self.tabs[self.current_tab].update()
-                    self.status_bar.update_left("Doing nothing.")
+                    self.status_bar.update("Doing nothing.")
             elif input == curses.KEY_RIGHT or input in [ord(key) for key in config.config['keys']['olderpage']]:
                 if self.tabs[self.current_tab].nextpage():
-                    self.status_bar.update_left("Moving to older page...")
+                    self.status_bar.update("Moving to older page...")
                     self.tabs[self.current_tab].update()
-                    self.status_bar.update_left("Doing nothing.")
+                    self.status_bar.update("Doing nothing.")
             elif input == ord("r") or input in [ord(key) for key in config.config['keys']['refresh']]:
                 self.update_tabs()
             elif input == ord("i") or input in [ord(key) for key in config.config['keys']['input']]:
@@ -662,7 +661,7 @@ class IdentiCurse(object):
                     self.tabs[self.current_tab].update_buffer()
                     self.tabs[self.current_tab].scrolltodent(self.tabs[self.current_tab].chosen_one)
             elif input == ord("f") or input in [ord(key) for key in config.config['keys']['cfav']]:
-                self.status_bar.update_left("Favouriting Notice...")
+                self.status_bar.update("Favouriting Notice...")
                 if "retweeted_status" in self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]:
                     id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['retweeted_status']['id']
                 else:
@@ -670,11 +669,11 @@ class IdentiCurse(object):
                 try:
                     self.conn.favorites_create(id)
                 except StatusNetError, e:
-                    self.status_bar.timed_update_left("Status.Net error %d: %s" % (e.errcode, e.details))
-                self.status_bar.update_left("Doing Nothing.")
+                    self.status_bar.timed_update("Status.Net error %d: %s" % (e.errcode, e.details))
+                self.status_bar.update("Doing Nothing.")
             elif input == ord("e") or input in [ord(key) for key in config.config['keys']['crepeat']]:
                 try:
-                    self.status_bar.update_left("Repeating Notice...")
+                    self.status_bar.update("Repeating Notice...")
                     if "retweeted_status" in self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]:
                         id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['retweeted_status']['id']
                     else:
@@ -683,7 +682,7 @@ class IdentiCurse(object):
                     debug_filename = os.path.join(os.path.expanduser("~"), "identicurse_debug.txt")
                     open(debug_filename, "w").write("IndexError\n%s\n\tself.current_tab = %d ; len(self.tabs) = %d ; chosen_one = %d ; len(self.tabs[self.current_tab].timeline) = %d\n"
                             % (str(e), self.current_tab, len(self.tabs), self.tabs[self.current_tab].chosen_one, len(self.tabs[self.current_tab].timeline)))
-                    self.status_bar.update_left("Something broke, please get a copy of '%s' to @psquid." % (debug_filename))
+                    self.status_bar.update("Something broke, please get a copy of '%s' to @psquid." % (debug_filename))
                 try:
                     update = self.conn.statuses_retweet(id, source="IdentiCurse")
                     if isinstance(update, list):
@@ -693,10 +692,10 @@ class IdentiCurse(object):
                         self.tabs[self.current_tab].timeline.insert(0, update)
                     self.tabs[self.current_tab].update_buffer()
                 except StatusNetError, e:
-                    self.status_bar.timed_update_left("Status.Net error %d: %s" % (e.errcode, e.details))
-                self.status_bar.update_left("Doing Nothing.")
+                    self.status_bar.timed_update("Status.Net error %d: %s" % (e.errcode, e.details))
+                self.status_bar.update("Doing Nothing.")
             elif input == ord("c") or input in [ord(key) for key in config.config['keys']['ccontext']]:
-                self.status_bar.update_left("Loading Context...")
+                self.status_bar.update("Loading Context...")
                 if "retweeted_status" in self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]:
                     id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['retweeted_status']['id']
                 else:
@@ -707,7 +706,7 @@ class IdentiCurse(object):
                 self.tabs[self.current_tab].active = True
                 self.tab_order.insert(0, self.current_tab)
                 self.tabs[self.current_tab].update()
-                self.status_bar.update_left("Doing Nothing.")
+                self.status_bar.update("Doing Nothing.")
             elif input == ord("n") or input in [ord(key) for key in config.config['keys']['nextmatch']]:
                 if (self.last_page_search['query'] != "") and (self.last_page_search['tab'] == self.current_tab):
                     if self.last_page_search['viewing'] < (len(self.last_page_search['occurs']) - 1):
@@ -717,9 +716,9 @@ class IdentiCurse(object):
                     self.tabs[self.current_tab].scrollto(self.last_page_search['occurs'][self.last_page_search['viewing']])
                     self.tabs[self.current_tab].search_highlight_line = self.last_page_search['occurs'][self.last_page_search['viewing']]
                     if self.last_page_search['viewing'] == 0:
-                        self.status_bar.update_left("Viewing result #%d for '%s' (search hit BOTTOM, continuing at TOP)" % (self.last_page_search['viewing'] + 1, self.last_page_search['query']))
+                        self.status_bar.update("Viewing result #%d for '%s' (search hit BOTTOM, continuing at TOP)" % (self.last_page_search['viewing'] + 1, self.last_page_search['query']))
                     else:
-                        self.status_bar.update_left("Viewing result #%d for '%s'" % (self.last_page_search['viewing'] + 1, self.last_page_search['query']))
+                        self.status_bar.update("Viewing result #%d for '%s'" % (self.last_page_search['viewing'] + 1, self.last_page_search['query']))
                     self.display_current_tab()
             elif input == ord("N") or input in [ord(key) for key in config.config['keys']['prevmatch']]:
                 if (self.last_page_search['query'] != "") and (self.last_page_search['tab'] == self.current_tab):
@@ -730,9 +729,9 @@ class IdentiCurse(object):
                     self.tabs[self.current_tab].scrollto(self.last_page_search['occurs'][self.last_page_search['viewing']])
                     self.tabs[self.current_tab].search_highlight_line = self.last_page_search['occurs'][self.last_page_search['viewing']]
                     if self.last_page_search['viewing'] == (len(self.last_page_search['occurs']) - 1):
-                        self.status_bar.update_left("Viewing result #%d for '%s' (search hit TOP, continuing at BOTTOM)" % (self.last_page_search['viewing'] + 1, self.last_page_search['query']))
+                        self.status_bar.update("Viewing result #%d for '%s' (search hit TOP, continuing at BOTTOM)" % (self.last_page_search['viewing'] + 1, self.last_page_search['query']))
                     else:
-                        self.status_bar.update_left("Viewing result #%d for '%s'" % (self.last_page_search['viewing'] + 1, self.last_page_search['query']))
+                        self.status_bar.update("Viewing result #%d for '%s'" % (self.last_page_search['viewing'] + 1, self.last_page_search['query']))
                     self.display_current_tab()
             elif input == curses.ascii.ctrl(ord("l")):
                 self.redraw()
@@ -752,19 +751,19 @@ class IdentiCurse(object):
     def validate(self, character_count):
         if self.quote_mode:
             if self.conn.length_limit == 0:
-                self.status_bar.update_left("Quote Mode: " + str(character_count))
+                self.status_bar.update("Quote Mode: " + str(character_count))
             else:
-                self.status_bar.update_left("Quote Mode: " + str(self.conn.length_limit - character_count))
+                self.status_bar.update("Quote Mode: " + str(self.conn.length_limit - character_count))
         elif self.search_mode:
             if self.last_page_search['query'] != "":
-                self.status_bar.update_left("In-page Search (last search: '%s')" % (self.last_page_search['query']))
+                self.status_bar.update("In-page Search (last search: '%s')" % (self.last_page_search['query']))
             else:
-                self.status_bar.update_left("In-page Search")
+                self.status_bar.update("In-page Search")
         else:
             if self.conn.length_limit == 0:
-                self.status_bar.update_left("Insert Mode: " + str(character_count))
+                self.status_bar.update("Insert Mode: " + str(character_count))
             else:
-                self.status_bar.update_left("Insert Mode: " + str(self.conn.length_limit - character_count))
+                self.status_bar.update("Insert Mode: " + str(self.conn.length_limit - character_count))
 
     def parse_input(self, input):
         update = False
@@ -802,7 +801,7 @@ class IdentiCurse(object):
                 
                 try:
                     if tokens[0] == "/reply" and len(tokens) >= 3:
-                        self.status_bar.update_left("Posting Reply...")
+                        self.status_bar.update("Posting Reply...")
     
                         try:
                             float(tokens[1])
@@ -823,10 +822,10 @@ class IdentiCurse(object):
                         try:
                             update = self.conn.statuses_update(status, "IdentiCurse", int(id), long_dent=config.config['long_dent'], dup_first_word=True)
                         except Exception, (errmsg):
-                            self.status_bar.timed_update_left("ERROR: Couldn't post status: %s" % (errmsg))
+                            self.status_bar.timed_update("ERROR: Couldn't post status: %s" % (errmsg))
     
                     elif tokens[0] == "/favourite" and len(tokens) == 2:
-                        self.status_bar.update_left("Favouriting Notice...")
+                        self.status_bar.update("Favouriting Notice...")
                         if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
                             id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['retweeted_status']['id']
                         else:
@@ -834,7 +833,7 @@ class IdentiCurse(object):
                         self.conn.favorites_create(id)
     
                     elif tokens[0] == "/repeat" and len(tokens) == 2:
-                        self.status_bar.update_left("Repeating Notice...")
+                        self.status_bar.update("Repeating Notice...")
                         if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
                             id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['retweeted_status']['id']
                         else:
@@ -842,7 +841,7 @@ class IdentiCurse(object):
                         update = self.conn.statuses_retweet(id, source="IdentiCurse")
                         
                     elif tokens[0] == "/direct" and len(tokens) >= 3:
-                        self.status_bar.update_left("Sending Direct...")
+                        self.status_bar.update("Sending Direct...")
                         
                         try:
                             float(tokens[1])
@@ -863,7 +862,7 @@ class IdentiCurse(object):
                         self.conn.direct_messages_new(screen_name, id, " ".join(tokens[2:]), source="IdentiCurse")
     
                     elif tokens[0] == "/delete" and len(tokens) == 2:
-                        self.status_bar.update_left("Deleting Notice...")
+                        self.status_bar.update("Deleting Notice...")
                         if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
                             repeat_id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['retweeted_status']['id']
                         id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['id']
@@ -876,7 +875,7 @@ class IdentiCurse(object):
                                 raise(e)
     
                     elif tokens[0] == "/profile" and len(tokens) == 2:
-                        self.status_bar.update_left("Loading Profile...")
+                        self.status_bar.update("Loading Profile...")
                         # Yeuch
                         try:
                             float(tokens[1])
@@ -897,7 +896,7 @@ class IdentiCurse(object):
                         self.tab_order.insert(0, self.current_tab)
     
                     elif tokens[0] == "/spamreport" and len(tokens) >= 3:
-                        self.status_bar.update_left("Firing Orbital Laser Cannon...")
+                        self.status_bar.update("Firing Orbital Laser Cannon...")
                         # Yeuch
                         try:
                             float(tokens[1])
@@ -918,7 +917,7 @@ class IdentiCurse(object):
                         self.conn.blocks_create(user_id=id, screen_name=username)
     
                     elif tokens[0] == "/block" and len(tokens) >= 2:
-                        self.status_bar.update_left("Creating Block(s)...")
+                        self.status_bar.update("Creating Block(s)...")
                         for token in tokens[1:]:
                             # Yeuch
                             try:
@@ -938,7 +937,7 @@ class IdentiCurse(object):
                             self.conn.blocks_create(user_id=id, screen_name=user)
     
                     elif tokens[0] == "/unblock" and len(tokens) >= 2:
-                        self.status_bar.update_left("Removing Block(s)...")
+                        self.status_bar.update("Removing Block(s)...")
                         for token in tokens[1:]:
                             # Yeuch
                             try:
@@ -958,7 +957,7 @@ class IdentiCurse(object):
                             self.conn.blocks_destroy(user_id=id, screen_name=user)
     
                     elif tokens[0] == "/user" and len(tokens) == 2:
-                        self.status_bar.update_left("Loading User Timeline...")
+                        self.status_bar.update("Loading User Timeline...")
                         # Yeuch
                         try:
                             float(tokens[1])
@@ -982,7 +981,7 @@ class IdentiCurse(object):
                         self.tab_order.insert(0, self.current_tab)
     
                     elif tokens[0] == "/context" and len(tokens) == 2:
-                        self.status_bar.update_left("Loading Context...")
+                        self.status_bar.update("Loading Context...")
                         if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
                             id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["retweeted_status"]["id"]
                         else:
@@ -995,7 +994,7 @@ class IdentiCurse(object):
                         self.tab_order.insert(0, self.current_tab)
     
                     elif tokens[0] == "/subscribe" and len(tokens) == 2:
-                        self.status_bar.update_left("Subscribing...")
+                        self.status_bar.update("Subscribing...")
                         # Yeuch
                         try:
                             float(tokens[1])
@@ -1015,7 +1014,7 @@ class IdentiCurse(object):
                         self.conn.friendships_create(user_id=id, screen_name=user)
                         
                     elif tokens[0] == "/unsubscribe" and len(tokens) == 2:
-                        self.status_bar.update_left("Unsubscribing...")
+                        self.status_bar.update("Unsubscribing...")
                         # Yeuch
                         try:
                             float(tokens[1])
@@ -1035,7 +1034,7 @@ class IdentiCurse(object):
                         self.conn.friendships_destroy(user_id=id, screen_name=user)
     
                     elif tokens[0] == "/group" and len(tokens) == 2:
-                        self.status_bar.update_left("Loading Group Timeline...")
+                        self.status_bar.update("Loading Group Timeline...")
                         group = tokens[1]
                         if group[0] == "!":
                             group = group[1:]
@@ -1048,7 +1047,7 @@ class IdentiCurse(object):
                         self.tab_order.insert(0, self.current_tab)
     
                     elif tokens[0] == "/groupjoin" and len(tokens) == 2:
-                        self.status_bar.update_left("Joining Group...")
+                        self.status_bar.update("Joining Group...")
                         group = tokens[1]
                         if group[0] == "!":
                             group = group[1:]
@@ -1057,7 +1056,7 @@ class IdentiCurse(object):
                         self.conn.statusnet_groups_join(group_id=id, nickname=group)
     
                     elif tokens[0] == "/groupleave" and len(tokens) == 2:
-                        self.status_bar.update_left("Leaving Group...")
+                        self.status_bar.update("Leaving Group...")
                         group = tokens[1]
                         if group[0] == "!":
                             group = group[1:]
@@ -1066,7 +1065,7 @@ class IdentiCurse(object):
                         self.conn.statusnet_groups_leave(group_id=id, nickname=group)
     
                     elif tokens[0] == "/groupmember" and len(tokens) == 2:
-                        self.status_bar.update_left("Checking membership...")
+                        self.status_bar.update("Checking membership...")
                         group = tokens[1]
                         if group[0] == "!":
                             group = group[1:]
@@ -1074,12 +1073,12 @@ class IdentiCurse(object):
                         user_id = int(self.conn.users_show(screen_name=config.config['username'])['id'])
 
                         if self.conn.statusnet_groups_is_member(user_id, group_id):
-                            self.status_bar.timed_update_left("You are a member of !%s." % (group))
+                            self.status_bar.timed_update("You are a member of !%s." % (group))
                         else:
-                            self.status_bar.timed_update_left("You are not a member of !%s." % (group))
+                            self.status_bar.timed_update("You are not a member of !%s." % (group))
 
                     elif tokens[0] == "/tag" and len(tokens) == 2:
-                        self.status_bar.update_left("Loading Tag Timeline...")
+                        self.status_bar.update("Loading Tag Timeline...")
                         tag = tokens[1]
                         if tag[0] == "#":
                             tag = tag[1:]
@@ -1098,7 +1097,7 @@ class IdentiCurse(object):
                                     already_have_one = True
                                     break
                         if not already_have_one:
-                            self.status_bar.update_left("Loading Sent Directs...")
+                            self.status_bar.update("Loading Sent Directs...")
                             self.tabs.append(Timeline(self.conn, self.notice_window, "sentdirect"))
                             self.tabs[self.current_tab].active = False
                             self.current_tab = len(self.tabs) - 1
@@ -1113,7 +1112,7 @@ class IdentiCurse(object):
                                     already_have_one = True
                                     break
                         if not already_have_one:
-                            self.status_bar.update_left("Loading Favourites...")
+                            self.status_bar.update("Loading Favourites...")
                             self.tabs.append(Timeline(self.conn, self.notice_window, "favourites"))
                             self.tabs[self.current_tab].active = False
                             self.current_tab = len(self.tabs) - 1
@@ -1121,7 +1120,7 @@ class IdentiCurse(object):
                             self.tab_order.insert(0, self.current_tab)
                         
                     elif tokens[0] == "/search" and len(tokens) >= 2:
-                        self.status_bar.update_left("Searching...")
+                        self.status_bar.update("Searching...")
                         query = " ".join(tokens[1:])
                         self.tabs.append(Timeline(self.conn, self.notice_window, "search"))
                         self.tabs[self.current_tab].active = False
@@ -1194,7 +1193,7 @@ class IdentiCurse(object):
                         config.config.save()
     
                     elif tokens[0] == "/alias" and len(tokens) >= 3:
-                        self.status_bar.update_left("Creating alias...")
+                        self.status_bar.update("Creating alias...")
                         alias, command = tokens[1], " ".join(tokens[2:])
                         if alias[0] != "/":
                             alias = "/" + alias
@@ -1206,7 +1205,7 @@ class IdentiCurse(object):
                     elif tokens[0] == "/link":
                         dent_index = int(tokens[2]) - 1
                         if tokens[1] == "*":
-                            self.status_bar.update_left("Opening links...")
+                            self.status_bar.update("Opening links...")
                             if "retweeted_status" in self.tabs[self.current_tab].timeline[dent_index]:
                                 for target_url in self.url_regex.findall(self.tabs[self.current_tab].timeline[dent_index]['retweeted_status']['text']):
                                     subprocess.Popen(config.config['browser'] % (target_url), shell=True, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
@@ -1214,7 +1213,7 @@ class IdentiCurse(object):
                                 for target_url in self.url_regex.findall(self.tabs[self.current_tab].timeline[dent_index]['text']):
                                     subprocess.Popen(config.config['browser'] % (target_url), shell=True, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
                         else:
-                            self.status_bar.update_left("Opening link...")
+                            self.status_bar.update("Opening link...")
                             link_index = int(tokens[1]) - 1
                             if "retweeted_status" in self.tabs[self.current_tab].timeline[dent_index]:
                                 target_url = self.url_regex.findall(self.tabs[self.current_tab].timeline[dent_index]['retweeted_status']['text'])[link_index]
@@ -1223,13 +1222,13 @@ class IdentiCurse(object):
                             subprocess.Popen(config.config['browser'] % (target_url), shell=True, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
 
                     elif tokens[0] == "/bugreport" and len(tokens) >= 2:
-                        self.status_bar.update_left("Reporting bug...")
+                        self.status_bar.update("Reporting bug...")
     
                         status = "#icursebug " + " ".join(tokens[1:])
                         update = self.conn.statuses_update(status, "IdentiCurse", long_dent=config.config['long_dent'], dup_first_word=True)
    
                     elif tokens[0] == "/featurerequest" and len(tokens) >= 2:
-                        self.status_bar.update_left("Posting feature request...")
+                        self.status_bar.update("Posting feature request...")
     
                         status = "#icurserequest " + " ".join(tokens[1:])
                         update = self.conn.statuses_update(status, "IdentiCurse", long_dent=config.config['long_dent'], dup_first_word=True)
@@ -1250,17 +1249,17 @@ class IdentiCurse(object):
                         if status is None:
                             status = ""
                         if len(status) > 0:
-                            self.status_bar.update_left("Posting Notice...")
+                            self.status_bar.update("Posting Notice...")
                             update = self.conn.statuses_update(status, "IdentiCurse", original_id, long_dent=config.config['long_dent'])
    
                 except StatusNetError, e:
-                    self.status_bar.timed_update_left("Status.Net error %d: %s" % (e.errcode, e.details))
+                    self.status_bar.timed_update("Status.Net error %d: %s" % (e.errcode, e.details))
             else:
-                self.status_bar.update_left("Posting Notice...")
+                self.status_bar.update("Posting Notice...")
                 try:
                     update = self.conn.statuses_update(input, source="IdentiCurse", long_dent=config.config['long_dent'])
                 except Exception, (errmsg):
-                    self.status_bar.timed_update_left("ERROR: Couldn't post status: %s" % (errmsg))
+                    self.status_bar.timed_update("ERROR: Couldn't post status: %s" % (errmsg))
 
         if hasattr(self.tabs[self.current_tab], 'timeline_type'):
             if update != False:
@@ -1274,13 +1273,13 @@ class IdentiCurse(object):
                         else:
                             tab.timeline.insert(0, update)
                         tab.update_buffer()
-                self.status_bar.update_left("Doing nothing.")
+                self.status_bar.update("Doing nothing.")
             else:
                 self.tabs[self.current_tab].update()
         elif update != False and self.tabs[self.current_tab].name == "Context":
             self.tabs[self.current_tab].timeline.insert(0, update)
             self.tabs[self.current_tab].update_buffer()
-            self.status_bar.update_left("Doing nothing.")
+            self.status_bar.update("Doing nothing.")
         else:
             self.tabs[self.current_tab].update()
           
@@ -1290,7 +1289,7 @@ class IdentiCurse(object):
         self.text_entry.stripspaces = 1
         self.tabs[self.current_tab].search_highlight_line = -1
         self.display_current_tab()
-        self.status_bar.update_left("Doing nothing.")
+        self.status_bar.update("Doing nothing.")
         self.insert_mode = False
         self.update_timer = Timer(config.config['update_interval'], self.update_tabs)
         self.update_timer.start()
@@ -1306,11 +1305,11 @@ class IdentiCurse(object):
                     self.last_page_search['viewing'] += 1
                     self.tabs[self.current_tab].scrollto(self.last_page_search['occurs'][self.last_page_search['viewing']])
                     self.tabs[self.current_tab].search_highlight_line = self.last_page_search['occurs'][self.last_page_search['viewing']]
-                    self.status_bar.update_left("Viewing result #%d for '%s'" % (self.last_page_search['viewing'] + 1, query))
+                    self.status_bar.update("Viewing result #%d for '%s'" % (self.last_page_search['viewing'] + 1, query))
                     self.display_current_tab()
                 else:
                     self.tabs[self.current_tab].search_highlight_line = -1
-                    self.status_bar.update_left("No more results for '%s'" % (query))
+                    self.status_bar.update("No more results for '%s'" % (query))
             else:
                 # new search
                 maxx = self.tabs[self.current_tab].window.getmaxyx()[1]
@@ -1335,14 +1334,14 @@ class IdentiCurse(object):
                 if len(page_search['occurs']) > 0:
                     self.tabs[self.current_tab].scrollto(page_search['occurs'][0])
                     self.tabs[self.current_tab].search_highlight_line = page_search['occurs'][0]
-                    self.status_bar.update_left("Viewing result #1 for '%s'" % (query))
+                    self.status_bar.update("Viewing result #1 for '%s'" % (query))
                     self.last_page_search = page_search  # keep this search
                 else:
                     self.tabs[self.current_tab].search_highlight_line = -1
-                    self.status_bar.update_left("No results for '%s'" % (query))
+                    self.status_bar.update("No results for '%s'" % (query))
                     self.last_page_search = {'query':"", 'occurs':[], 'viewing':0, 'tab':-1}  # reset to no search
         else:
-            self.status_bar.update_left("Doing nothing.")
+            self.status_bar.update("Doing nothing.")
 
         self.entry_window.clear()
         self.text_entry = Textbox(self.entry_window, self.validate, insert_mode=True)

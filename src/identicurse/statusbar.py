@@ -20,48 +20,38 @@ import threading, time, curses
 class StatusBar(object):
     def __init__(self, window):
         self.window = window
-        self.left_text = ""
-        self.right_text = ""
+        self.text = ""
+        self.timed_update_restore_value = None
 
-    def update_left(self, text):
-        self.left_text = text
-        self.update()
-    
-    def update_right(self, text):
-        self.right_text = text
-        self.update()
+    def timed_update(self, text, delay=10):
+        TimedUpdate(self, text, delay).start()
 
-    def timed_update_left(self, text, delay=10):
-        TimedUpdate(self, 'left', text, delay).start()
-
-    def timed_update_right(self, text, delay=10):
-        TimedUpdate(self, 'right', text, delay).start()
-
-    def update(self):
-        self.window.erase()
-        right_x = self.window.getmaxyx()[1] - (len(self.right_text) + 2)
-        if len(self.left_text) >= (right_x - 3):  # if the left text would end up too near the right text
-            self.window.addstr(0, 1, self.left_text[:right_x-6].strip() + "...")
+    def update(self, text):
+        if self.timed_update_restore_value is None:
+            self.window.erase()
+            maxx = self.window.getmaxyx()[1] - 1
+            if len(text) >= (maxx):  # if the left text would end up too near the right text
+                self.window.addstr(0, 1, text[:maxx-3].strip() + "...")
+            else:
+                self.window.addstr(0, 1, text)
+            self.window.refresh()
         else:
-            self.window.addstr(0, 1, self.left_text)
-        self.window.addstr(0, right_x, self.right_text)
-        self.window.refresh()
+            self.timed_update_restore_value = text  # don't override the current message, instead store the text as our new restore value
 
 class TimedUpdate(threading.Thread):
-    def __init__(self, statusbar, side, text, delay):
+    def __init__(self, statusbar, text, delay):
         threading.Thread.__init__(self)
 
         self.statusbar = statusbar
-        self.side = side
         self.text = text
         self.delay = delay
 
     def run(self):
-        initial_value = getattr(self.statusbar, self.side + "_text")
-
-        update_function = getattr(self.statusbar, "update_" + self.side)
-        update_function(self.text)
+        self.statusbar.timed_update_restore_value = self.statusbar.text
+        self.statusbar.update(self.text)
 
         time.sleep(self.delay)
 
-        update_function(initial_value)
+        temp_restore_value = self.statusbar.timed_update_restore_value  # store this so we can reset the original, otherwise we hit the else clause in update
+        self.statusbar.timed_update_restore_value = None
+        self.statusbar.update(temp_restore_value)
