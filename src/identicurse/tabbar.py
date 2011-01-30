@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import curses, identicurse
+import curses, identicurse, config
 
 class TabBar(object):
     def __init__(self, window):
@@ -33,7 +33,10 @@ class TabBar(object):
                 attr = identicurse.colour_fields['tabbar_active']
             else:
                 attr = identicurse.colour_fields['tabbar']
-            tab_list.append((self.tabs[tab_num], attr))
+            if (not config.config["enable_colours"]) and (tab_num == self.current_tab):
+                tab_list.append((self.tabs[tab_num].upper(), attr))
+            else:
+                tab_list.append((self.tabs[tab_num], attr))
             total_length += (1 + len(self.tabs[tab_num]))
         maxx = self.window.getmaxyx()[1]
         if total_length >= (maxx - 1):  # if the full tab list would be wider than the available display area
