@@ -270,6 +270,8 @@ class IdentiCurse(object):
             config.config["password"] = ""
         if not "show_notice_links" in config.config:
             config.config["show_notice_links"] = False
+        if not "length_override" in config.config:
+            config.config["length_override"] = 0
         if not "keys" in config.config:
             config.config['keys'] = {}
         if not "scrollup" in config.config['keys']:
@@ -359,10 +361,14 @@ class IdentiCurse(object):
             current_y += 3
             y -= 3
 
-        if self.conn.length_limit == 0:
+        if self.conn.length_limit == 0 and config.config["length_override"] != 0:
             entry_lines = 3
         else:
-            entry_lines = (self.conn.length_limit / x) + 1
+            if config.config["length_override"] != 0:
+                notice_length = config.config["length_override"]
+            else:
+                notice_length = self.conn.length_limit
+            entry_lines = (notice_length / x) + 1
 
         import random
         for part in config.config['ui_order']:
