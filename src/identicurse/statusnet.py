@@ -161,16 +161,26 @@ class StatusNet(object):
                 tokens["token"] = self.oauth_token
                 tokens["token_secret"] = self.oauth_token_secret
             self.oauth_sign_request(request, tokens, raw_params)
-        
-        try:
-            response = urllib2.urlopen(request)
-        except urllib2.HTTPError, e:
-            raw_details = e.read()
+
+        success = False
+        attempt_count = 0
+        while not success:
+            success = True  # succeed unless we hit BadStatusLine
+            if attempt_count >= 10:  # after 10 failed attempts
+                raise Exception("Could not successfully read any response. Please check that your connection is working.")
             try:
-                err_details = json.loads(raw_details)['error']
-            except ValueError:  # not JSON, use raw
-                err_details = raw_details
-            raise StatusNetError(e.code, err_details)
+                response = urllib2.urlopen(request)
+            except urllib2.HTTPError, e:
+                raw_details = e.read()
+                try:
+                    err_details = json.loads(raw_details)['error']
+                except ValueError:  # not JSON, use raw
+                    err_details = raw_details
+                raise StatusNetError(e.code, err_details)
+            except httplib.BadStatusLine, e:
+                success = False
+            attempt_count += 1
+
         content = response.read()
         
         try:
