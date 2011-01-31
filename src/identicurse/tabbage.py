@@ -422,6 +422,16 @@ class Timeline(Tab):
                 self.buffer.append(line)
                 self.buffer.append([])
 
+            if config.config["show_notice_links"]:
+                line = []
+                base_url = helpers.base_url_regex.findall(self.conn.api_path)[0][0]
+                if self.timeline_type in ["direct", "sentdirect"]:
+                    notice_link = "%s/message/%s" % (base_url, str(n["id"]))
+                else:
+                    notice_link = "%s/notice/%s" % (base_url, str(n["id"]))
+                line.append(("<%s>" % (notice_link), identicurse.colour_fields["notice_link"]))
+                self.buffer.append(line)
+
             self.buffer.append([])
 
             c += 1

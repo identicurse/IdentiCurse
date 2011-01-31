@@ -52,6 +52,7 @@ colour_fields = {
     "search_highlight": 15,
     "tabbar": 16,
     "tabbar_active": 17,
+    "notice_link": 18,
 }
 
 colours = {
@@ -225,6 +226,7 @@ class IdentiCurse(object):
                 "profile_fields": ("blue", "none"),
                 "profile_values": ("none", "none"),
                 "search_highlight": ("white", "blue"),
+                "notice_link": ("green", "none"),
                 "none": ("none", "none")
             }
 
@@ -266,6 +268,8 @@ class IdentiCurse(object):
             config.config["username"] = ""
         if not "password" in config.config:
             config.config["password"] = ""
+        if not "show_notice_links" in config.config:
+            config.config["show_notice_links"] = False
         if not "keys" in config.config:
             config.config['keys'] = {}
         if not "scrollup" in config.config['keys']:
