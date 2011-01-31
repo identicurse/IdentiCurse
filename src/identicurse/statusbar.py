@@ -28,15 +28,19 @@ class StatusBar(object):
 
     def update(self, text):
         if self.timed_update_restore_value is None:
-            self.window.erase()
-            maxx = self.window.getmaxyx()[1] - 2
-            if len(text) >= (maxx):  # if the left text would end up too near the right text
-                self.window.addstr(0, 1, text[:maxx-3].strip() + "...")
-            else:
-                self.window.addstr(0, 1, text)
-            self.window.refresh()
+            self.text = text
+            self.redraw()
         else:
-            self.timed_update_restore_value = text  # don't override the current message, instead store the text as our new restore value
+            self.timed_update_restore_value = text
+
+    def redraw(self):
+        self.window.erase()
+        maxx = self.window.getmaxyx()[1] - 2
+        if len(self.text) >= (maxx):  # if the left text would end up too near the right text
+            self.window.addstr(0, 1, self.text[:maxx-3].strip() + "...")
+        else:
+            self.window.addstr(0, 1, self.text)
+        self.window.refresh()
 
 class TimedUpdate(threading.Thread):
     def __init__(self, statusbar, text, delay):

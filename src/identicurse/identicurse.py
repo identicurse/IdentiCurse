@@ -436,6 +436,7 @@ class IdentiCurse(object):
 
         if hasattr(self, 'status_bar'):
             self.status_bar.window = self.status_window
+            self.status_bar.redraw()
         if hasattr(self, 'tab_bar'):
             self.tab_bar.window = self.tab_bar_window
 
