@@ -336,7 +336,7 @@ class StatusNet(object):
                 params['status'] = status[:self.length_limit]
             elif long_dent=="split":
                 status_next = status[helpers.find_split_point(status, self.length_limit - 2):]
-                status = status.encode('utf-8')[:helpers.find_split_point(status, self.length_limit - 2)] + u".."
+                status = status.encode('utf-8')[:helpers.find_split_point(status, self.length_limit - 3)] + u".."
                 if dup_first_word or (not (in_reply_to_status_id == 0)):
                     status_next = status.split(" ")[0].encode('utf-8') + " .. " + status_next
                 else:

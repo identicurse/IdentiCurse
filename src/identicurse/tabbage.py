@@ -55,19 +55,19 @@ class Buffer(list):
         """ Return a reflowed-for-width copy of the buffer as a list. """
         reflowed_buffer = []
 
-        for line in self:
+        for raw_line in self:
             reflowed_buffer.append([])
             line_length = 0
-            for block in line:
+            line = raw_line[:]
+            line.reverse()  # reverse the line so we can use it as a stack
+            while len(line) > 0:
+                block = line.pop()
                 if (len(block[0]) + line_length) > width:
                     split_point = helpers.find_split_point(block[0], width - line_length)
-                    reflowed_buffer[-1].append((block[0][:split_point], block[1]))
-                    block = (block[0][split_point:], block[1])
-                    while len(block[0]) > width:
-                        split_point = helpers.find_split_point(block[0], width)
-                        reflowed_buffer.append([(block[0][:split_point], block[1])])
-                        block = (block[0][split_point:], block[1])
-                    reflowed_buffer.append([(block[0][:split_point], block[1])])
+                    reflowed_buffer[-1].append((block[0][:split_point], block[1]))  # add the first half of the block as usual
+                    reflowed_buffer.append([])
+                    line.append((block[0][split_point:], block[1]))  # put the rest of the block back on the stack
+                    line_length = 0
                 else:
                     reflowed_buffer[-1].append(block)
                     line_length += len(block[0])
