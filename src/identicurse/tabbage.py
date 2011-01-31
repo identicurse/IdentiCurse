@@ -17,6 +17,7 @@
 
 from helpers import DATETIME_FORMAT
 import os.path, re, sys, threading, datetime, locale, helpers, curses, random, identicurse, config
+from statusnet import StatusNetError
 
 class Buffer(list):
     def __init__(self):
@@ -617,43 +618,50 @@ class Profile(Tab):
         Tab.__init__(self, window)
 
     def update(self):
-        self.profile = self.conn.users_show(screen_name=self.id)
+        try:
+            self.profile = self.conn.users_show(screen_name=self.id)
+            # numerical fields, convert them to strings to make the buffer code more clean
+            for field in ['id', 'created_at', 'followers_count', 'friends_count', 'favourites_count', 'statuses_count']:
+                self.profile[field] = str(self.profile[field])
 
-        # numerical fields, convert them to strings to make the buffer code more clean
-        for field in ['id', 'created_at', 'followers_count', 'friends_count', 'favourites_count', 'statuses_count']:
-            self.profile[field] = str(self.profile[field])
+            # special handling for following
+            if self.profile['following']:
+                self.profile['following'] = "Yes"
+            else:
+                self.profile['following'] = "No"
 
-        # special handling for following
-        if self.profile['following']:
-            self.profile['following'] = "Yes"
-        else:
-            self.profile['following'] = "No"
+            # create this field specially
+            locale.setlocale(locale.LC_TIME, 'C')  # hacky fix because statusnet uses english timestrings regardless of locale
+            datetime_joined = datetime.datetime.strptime(self.profile['created_at'], DATETIME_FORMAT)
+            locale.setlocale(locale.LC_TIME, '') # other half of the hacky fix
+            days_since_join = helpers.single_unit(helpers.time_since(datetime_joined), "days")['days']
+            self.profile['notices_per_day'] = "%0.2f" % (float(self.profile['statuses_count']) / days_since_join)
 
-        # create this field specially
-        locale.setlocale(locale.LC_TIME, 'C')  # hacky fix because statusnet uses english timestrings regardless of locale
-        datetime_joined = datetime.datetime.strptime(self.profile['created_at'], DATETIME_FORMAT)
-        locale.setlocale(locale.LC_TIME, '') # other half of the hacky fix
-        days_since_join = helpers.single_unit(helpers.time_since(datetime_joined), "days")['days']
-        self.profile['notices_per_day'] = "%0.2f" % (float(self.profile['statuses_count']) / days_since_join)
+        except StatusNetError, e:
+            if e.errcode == 404:
+                self.profile = None
 
         self.update_buffer()
 
     def update_buffer(self):
         self.buffer.clear()
 
-        self.buffer.append([("@" + self.profile['screen_name'] + "'s Profile", identicurse.colour_fields['profile_title'])])
-        self.buffer.append([("", identicurse.colour_fields['none'])])
+        if self.profile is not None:
+            self.buffer.append([("@" + self.profile['screen_name'] + "'s Profile", identicurse.colour_fields['profile_title'])])
+            self.buffer.append([("", identicurse.colour_fields['none'])])
 
-        for field in self.fields:
-            if self.profile[field[1]] is not None:
-                line = []
+            for field in self.fields:
+                if self.profile[field[1]] is not None:
+                    line = []
 
-                line.append((field[0] + ":", identicurse.colour_fields['profile_fields']))
-                line.append((" ", identicurse.colour_fields['none']))
+                    line.append((field[0] + ":", identicurse.colour_fields['profile_fields']))
+                    line.append((" ", identicurse.colour_fields['none']))
 
-                line.append((self.profile[field[1]], identicurse.colour_fields['profile_values']))
+                    line.append((self.profile[field[1]], identicurse.colour_fields['profile_values']))
 
-                self.buffer.append(line)
+                    self.buffer.append(line)
 
-            if field[2]:
-                self.buffer.append([("", identicurse.colour_fields['none'])])
+                if field[2]:
+                    self.buffer.append([("", identicurse.colour_fields['none'])])
+        else:
+            self.buffer.append([("There is no user called @%s on this instance." % (self.id), identicurse.colour_fields['none'])])
