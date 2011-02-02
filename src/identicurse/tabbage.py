@@ -417,8 +417,8 @@ class Timeline(Tab):
 
             if not config.config['compact_notices']:
                 line = []
-                line.append((" " * (maxx - (len(time_msg) + 2)), identicurse.colour_fields["time"]))
-                line.append((time_msg, identicurse.colour_fields["none"]))
+                line.append((" " * (maxx - (len(time_msg) + 2)), identicurse.colour_fields["none"]))
+                line.append((time_msg, identicurse.colour_fields["time"]))
                 
                 self.buffer.append(line)
                 self.buffer.append([])
