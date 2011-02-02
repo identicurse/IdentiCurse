@@ -25,7 +25,10 @@ class StatusNetError(Exception):
     def __init__(self, errcode, details):
         self.errcode = errcode
         self.details = details
-        Exception.__init__(self, "Error %d: %s" % (self.errcode, self.details))
+        if errcode == -1:
+            Exception.__init__(self, "Error: %s" % (self.details))
+        else:
+            Exception.__init__(self, "Error %d: %s" % (self.errcode, self.details))
 
 class StatusNet(object):
     def __init__(self, api_path, username="", password="", use_auth=True, auth_type="basic", consumer_key=None, consumer_secret=None):
@@ -177,6 +180,8 @@ class StatusNet(object):
                 except ValueError:  # not JSON, use raw
                     err_details = raw_details
                 raise StatusNetError(e.code, err_details)
+            except urllib2.URLError, e:
+                raise StatusNetError(-1, e.reason)
             except httplib.BadStatusLine, e:
                 success = False
             attempt_count += 1
