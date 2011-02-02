@@ -718,17 +718,11 @@ class IdentiCurse(object):
                     self.status_bar.timed_update("Status.Net error %d: %s" % (e.errcode, e.details))
                 self.status_bar.update("Doing Nothing.")
             elif input == ord("e") or input in [ord(key) for key in config.config['keys']['crepeat']]:
-                try:
-                    self.status_bar.update("Repeating Notice...")
-                    if "retweeted_status" in self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]:
-                        id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['retweeted_status']['id']
-                    else:
-                        id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['id']
-                except IndexError, e:  # shit broke, debug time
-                    debug_filename = os.path.join(os.path.expanduser("~"), "identicurse_debug.txt")
-                    open(debug_filename, "w").write("IndexError\n%s\n\tself.current_tab = %d ; len(self.tabs) = %d ; chosen_one = %d ; len(self.tabs[self.current_tab].timeline) = %d\n"
-                            % (str(e), self.current_tab, len(self.tabs), self.tabs[self.current_tab].chosen_one, len(self.tabs[self.current_tab].timeline)))
-                    self.status_bar.update("Something broke, please get a copy of '%s' to @psquid." % (debug_filename))
+                self.status_bar.update("Repeating Notice...")
+                if "retweeted_status" in self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]:
+                    id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['retweeted_status']['id']
+                else:
+                    id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['id']
                 try:
                     update = self.conn.statuses_retweet(id, source="IdentiCurse")
                     if isinstance(update, list):

@@ -257,8 +257,7 @@ class Timeline(Tab):
         Tab.__init__(self, window)
 
     def update(self):
-        self.timeline = []
-        get_count = config.config['notice_limit'] - len(self.timeline)
+        get_count = config.config['notice_limit']
         if self.timeline_type == "home":
             raw_timeline = self.conn.statuses_home_timeline(count=get_count, page=self.page)
         elif self.timeline_type == "mentions":
@@ -286,6 +285,8 @@ class Timeline(Tab):
         elif self.timeline_type == "search":
             raw_timeline = self.conn.search(self.type_params['query'], page=self.page, standardise=True)
 
+        temp_timeline = []
+
         for notice in raw_timeline:
             passes_filters = True
             for filter_item in config.config['filters']:
@@ -302,7 +303,9 @@ class Timeline(Tab):
                         page = urllib2.urlopen(req).read()
                         notice['text'] = helpers.html_unescape_string(self.title_regex.findall(page)[0].decode(sys.getfilesystemencoding()))
                         break
-                self.timeline.append(notice)
+                temp_timeline.append(notice)
+
+        self.timeline = temp_timeline[:]
 
         if self.page > 1:
             self.name = self.basename + "+%d" % (self.page - 1)
