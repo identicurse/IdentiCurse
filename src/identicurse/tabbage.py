@@ -320,15 +320,18 @@ class Timeline(Tab):
         c = 1
 
         for n in self.timeline:
+            from_user = None
+            to_user = None
+            repeating_user = None
             if "direct" in self.timeline_type:
-                user = unicode("%s -> %s" % (n["sender"]["screen_name"], n["recipient"]["screen_name"]))
+                from_user = n["sender"]["screen_name"]
+                to_user = n["recipient"]["screen_name"]
                 source_msg = ""
             else:
                 if "retweeted_status" in n:
-                    user = "%s [ repeat by %s ]" % (n["retweeted_status"]["user"]["screen_name"], n["user"]["screen_name"])
+                    repeating_user = n["user"]["screen_name"]
                     n = n["retweeted_status"]
-                else:
-                    user = unicode(n["user"]["screen_name"])
+                from_user = n["user"]["screen_name"]
                 raw_source_msg = "from %s" % (n["source"])
                 source_msg = self.html_regex.sub("", raw_source_msg)
                 repeat_msg = ""
@@ -344,8 +347,9 @@ class Timeline(Tab):
             else:
                 time_msg = helpers.format_time(helpers.time_since(datetime_notice))
 
-            if not user in config.session_store.user_cache:
-                config.session_store.user_cache[user] = random.choice(identicurse.base_colours.items())[1]
+            for user in [user for user in [from_user, to_user, repeating_user] if user is not None]:
+                if not user in config.session_store.user_cache:
+                    config.session_store.user_cache[user] = random.choice(identicurse.base_colours.items())[1]
            
             # Build the line
             line = []
@@ -362,17 +366,35 @@ class Timeline(Tab):
                 line.append((' ' * 3, identicurse.colour_fields["selector"]))
 
             if config.config['user_rainbow']:
-                line.append((user, config.session_store.user_cache[user]))
+                line.append((from_user, config.session_store.user_cache[from_user]))
             else:
-                line.append((user, identicurse.colour_fields["username"]))
+                line.append((from_user, identicurse.colour_fields["username"]))
+            user_length = len(from_user)
+
+            if to_user is not None:
+                line.append((" -> ", identicurse.colour_fields["none"]))
+                if config.config['user_rainbow']:
+                    line.append((to_user, config.session_store.user_cache[to_user]))
+                else:
+                    line.append((to_user, identicurse.colour_fields["username"]))
+                user_length += (len(" -> ") + len(to_user))
+
+            if repeating_user is not None:
+                line.append((" [ repeat by ", identicurse.colour_fields["none"]))
+                if config.config['user_rainbow']:
+                    line.append((repeating_user, config.session_store.user_cache[repeating_user]))
+                else:
+                    line.append((repeating_user, identicurse.colour_fields["username"]))
+                line.append((" ]", identicurse.colour_fields["none"]))
+                user_length += (len(" [ repeat by ") + len(repeating_user) + len(" ]"))
 
             if config.config['compact_notices']:
-                line.append((' ' * (maxx - ((len(source_msg) + len(time_msg) + len(user) + (6 + len(cout))))), identicurse.colour_fields["none"]))
+                line.append((' ' * (maxx - ((len(source_msg) + len(time_msg) + user_length + (6 + len(cout))))), identicurse.colour_fields["none"]))
                 line.append((time_msg, identicurse.colour_fields["time"]))
                 line.append((' ', identicurse.colour_fields["none"]))
                 line.append((source_msg, identicurse.colour_fields["source"]))
             else:
-                line.append((' ' * (maxx - ((len(source_msg) + len(user) + (5 + len(cout))))), identicurse.colour_fields["none"]))
+                line.append((' ' * (maxx - ((len(source_msg) + user_length + (5 + len(cout))))), identicurse.colour_fields["none"]))
                 line.append((source_msg, identicurse.colour_fields["source"]))
 
             self.buffer.append(line)
@@ -489,11 +511,12 @@ class Context(Tab):
         maxx = self.window.getmaxyx()[1]
 
         for n in self.timeline:
+            from_user = None
+            repeating_user = None
             if "retweeted_status" in n:
-                user = "%s [ repeat by %s ]" % (n["retweeted_status"]["user"]["screen_name"], n["user"]["screen_name"])
+                repeating_user = n["user"]["screen_name"]
                 n = n["retweeted_status"]
-            else:
-                user = unicode(n["user"]["screen_name"])
+            from_user = n["user"]["screen_name"]
             raw_source_msg = "from %s" % (n["source"])
             source_msg = self.html_regex.sub("", raw_source_msg)
             if n["in_reply_to_status_id"] is not None:
@@ -509,8 +532,9 @@ class Context(Tab):
             else:
                 time_msg = helpers.format_time(helpers.time_since(datetime_notice))
             
-            if not user in config.session_store.user_cache:
-                config.session_store.user_cache[user] = random.choice(identicurse.base_colours.items())[1]
+            for user in [user for user in [from_user, repeating_user] if user is not None]:
+                if not user in config.session_store.user_cache:
+                    config.session_store.user_cache[user] = random.choice(identicurse.base_colours.items())[1]
 
             line = []
 
@@ -526,17 +550,27 @@ class Context(Tab):
                 line.append((' ' * 3, identicurse.colour_fields["selector"]))
 
             if config.config['user_rainbow']:
-                line.append((user, config.session_store.user_cache[user]))
+                line.append((from_user, config.session_store.user_cache[from_user]))
             else:
-                line.append((user, identicurse.colour_fields["username"]))
+                line.append((from_user, identicurse.colour_fields["username"]))
+            user_length = len(from_user)
+
+            if repeating_user is not None:
+                line.append((" [ repeat by ", identicurse.colour_fields["none"]))
+                if config.config['user_rainbow']:
+                    line.append((repeating_user, config.session_store.user_cache[repeating_user]))
+                else:
+                    line.append((repeating_user, identicurse.colour_fields["username"]))
+                line.append((" ]", identicurse.colour_fields["none"]))
+                user_length += (len(" [ repeat by ") + len(repeating_user) + len(" ]"))
             
             if config.config['compact_notices']:
-                line.append((' ' * (maxx - ((len(source_msg) + len(time_msg) + len(user) + (6 + len(cout))))), identicurse.colour_fields["none"]))
+                line.append((' ' * (maxx - ((len(source_msg) + len(time_msg) + user_length + (6 + len(cout))))), identicurse.colour_fields["none"]))
                 line.append((time_msg, identicurse.colour_fields["time"]))
                 line.append((' ', identicurse.colour_fields["none"]))
                 line.append((source_msg, identicurse.colour_fields["source"]))
             else:
-                line.append((' ' * (maxx - ((len(source_msg) + len(user) + (5 + len(cout))))), identicurse.colour_fields["none"]))
+                line.append((' ' * (maxx - ((len(source_msg) + user_length + (5 + len(cout))))), identicurse.colour_fields["none"]))
                 line.append((source_msg, identicurse.colour_fields["source"]))
 
             self.buffer.append(line)
@@ -582,8 +616,8 @@ class Context(Tab):
 
             if not config.config['compact_notices']:
                 line = []
-                line.append((" " * (maxx - (len(time_msg) + 2)), identicurse.colour_fields["time"]))
-                line.append((time_msg, identicurse.colour_fields["none"]))
+                line.append((" " * (maxx - (len(time_msg) + 2)), identicurse.colour_fields["none"]))
+                line.append((time_msg, identicurse.colour_fields["time"]))
                 
                 self.buffer.append(line)
                 self.buffer.append([])
