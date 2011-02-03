@@ -51,11 +51,12 @@ class TimedUpdate(threading.Thread):
         self.delay = delay
 
     def run(self):
-        self.statusbar.timed_update_restore_value = self.statusbar.text
+        temp_restore_value = self.statusbar.text  # store so we can set without trigerring the else clause
         self.statusbar.update(self.text)
+        self.statusbar.timed_update_restore_value = temp_restore_value
 
         time.sleep(self.delay)
 
-        temp_restore_value = self.statusbar.timed_update_restore_value  # store this so we can reset the original, otherwise we hit the else clause in update
+        temp_restore_value = self.statusbar.timed_update_restore_value  # as above
         self.statusbar.timed_update_restore_value = None
         self.statusbar.update(temp_restore_value)
