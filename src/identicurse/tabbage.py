@@ -412,23 +412,23 @@ class Timeline(Tab):
                         if part_list[0] in ['@', '!', '#']:
                             highlight_part = "".join(part_list[1:])
                             if part_list[0] == '@':
+                                if not highlight_part in config.session_store.user_cache:
+                                    config.session_store.user_cache[highlight_part] = random.choice(identicurse.base_colours.items())[1]
                                 if config.config['user_rainbow']:
-                                    if not highlight_part in config.session_store.user_cache:
-                                        config.session_store.user_cache[highlight_part] = random.choice(identicurse.base_colours.items())[1]
                                     line.append((part, config.session_store.user_cache[highlight_part]))
                                 else:
                                     line.append((part, identicurse.colour_fields['username']))
                             elif part_list[0] == '!':
+                                if not highlight_part in config.session_store.group_cache:
+                                    config.session_store.group_cache[highlight_part] = random.choice(identicurse.base_colours.items())[1]
                                 if config.config['group_rainbow']:
-                                    if not highlight_part in config.session_store.group_cache:
-                                        config.session_store.group_cache[highlight_part] = random.choice(identicurse.base_colours.items())[1]
                                     line.append((part, config.session_store.group_cache[highlight_part]))
                                 else:
                                     line.append((part, identicurse.colour_fields['group']))
                             elif part_list[0] == '#':
+                                if not highlight_part in config.session_store.tag_cache:
+                                    config.session_store.tag_cache[highlight_part] = random.choice(identicurse.base_colours.items())[1]
                                 if config.config['tag_rainbow']:
-                                    if not highlight_part in config.session_store.tag_cache:
-                                        config.session_store.tag_cache[highlight_part] = random.choice(identicurse.base_colours.items())[1]
                                     line.append((part, config.session_store.tag_cache[highlight_part]))
                                 else:
                                     line.append((part, identicurse.colour_fields['tag']))
