@@ -788,22 +788,27 @@ class IdentiCurse(object):
 
         self.quit();
 
-    def validate(self, character_count):
-        if self.quote_mode:
-            if self.conn.length_limit == 0:
-                self.status_bar.update("Quote Mode: " + str(character_count))
-            else:
-                self.status_bar.update("Quote Mode: " + str(self.conn.length_limit - character_count))
-        elif self.search_mode:
-            if self.last_page_search['query'] != "":
-                self.status_bar.update("In-page Search (last search: '%s')" % (self.last_page_search['query']))
-            else:
-                self.status_bar.update("In-page Search")
+    def validate(self, param):
+        if type(param) == type([]):
+            guess_list = param
+            self.status_bar.timed_update("  ".join(guess_list))
         else:
-            if self.conn.length_limit == 0:
-                self.status_bar.update("Insert Mode: " + str(character_count))
+            character_count = param
+            if self.quote_mode:
+                if self.conn.length_limit == 0:
+                    self.status_bar.update("Quote Mode: " + str(character_count))
+                else:
+                    self.status_bar.update("Quote Mode: " + str(self.conn.length_limit - character_count))
+            elif self.search_mode:
+                if self.last_page_search['query'] != "":
+                    self.status_bar.update("In-page Search (last search: '%s')" % (self.last_page_search['query']))
+                else:
+                    self.status_bar.update("In-page Search")
             else:
-                self.status_bar.update("Insert Mode: " + str(self.conn.length_limit - character_count))
+                if self.conn.length_limit == 0:
+                    self.status_bar.update("Insert Mode: " + str(character_count))
+                else:
+                    self.status_bar.update("Insert Mode: " + str(self.conn.length_limit - character_count))
 
     def parse_input(self, input):
         update = False

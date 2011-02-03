@@ -73,10 +73,13 @@ class Textbox(textpad.Textbox):
                 elif hasattr(config.session_store, "user_cache"):  # if no special char, assume username
                     guess_source = getattr(config.session_store, "user_cache")
                 if guess_source is not None:
-                    guess = helpers.find_longest_common_start([user for user in guess_source if user[:len(last_word)] == last_word])
+                    possible_guesses = [user for user in guess_source if user[:len(last_word)] == last_word]
+                    guess = helpers.find_longest_common_start(possible_guesses)
                     if len(guess) > len(last_word):
                         for char in guess[len(last_word):]:
                             self.do_command(char)
+                    elif len(possible_guesses) > 0:
+                        self.poll_function(possible_guesses)
             elif ch == curses.KEY_HOME:
                 self.win.move(0, 0)
             elif ch == curses.KEY_END:
