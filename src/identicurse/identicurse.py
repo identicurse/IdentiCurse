@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import os, sys, curses, locale, re, subprocess
+import os, sys, curses, locale, re, subprocess, random
 try:
     import json
 except ImportError:
@@ -272,6 +272,8 @@ class IdentiCurse(object):
             config.config["show_notice_links"] = False
         if not "length_override" in config.config:
             config.config["length_override"] = 0
+        if not "prefill_user_cache" in config.config:
+            config.config["prefill_user_cache"] = False
         if not "keys" in config.config:
             config.config['keys'] = {}
         if not "scrollup" in config.config['keys']:
@@ -330,6 +332,22 @@ class IdentiCurse(object):
         except Exception, (errmsg):
             sys.exit("ERROR: Couldn't establish connection: %s" % (errmsg))
 
+        if config.config["prefill_user_cache"]:
+            print "Prefilling the user cache based on your followed/following users. This will take quite a bit of time, especially on slower connections. Please be patient."
+            users = []
+            for user_id in [self.conn.friends_ids(0, "")]:
+                try:
+                    screen_name = self.conn.users_show(user_id)["screen_name"]
+                    if not screen_name in users:
+                        print "Added @%s." % (screen_name)
+                        users.append(screen_name)
+                except:
+                    pass
+            for user in users:
+                if not hasattr(config.session_store, "user_cache"):
+                    config.session_store.user_cache = {}
+                config.session_store.user_cache[user] = random.choice(range(8))
+
         self.insert_mode = False
         self.search_mode = False
         self.quote_mode = False
@@ -370,7 +388,6 @@ class IdentiCurse(object):
                 notice_length = self.conn.length_limit
             entry_lines = (notice_length / x) + 1
 
-        import random
         for part in config.config['ui_order']:
             if part == "divider":
                 current_y += 1
