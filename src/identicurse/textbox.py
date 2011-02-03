@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import curses, identicurse
+import curses, identicurse, config, helpers
 from curses import textpad
 from curses import ascii
 
@@ -41,9 +41,42 @@ class Textbox(textpad.Textbox):
                 self.do_command(263)
             elif ch == curses.KEY_ENTER or ch == 10:
                 break
-            elif ch == 9 or ch == 27:
+            elif ch == 27:
                 abort = True
                 break
+            elif ch ==9:
+                cursor_position = self.win.getyx()
+                x = cursor_position[1]
+                last_word = ""
+                while True:
+                    x -= 1
+                    c = chr(curses.ascii.ascii(self.win.inch(cursor_position[0], x)))
+                    if c == " ":
+                        if (len(last_word) == 0) and (x > 0):
+                            continue
+                        else:
+                            break
+                    last_word = c + last_word
+                    if x == 0:
+                        break
+                self.win.move(cursor_position[0], cursor_position[1])
+                guess_source = None
+                if last_word[0] == "@" and hasattr(config.session_store, "user_cache"):
+                    last_word = last_word[1:]
+                    guess_source = getattr(config.session_store, "user_cache")
+                elif last_word[0] == "!" and hasattr(config.session_store, "group_cache"):
+                    last_word = last_word[1:]
+                    guess_source = getattr(config.session_store, "group_cache")
+                elif last_word[0] == "#" and hasattr(config.session_store, "tag_cache"):
+                    last_word = last_word[1:]
+                    guess_source = getattr(config.session_store, "tag_cache")
+                elif hasattr(config.session_store, "user_cache"):  # if no special char, assume username
+                    guess_source = getattr(config.session_store, "user_cache")
+                if guess_source is not None:
+                    guess = helpers.find_longest_common_start([user for user in guess_source if user[:len(last_word)] == last_word])
+                    if len(guess) > len(last_word):
+                        for char in guess[len(last_word):]:
+                            self.do_command(char)
             elif ch == curses.KEY_HOME:
                 self.win.move(0, 0)
             elif ch == curses.KEY_END:

@@ -153,3 +153,19 @@ def html_unescape_block(block):
 
 def html_unescape_string(escaped_string):
     return re.sub("&#?\w+;", html_unescape_block, escaped_string)
+
+def find_longest_common_start(words):
+    if len(words) == 0:
+        return ""
+    last_match = ""
+    for length in xrange(len(words[0]) + 1):
+        match_string = words[0][:length]
+        match = True
+        for word in words:
+            if word[:length] != match_string:
+                match = False
+        if not match:
+            break
+        last_match = match_string
+    return last_match
+
