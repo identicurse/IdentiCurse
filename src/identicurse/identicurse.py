@@ -333,13 +333,12 @@ class IdentiCurse(object):
             sys.exit("ERROR: Couldn't establish connection: %s" % (errmsg))
 
         if config.config["prefill_user_cache"]:
-            print "Prefilling the user cache based on your followed/following users. This will take quite a bit of time, especially on slower connections. Please be patient."
+            print "Prefilling the user cache based on your followed/following users. This will take a little while, especially on slower connections. Please be patient."
             users = []
-            for user_id in [self.conn.friends_ids(0, "")]:
+            for user_profile in [self.conn.statuses_friends()]:
                 try:
-                    screen_name = self.conn.users_show(user_id)["screen_name"]
+                    screen_name = user_profile["screen_name"]
                     if not screen_name in users:
-                        print "Added @%s." % (screen_name)
                         users.append(screen_name)
                 except:
                     pass
