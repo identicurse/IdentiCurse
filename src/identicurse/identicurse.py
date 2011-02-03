@@ -791,7 +791,7 @@ class IdentiCurse(object):
     def validate(self, param):
         if type(param) == type([]):
             guess_list = param
-            self.status_bar.timed_update("  ".join(guess_list))
+            self.status_bar.timed_update("  ".join(guess_list), 2)
         else:
             character_count = param
             if self.quote_mode:
