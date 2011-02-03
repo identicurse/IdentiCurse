@@ -57,6 +57,7 @@ class TimedUpdate(threading.Thread):
 
         time.sleep(self.delay)
 
-        temp_restore_value = self.statusbar.timed_update_restore_value  # as above
-        self.statusbar.timed_update_restore_value = None
-        self.statusbar.update(temp_restore_value)
+        if self.statusbar.timed_update_restore_value is not None:  # make sure it wasn't already reset by another timed update, because we'd end up setting it to None, then, which just fucks everything up
+            temp_restore_value = self.statusbar.timed_update_restore_value  # as above
+            self.statusbar.timed_update_restore_value = None
+            self.statusbar.update(temp_restore_value)
