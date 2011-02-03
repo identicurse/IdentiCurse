@@ -335,13 +335,10 @@ class IdentiCurse(object):
         if config.config["prefill_user_cache"]:
             print "Prefilling the user cache based on your followed/following users. This will take a little while, especially on slower connections. Please be patient."
             users = []
-            for user_profile in [self.conn.statuses_friends()]:
-                try:
-                    screen_name = user_profile["screen_name"]
-                    if not screen_name in users:
-                        users.append(screen_name)
-                except:
-                    pass
+            for user_profile in self.conn.statuses_friends():
+                screen_name = user_profile["screen_name"]
+                if not screen_name in users:
+                    users.append(screen_name)
             for user in users:
                 if not hasattr(config.session_store, "user_cache"):
                     config.session_store.user_cache = {}
