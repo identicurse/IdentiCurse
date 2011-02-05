@@ -483,7 +483,7 @@ class Context(Tab):
         Tab.__init__(self, window)
 
     def update(self):
-        self.timeline = []
+        temp_timeline = []
         next_id = self.notice
 
         while next_id is not None:
@@ -497,11 +497,13 @@ class Context(Tab):
                     page = urllib2.urlopen(req).read()
                     notice['text'] = helpers.html_unescape_string(self.title_regex.findall(page)[0].decode(sys.getfilesystemencoding()))
                     break
-            self.timeline.append(notice)
-            if "retweeted_status" in self.timeline[-1]:
-                next_id = self.timeline[-1]['retweeted_status']['id']
+            temp_timeline.append(notice)
+            if "retweeted_status" in temp_timeline[-1]:
+                next_id = temp_timeline[-1]['retweeted_status']['id']
             else:
-                next_id = self.timeline[-1]['in_reply_to_status_id']
+                next_id = temp_timeline[-1]['in_reply_to_status_id']
+
+        self.timeline = temp_timeline
 
         self.search_highlight_line = -1
 
