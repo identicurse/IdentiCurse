@@ -227,6 +227,7 @@ class Timeline(Tab):
         self.timeline = []
         self.raw_mentions_timeline = []
         self.raw_directs_timeline = []
+        self.prev_page = -1
         if not hasattr(config.session_store, 'user_cache'):
             config.session_store.user_cache = {}
         if not hasattr(config.session_store, 'tag_cache'):
@@ -259,14 +260,16 @@ class Timeline(Tab):
             raw_timeline = self.conn.statuses_home_timeline(count=get_count, page=self.page)
         elif self.timeline_type == "mentions":
             raw_timeline = self.conn.statuses_mentions(count=get_count, page=self.page)
-            if (len(self.raw_mentions_timeline) > 0) and ([n['id'] for n in raw_timeline] != [n['id'] for n in self.raw_mentions_timeline]):
+            if (len(self.raw_mentions_timeline) > 0) and ([n['id'] for n in raw_timeline] != [n['id'] for n in self.raw_mentions_timeline]) and self.prev_page == self.page:
                 curses.flash()
             self.raw_mentions_timeline = raw_timeline
+            self.prev_page = self.page
         elif self.timeline_type == "direct":
             raw_timeline = self.conn.direct_messages(count=get_count, page=self.page)
-            if (len(self.raw_directs_timeline) > 0) and ([n['id'] for n in raw_timeline] != [n['id'] for n in self.raw_directs_timeline]):
+            if (len(self.raw_directs_timeline) > 0) and ([n['id'] for n in raw_timeline] != [n['id'] for n in self.raw_directs_timeline]) and self.prev_page == self.page:
                 curses.flash()
             self.raw_directs_timeline = raw_timeline
+            self.prev_page = self.page
         elif self.timeline_type == "user":
             raw_timeline = self.conn.statuses_user_timeline(user_id=self.type_params['user_id'], screen_name=self.type_params['screen_name'], count=get_count, page=self.page)
         elif self.timeline_type == "group":
