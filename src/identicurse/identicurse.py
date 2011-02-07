@@ -30,6 +30,7 @@ from statusbar import StatusBar
 from tabbar import TabBar
 
 import config
+import helpers
 
 locale.setlocale(locale.LC_ALL, '')
 code = locale.getpreferredencoding()
@@ -1300,6 +1301,9 @@ class IdentiCurse(object):
                             original_id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['id']
                         original_status = self.conn.statuses_show(original_id)
                         new_status_base = "RD @%s %s" % (original_status['user']['screen_name'], original_status['text'])
+                        for match in helpers.entity_regex.findall(new_status_base):
+                            if match[0] == "!":
+                                new_status_base = new_status_base.replace(match, "#" + match[1:])
 
                         status = self.text_entry.edit(new_status_base)
                         self.quote_mode = False
