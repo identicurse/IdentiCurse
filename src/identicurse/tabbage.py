@@ -235,9 +235,6 @@ class Timeline(Tab):
             config.session_store.group_cache = {}
         self.timeline_type = timeline
         self.type_params = type_params
-        self.highlight_regex = re.compile(r'([@!#]\w+)')
-        if config.config['expand_remote']:
-            self.title_regex = re.compile("\<title\>(.*)\<\/title\>")
         self.chosen_one = 0
 
         if self.timeline_type == "user":
@@ -301,7 +298,7 @@ class Timeline(Tab):
                             continue
                         req = urllib2.Request(attachment['url'])
                         page = urllib2.urlopen(req).read()
-                        notice['text'] = helpers.html_unescape_string(self.title_regex.findall(page)[0].decode(sys.getfilesystemencoding()))
+                        notice['text'] = helpers.html_unescape_string(helpers.title_regex.findall(page)[0].decode(sys.getfilesystemencoding()))
                         break
                 temp_timeline.append(notice)
 
@@ -405,7 +402,7 @@ class Timeline(Tab):
             try:
                 line = []
 
-                notice_parts = self.highlight_regex.split(n['text'])
+                notice_parts = helpers.entity_regex.split(n['text'])
                 for part in notice_parts:
                     part_list = list(part)
                     if len(part_list) > 0:
@@ -473,9 +470,6 @@ class Context(Tab):
             config.session_store.tag_cache = {}
         if not hasattr(config.session_store, 'group_cache'):
             config.session_store.group_cache = {}
-        self.highlight_regex = re.compile(r'([@!#]\w+)')
-        if config.config['expand_remote']:
-            self.title_regex = re.compile("\<title\>(.*)\<\/title\>")
         self.chosen_one = 0
 
         self.name = "Context"
@@ -495,7 +489,7 @@ class Context(Tab):
                         continue
                     req = urllib2.Request(attachment['url'])
                     page = urllib2.urlopen(req).read()
-                    notice['text'] = helpers.html_unescape_string(self.title_regex.findall(page)[0].decode(sys.getfilesystemencoding()))
+                    notice['text'] = helpers.html_unescape_string(helpers.title_regex.findall(page)[0].decode(sys.getfilesystemencoding()))
                     break
             temp_timeline.append(notice)
             if "retweeted_status" in temp_timeline[-1]:
@@ -583,7 +577,7 @@ class Context(Tab):
             try:
                 line = []
 
-                notice_parts = self.highlight_regex.split(n['text'])
+                notice_parts = helpers.entity_regex.split(n['text'])
                 wtf = False
                 for part in notice_parts:
                     part_list = list(part)

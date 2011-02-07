@@ -19,6 +19,8 @@ import time, datetime, htmlentitydefs, re
 DATETIME_FORMAT = "%a %b %d %H:%M:%S +0000 %Y"
 offset_regex = re.compile("[+-][0-9]{4}")
 base_url_regex = re.compile("(http(s|)://.+?)/.*")
+entity_regex = re.compile(r'([@!#]\w+)')
+title_regex = re.compile("\<title\>(.*)\<\/title\>")
 
 def time_since(datetime_then):
     if datetime_then > datetime.datetime.utcnow():
