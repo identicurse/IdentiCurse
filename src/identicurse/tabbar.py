@@ -24,7 +24,6 @@ class TabBar(object):
         self.current_tab = -1
 
     def update(self):
-        self.window.erase()
         tab_list = []
         total_length = 0
         for tab_num in xrange(len(self.tabs)):
@@ -39,6 +38,7 @@ class TabBar(object):
                 tab_list.append((self.tabs[tab_num], attr))
             total_length += (1 + len(self.tabs[tab_num]))
         maxx = self.window.getmaxyx()[1]
+        self.window.erase()
         if total_length >= (maxx - 1):  # if the full tab list would be wider than the available display area
             # TODO: handle this
             pass
