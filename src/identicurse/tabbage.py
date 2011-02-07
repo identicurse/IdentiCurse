@@ -298,7 +298,10 @@ class Timeline(Tab):
                             continue
                         req = urllib2.Request(attachment['url'])
                         page = urllib2.urlopen(req).read()
-                        notice['text'] = helpers.html_unescape_string(helpers.title_regex.findall(page)[0].decode(sys.getfilesystemencoding()))
+                        try:
+                            notice['text'] = helpers.html_unescape_string(helpers.title_regex.findall(page)[0].decode(sys.getfilesystemencoding()))
+                        except IndexError:  # no title could be found
+                            pass
                         break
                 temp_timeline.append(notice)
 
@@ -489,7 +492,10 @@ class Context(Tab):
                         continue
                     req = urllib2.Request(attachment['url'])
                     page = urllib2.urlopen(req).read()
-                    notice['text'] = helpers.html_unescape_string(helpers.title_regex.findall(page)[0].decode(sys.getfilesystemencoding()))
+                    try:
+                        notice['text'] = helpers.html_unescape_string(helpers.title_regex.findall(page)[0].decode(sys.getfilesystemencoding()))
+                    except IndexError:  # no title could be found
+                        pass
                     break
             temp_timeline.append(notice)
             if "retweeted_status" in temp_timeline[-1]:
