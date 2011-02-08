@@ -1342,9 +1342,6 @@ class IdentiCurse(object):
             self.tabs[self.current_tab].timeline.insert(0, update)
             self.tabs[self.current_tab].update_buffer()
             self.status_bar.update("Doing nothing.")
-        else:
-            self.tabs[self.current_tab].update()
-          
 
         self.entry_window.clear()
         self.text_entry = Textbox(self.entry_window, self.validate, insert_mode=True)
