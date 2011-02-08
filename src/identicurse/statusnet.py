@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import urllib, urllib2, helpers, config, time
+import urllib, urllib2, httplib, helpers, config, time
 try:
     import json
 except ImportError:

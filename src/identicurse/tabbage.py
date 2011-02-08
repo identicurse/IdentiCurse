@@ -89,8 +89,6 @@ class TabUpdater(threading.Thread):
                 tab.update()
             except StatusNetError, e:
                 config.session_store.update_error="Status.Net error %d in '%s': %s" % (e.errcode, tab.name, e.details)
-            except httplib.BadStatusLine, e:
-                config.session_store.update_error="HTTP error in '%s': bad status line" % (tab.name)
             if tab.active:
                 tab.display()  # update the display of the tab if it's the foreground one
 
