@@ -83,8 +83,12 @@ class TabUpdater(threading.Thread):
         self.callback_function = callback_function
 
     def run (self):
+        config.session_store.update_error=None
         for tab in self.tabs:
-            tab.update()
+            try:
+                tab.update()
+            except StatusNetError:
+                config.session_store.update_error="Status.Net error %d in '%s': %s" % (e.errcode, tab.name, e.details)
             if tab.active:
                 tab.display()  # update the display of the tab if it's the foreground one
 

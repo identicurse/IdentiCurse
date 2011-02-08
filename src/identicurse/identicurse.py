@@ -576,6 +576,8 @@ class IdentiCurse(object):
 
     def end_update_tabs(self):
         self.display_current_tab()
+        if config.session_store.update_error is not None:
+            self.status_bar.timed_update(config.session_store.update_error)
         self.status_bar.update("Doing nothing.")
         self.tab_bar.tabs = [tab.name for tab in self.tabs]
         self.tab_bar.current_tab = self.current_tab
