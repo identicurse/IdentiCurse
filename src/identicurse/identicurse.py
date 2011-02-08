@@ -732,22 +732,27 @@ class IdentiCurse(object):
                     self.status_bar.timed_update("Status.Net error %d: %s" % (e.errcode, e.details))
                 self.status_bar.update("Doing Nothing.")
             elif input == ord("e") or input in [ord(key) for key in config.config['keys']['crepeat']]:
-                self.status_bar.update("Repeating Notice...")
-                if "retweeted_status" in self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]:
-                    id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['retweeted_status']['id']
+                if not hasattr(self.tabs[self.current_tab], "timeline_type"):
+                    pass
+                elif self.tabs[self.current_tab].timeline_type in ["direct", "sentdirect"]:
+                    pass
                 else:
-                    id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['id']
-                try:
-                    update = self.conn.statuses_retweet(id, source="IdentiCurse")
-                    if isinstance(update, list):
-                        for notice in update:
-                            self.tabs[self.current_tab].timeline.insert(0, notice)
+                    self.status_bar.update("Repeating Notice...")
+                    if "retweeted_status" in self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]:
+                        id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['retweeted_status']['id']
                     else:
-                        self.tabs[self.current_tab].timeline.insert(0, update)
-                    self.tabs[self.current_tab].update_buffer()
-                except StatusNetError, e:
-                    self.status_bar.timed_update("Status.Net error %d: %s" % (e.errcode, e.details))
-                self.status_bar.update("Doing Nothing.")
+                        id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['id']
+                    try:
+                        update = self.conn.statuses_retweet(id, source="IdentiCurse")
+                        if isinstance(update, list):
+                            for notice in update:
+                                self.tabs[self.current_tab].timeline.insert(0, notice)
+                        else:
+                            self.tabs[self.current_tab].timeline.insert(0, update)
+                        self.tabs[self.current_tab].update_buffer()
+                    except StatusNetError, e:
+                        self.status_bar.timed_update("Status.Net error %d: %s" % (e.errcode, e.details))
+                    self.status_bar.update("Doing Nothing.")
             elif input == ord("c") or input in [ord(key) for key in config.config['keys']['ccontext']]:
                 self.status_bar.update("Loading Context...")
                 if "retweeted_status" in self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]:
