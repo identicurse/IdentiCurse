@@ -202,7 +202,8 @@ class IdentiCurse(object):
             "/link",
             "/bugreport",
             "/featurerequest",
-            "/quote"
+            "/quote",
+            "/quit",
         ]
         
         # Set some defaults for configs that we will always need to use, but that are optional
@@ -610,9 +611,9 @@ class IdentiCurse(object):
             self.display_current_tab()
 
     def loop(self):
-        running = True
+        self.running = True
 
-        while running:
+        while self.running:
             input = self.main_window.getch()
            
             if self.qreply == False:
@@ -691,7 +692,7 @@ class IdentiCurse(object):
                 self.search_mode = True
                 self.parse_search(self.text_entry.edit())
             elif input == ord("q") or input in [ord(key) for key in config.config['keys']['quit']]:
-                running = False
+                self.running = False
             elif input == ord("x") or input in [ord(key) for key in config.config['keys']['closetab']]:
                 self.close_current_tab()
             elif input == ord("h") or input in [ord(key) for key in config.config['keys']['help']]:
@@ -1322,6 +1323,9 @@ class IdentiCurse(object):
                         if len(status) > 0:
                             self.status_bar.update("Posting Notice...")
                             update = self.conn.statuses_update(status, "IdentiCurse", original_id, long_dent=config.config['long_dent'])
+
+                    elif tokens[0] == "/quit" and len(tokens) == 1:
+                        self.running = False
    
                 except StatusNetError, e:
                     self.status_bar.timed_update("Status.Net error %d: %s" % (e.errcode, e.details))
