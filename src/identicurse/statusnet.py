@@ -110,13 +110,16 @@ class StatusNet(object):
                 urllib.quote(request.get_method(), safe='~'),
                 urllib.quote(request.get_full_url(), safe='~'),
                 ]
+
+        # make a local copy, otherwise it pollutes future GET requests
+        local_raw_params = dict(raw_params)
         
         for key, value in oauth_params.iteritems():
-            raw_params[key] = value
+            local_raw_params[key] = value
 
         params = ""
-        for key in sorted(raw_params.keys()):
-            params += "&%s=%s" % (urllib.quote(key, safe='~'), urllib.quote(str(raw_params[key]), safe='~'))
+        for key in sorted(local_raw_params.keys()):
+            params += "&%s=%s" % (urllib.quote(key, safe='~'), urllib.quote(str(local_raw_params[key]), safe='~'))
         raw_signature_data.append(urllib.quote(params[1:], safe='~'))
 
         signature_key = "%s&" % urllib.quote(oauth_tokens["consumer_secret"], safe='~')
@@ -142,7 +145,7 @@ class StatusNet(object):
         if not resource_path in ["oauth/request_token", "oauth/access_token"]:
             resource_path = "%s.json" % (resource_path)
 
-        if len(params) > 0:
+        if len(raw_params) > 0:
             request = urllib2.Request("%s/%s" % (self.api_path, resource_path), params)
         else:
             request = urllib2.Request("%s/%s" % (self.api_path, resource_path))
