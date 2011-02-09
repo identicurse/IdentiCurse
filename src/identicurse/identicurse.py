@@ -1059,6 +1059,7 @@ class IdentiCurse(object):
                         self.current_tab = len(self.tabs) - 1
                         self.tabs[self.current_tab].active = True
                         self.tab_order.insert(0, self.current_tab)
+                        self.tabs[self.current_tab].update()
     
                     elif tokens[0] == "/subscribe" and len(tokens) == 2:
                         self.status_bar.update("Subscribing...")
