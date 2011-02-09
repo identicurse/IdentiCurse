@@ -318,8 +318,7 @@ class StatusNet(object):
 ######## Status resources ########
     
     def statuses_show(self, id):
-        params = {'id':id}
-        return self.__makerequest("statuses/show", params)
+        return self.__makerequest("statuses/show/%s" % str(id))
 
     def statuses_update(self, status, source="", in_reply_to_status_id=0, latitude=-200, longitude=-200, place_id="", display_coordinates=False, long_dent="split", dup_first_word=False):
         status = "".join([s.strip(" ") for s in status.split("\n")])  # rejoin split lines back to 1 line
