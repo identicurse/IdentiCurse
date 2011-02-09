@@ -1190,7 +1190,7 @@ class IdentiCurse(object):
                     elif tokens[0] == "/search" and len(tokens) >= 2:
                         self.status_bar.update("Searching...")
                         query = " ".join(tokens[1:])
-                        self.tabs.append(Timeline(self.conn, self.notice_window, "search"))
+                        self.tabs.append(Timeline(self.conn, self.notice_window, "search", type_params={'query':query}))
                         self.tabs[self.current_tab].active = False
                         self.current_tab = len(self.tabs) - 1
                         self.tabs[self.current_tab].active = True
