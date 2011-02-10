@@ -15,12 +15,14 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import time, datetime, htmlentitydefs, re
+import time, datetime, htmlentitydefs, re, urllib, urllib2
 DATETIME_FORMAT = "%a %b %d %H:%M:%S +0000 %Y"
 offset_regex = re.compile("[+-][0-9]{4}")
 base_url_regex = re.compile("(http(s|)://.+?)/.*")
 entity_regex = re.compile(r'([@!#]\w+)')
 title_regex = re.compile("\<title\>(.*)\<\/title\>")
+ur1_regex = re.compile("Your ur1 is: <a.+?>(http://ur1\.ca/[0-9A-Za-z]+)")
+url_regex = re.compile("http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+")
 
 def time_since(datetime_then):
     if datetime_then > datetime.datetime.utcnow():
@@ -171,3 +173,12 @@ def find_longest_common_start(words):
         last_match = match_string
     return last_match
 
+def ur1ca_shorten(longurl):
+    request = urllib2.Request("http://ur1.ca/", urllib.urlencode({'longurl':longurl}))
+    response = urllib2.urlopen(request)
+    page = response.read()
+    results = ur1_regex.findall(page)
+    if len(results) > 0:
+        return results[0]
+    else:  # something went wrong, return the original url
+        return longurl

@@ -308,8 +308,6 @@ class IdentiCurse(object):
         for k in empty_default_keys:
             config.config['keys'][k] = []
         
-        self.url_regex = re.compile("http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+")
-
         try:
             if config.config["use_oauth"]:
                 instance = domain_regex.findall(config.config['api_path'])[0][2]
@@ -1279,18 +1277,18 @@ class IdentiCurse(object):
                         if tokens[1] == "*":
                             self.status_bar.update("Opening links...")
                             if "retweeted_status" in self.tabs[self.current_tab].timeline[dent_index]:
-                                for target_url in self.url_regex.findall(self.tabs[self.current_tab].timeline[dent_index]['retweeted_status']['text']):
+                                for target_url in helpers.url_regex.findall(self.tabs[self.current_tab].timeline[dent_index]['retweeted_status']['text']):
                                     subprocess.Popen(config.config['browser'] % (target_url), shell=True, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
                             else:
-                                for target_url in self.url_regex.findall(self.tabs[self.current_tab].timeline[dent_index]['text']):
+                                for target_url in helpers.url_regex.findall(self.tabs[self.current_tab].timeline[dent_index]['text']):
                                     subprocess.Popen(config.config['browser'] % (target_url), shell=True, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
                         else:
                             self.status_bar.update("Opening link...")
                             link_index = int(tokens[1]) - 1
                             if "retweeted_status" in self.tabs[self.current_tab].timeline[dent_index]:
-                                target_url = self.url_regex.findall(self.tabs[self.current_tab].timeline[dent_index]['retweeted_status']['text'])[link_index]
+                                target_url = helpers.url_regex.findall(self.tabs[self.current_tab].timeline[dent_index]['retweeted_status']['text'])[link_index]
                             else:
-                                target_url = self.url_regex.findall(self.tabs[self.current_tab].timeline[dent_index]['text'])[link_index]
+                                target_url = helpers.url_regex.findall(self.tabs[self.current_tab].timeline[dent_index]['text'])[link_index]
                             subprocess.Popen(config.config['browser'] % (target_url), shell=True, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
 
                     elif tokens[0] == "/bugreport" and len(tokens) >= 2:
