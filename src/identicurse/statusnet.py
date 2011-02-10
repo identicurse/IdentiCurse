@@ -42,11 +42,14 @@ class StatusNet(object):
         self.length_limit = int(self.server_config["site"]["textlimit"]) # this will be 0 on unlimited instances
         self.tz = self.server_config["site"]["timezone"]
     
-    def __makerequest(self, resource_path, raw_params={}):
+    def __makerequest(self, resource_path, raw_params={}, force_get=False):
         params = urllib.urlencode(raw_params)
         
-        if len(params) > 0:
-            request = urllib2.Request("%s/%s.json" % (self.api_path, resource_path), params)
+        if len(raw_params) > 0:
+            if force_get:
+                request = urllib2.Request("%s/%s.json?%s" % (self.api_path, resource_path, params))
+            else:
+                request = urllib2.Request("%s/%s.json" % (self.api_path, resource_path), params)
         else:
             request = urllib2.Request("%s/%s.json" % (self.api_path, resource_path))
         if self.auth_string is not None:
@@ -142,7 +145,7 @@ class StatusNet(object):
             params['page'] = page
         if include_rts:
             params['include_rts'] = "true"
-        return self.__makerequest("statuses/user_timeline", params)
+        return self.__makerequest("statuses/user_timeline", params, force_get=True)
 
 ### StatusNet does not implement this method yet
 #    def statuses_retweeted_by_me(self, since_id=0, max_id=0, count=0, page=0):
