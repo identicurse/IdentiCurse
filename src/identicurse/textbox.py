@@ -61,7 +61,14 @@ class Textbox(textpad.Textbox):
                         break
                 self.win.move(cursor_position[0], cursor_position[1])
                 guess_source = None
-                if last_word[0] == "@" and hasattr(config.session_store, "user_cache"):
+                if helpers.url_regex.match(last_word):  # this is a URL, shorten it
+                    shorturl = helpers.ur1ca_shorten(last_word)
+                    for n in xrange(len(last_word)):
+                        self.win.move(self.win.getyx()[0], self.win.getyx()[1]-1)
+                        self.win.delch()
+                    for char in shorturl:
+                        self.do_command(ord(char))
+                elif last_word[0] == "@" and hasattr(config.session_store, "user_cache"):
                     last_word = last_word[1:]
                     guess_source = getattr(config.session_store, "user_cache")
                 elif last_word[0] == "!" and hasattr(config.session_store, "group_cache"):
