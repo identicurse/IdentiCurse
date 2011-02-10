@@ -108,7 +108,7 @@ class StatusNet(object):
 
         raw_signature_data = [
                 urllib.quote(request.get_method(), safe='~'),
-                urllib.quote(request.get_full_url(), safe='~'),
+                urllib.quote(request.get_full_url().split("?")[0], safe='~'),
                 ]
 
         # make a local copy, otherwise it pollutes future GET requests
@@ -139,14 +139,17 @@ class StatusNet(object):
         
         request.add_header("Authorization", "OAuth %s" % (", ".join(["%s=%s" % (urllib.quote(key, safe='~'), urllib.quote(value, safe='~')) for key, value in oauth_params.iteritems()])))
         
-    def __makerequest(self, resource_path, raw_params={}):
+    def __makerequest(self, resource_path, raw_params={}, force_get=False):
         params = urllib.urlencode(raw_params)
         
         if not resource_path in ["oauth/request_token", "oauth/access_token"]:
             resource_path = "%s.json" % (resource_path)
 
         if len(raw_params) > 0:
-            request = urllib2.Request("%s/%s" % (self.api_path, resource_path), params)
+            if force_get:
+                request = urllib2.Request("%s/%s?%s" % (self.api_path, resource_path, params))
+            else:
+                request = urllib2.Request("%s/%s" % (self.api_path, resource_path), params)
         else:
             request = urllib2.Request("%s/%s" % (self.api_path, resource_path))
         if self.auth_type == "basic":
@@ -277,7 +280,7 @@ class StatusNet(object):
             params['page'] = page
         if include_rts:
             params['include_rts'] = "true"
-        return self.__makerequest("statuses/user_timeline", params)
+        return self.__makerequest("statuses/user_timeline", params, force_get=True)
 
 ### StatusNet does not implement this method yet
 #    def statuses_retweeted_by_me(self, since_id=0, max_id=0, count=0, page=0):
