@@ -205,6 +205,9 @@ class IdentiCurse(object):
             "/quote",
             "/quit",
         ]
+
+        # load all known commands and aliases into the command list
+        config.session_store.commands = [command[1:] for command in self.known_commands] + [alias[1:] for alias in config.config["aliases"]]
         
         # Set some defaults for configs that we will always need to use, but that are optional
         if not "enable_colours" in config.config:

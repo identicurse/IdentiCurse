@@ -77,6 +77,9 @@ class Textbox(textpad.Textbox):
                 elif last_word[0] == "#" and hasattr(config.session_store, "tag_cache"):
                     last_word = last_word[1:]
                     guess_source = getattr(config.session_store, "tag_cache")
+                elif last_word[0] == "/" and hasattr(config.session_store, "commands"):
+                    last_word = last_word[1:]
+                    guess_source = getattr(config.session_store, "commands")
                 elif hasattr(config.session_store, "user_cache"):  # if no special char, assume username
                     guess_source = getattr(config.session_store, "user_cache")
                 if guess_source is not None:
