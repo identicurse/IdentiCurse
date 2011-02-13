@@ -508,7 +508,7 @@ class IdentiCurse(object):
         self.tabs = []
         for tabspec in config.config['initial_tabs'].split("|"):
             tab = tabspec.split(':')
-            if tab[0] in ("home", "mentions", "direct", "public", "sentdirect"):
+            if tab[0] in ("home", "mentions", "direct", "public", "sentdirect", "favourites"):
                 already_have_one = False
                 for tab_obj in self.tabs:  # awkward name, but we already have a tab variable
                     if hasattr(tab_obj, 'timeline_type'):
