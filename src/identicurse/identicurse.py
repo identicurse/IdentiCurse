@@ -322,7 +322,7 @@ class IdentiCurse(object):
                     resp = urllib2.urlopen(req)
                     api_keys = json.loads(resp.read())
                     if not instance in api_keys['keys']:
-                        sys.exit("Sorry, IdentiCurse currently lacks the API keys needed to support OAuth with your instance (%(instance)s). If %(instance)s is a public instance, let us know which one it is, and we'll add support as soon as possible." % (locals()))
+                        sys.exit("Sorry, IdentiCurse currently lacks the API keys needed to support OAuth with your instance (%(instance)s). If %(instance)s is a public instance, let us know which one it is (filing a bug at http://bugzilla.identicurse.net/ is the preferred way of doing so), and we'll add support as soon as possible." % (locals()))
                     else:
                         self.conn = StatusNet(config.config['api_path'], auth_type="oauth", consumer_key=api_keys['keys'][instance], consumer_secret=api_keys['secrets'][instance])
                         config.config["consumer_key"] = api_keys['keys'][instance]
