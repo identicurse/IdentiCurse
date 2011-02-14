@@ -939,7 +939,7 @@ class IdentiCurse(object):
                         id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['id']
                         try:
                             self.conn.statuses_destroy(id)
-                        except statusnet.StatusNetError, e:
+                        except StatusNetError, e:
                             if e.errcode == 403:  # user doesn't own the original status, so is probably trying to delete the repeat
                                 self.conn.statuses_destroy(repeat_id)
                             else:  # it wasn't a 403, so re-raise
