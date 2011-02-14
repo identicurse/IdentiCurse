@@ -62,7 +62,11 @@ class Buffer(list):
             line.reverse()  # reverse the line so we can use it as a stack
             while len(line) > 0:
                 block = line.pop()
-                if (len(block[0]) + line_length) > width:
+                try:  # attempt to consider possibly different unicode length vs. ascii length
+                    block_len = len(block[0].encode(sys.getfilesystemencoding()))
+                except:
+                    block_len = len(block)
+                if (block_len + line_length) > width:
                     split_point = helpers.find_split_point(block[0], width - line_length)
                     reflowed_buffer[-1].append((block[0][:split_point], block[1]))  # add the first half of the block as usual
                     reflowed_buffer.append([])
@@ -70,7 +74,7 @@ class Buffer(list):
                     line_length = 0
                 else:
                     reflowed_buffer[-1].append(block)
-                    line_length += len(block[0])
+                    line_length += block_len
 
         return reflowed_buffer
 
