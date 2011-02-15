@@ -211,7 +211,8 @@ class Tab(object):
                     self.window.addstr(part, curses.color_pair(attr))
             if line_num == self.search_highlight_line:
                 self.window.addstr(" "*remaining_line_length, curses.color_pair(identicurse.colour_fields['search_highlight']))
-            self.window.addstr("\n")
+            if line_num <= (maxy - 3 + self.start_line):
+                self.window.addstr("\n")
             line_num += 1
         self.window.refresh()
 
