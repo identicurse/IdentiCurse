@@ -54,6 +54,7 @@ PRESET_SLOGANS = [
     "because some vpn won't run with the cool friends",
     "Making \"git pull\" fun again, since 2010.",
     "like a compact disc to the head!",
+    "along with his mechanical ass-kicking leg.",
     ]
 
 def main():
