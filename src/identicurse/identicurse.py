@@ -883,6 +883,7 @@ class IdentiCurse(object):
 
     def parse_input(self, input):
         update = False
+        new_tab = False
 
         if input is None:
             input = ""
@@ -1010,6 +1011,7 @@ class IdentiCurse(object):
                             else:
                                 user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
     
+                        new_tab = True
                         self.tabs.append(Profile(self.conn, self.notice_window,user))
                         self.tabs[self.current_tab].active = False
                         self.current_tab = len(self.tabs) - 1
@@ -1096,6 +1098,7 @@ class IdentiCurse(object):
                                 user = self.tabs[self.current_tab].timeline[int(token) - 1]["user"]["screen_name"]
                                 id = self.tabs[self.current_tab].timeline[int(token) - 1]['user']['id']
                         
+                        new_tab = True
                         self.tabs.append(Timeline(self.conn, self.notice_window, "user", {'user_id':id, 'screen_name':user}))
                         self.tabs[self.current_tab].active = False
                         self.current_tab = len(self.tabs) - 1
@@ -1109,6 +1112,7 @@ class IdentiCurse(object):
                         else:
                             id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["id"]
     
+                        new_tab = True
                         self.tabs.append(Context(self.conn, self.notice_window, id))
                         self.tabs[self.current_tab].active = False
                         self.current_tab = len(self.tabs) - 1
@@ -1163,6 +1167,7 @@ class IdentiCurse(object):
                             group = group[1:]
                         id = int(self.conn.statusnet_groups_show(nickname=group)['id'])
     
+                        new_tab = True
                         self.tabs.append(Timeline(self.conn, self.notice_window, "group", {'group_id':id, 'nickname':group}))
                         self.tabs[self.current_tab].active = False
                         self.current_tab = len(self.tabs) - 1
@@ -1206,6 +1211,7 @@ class IdentiCurse(object):
                         if tag[0] == "#":
                             tag = tag[1:]
     
+                        new_tab = True
                         self.tabs.append(Timeline(self.conn, self.notice_window, "tag", {'tag':tag}))
                         self.tabs[self.current_tab].active = False
                         self.current_tab = len(self.tabs) - 1
@@ -1221,6 +1227,7 @@ class IdentiCurse(object):
                                     break
                         if not already_have_one:
                             self.status_bar.update("Loading Sent Directs...")
+                            new_tab = True
                             self.tabs.append(Timeline(self.conn, self.notice_window, "sentdirect"))
                             self.tabs[self.current_tab].active = False
                             self.current_tab = len(self.tabs) - 1
@@ -1236,6 +1243,7 @@ class IdentiCurse(object):
                                     break
                         if not already_have_one:
                             self.status_bar.update("Loading Favourites...")
+                            new_tab = True
                             self.tabs.append(Timeline(self.conn, self.notice_window, "favourites"))
                             self.tabs[self.current_tab].active = False
                             self.current_tab = len(self.tabs) - 1
@@ -1245,6 +1253,7 @@ class IdentiCurse(object):
                     elif tokens[0] == "/search" and len(tokens) >= 2:
                         self.status_bar.update("Searching...")
                         query = " ".join(tokens[1:])
+                        new_tab = True
                         self.tabs.append(Timeline(self.conn, self.notice_window, "search", type_params={'query':query}))
                         self.tabs[self.current_tab].active = False
                         self.current_tab = len(self.tabs) - 1
@@ -1259,6 +1268,7 @@ class IdentiCurse(object):
                                     already_have_one = True
                                     break
                         if not already_have_one:
+                            new_tab = True
                             self.tabs.append(Timeline(self.conn, self.notice_window, "home"))
                             self.tabs[self.current_tab].active = False
                             self.current_tab = len(self.tabs) - 1
@@ -1273,6 +1283,7 @@ class IdentiCurse(object):
                                     already_have_one = True
                                     break
                         if not already_have_one:
+                            new_tab = True
                             self.tabs.append(Timeline(self.conn, self.notice_window, "mentions"))
                             self.tabs[self.current_tab].active = False
                             self.current_tab = len(self.tabs) - 1
@@ -1287,6 +1298,7 @@ class IdentiCurse(object):
                                     already_have_one = True
                                     break
                         if not already_have_one:
+                            new_tab = True
                             self.tabs.append(Timeline(self.conn, self.notice_window, "direct"))
                             self.tabs[self.current_tab].active = False
                             self.current_tab = len(self.tabs) - 1
@@ -1301,6 +1313,7 @@ class IdentiCurse(object):
                                     already_have_one = True
                                     break
                         if not already_have_one:
+                            new_tab = True
                             self.tabs.append(Timeline(self.conn, self.notice_window, "public"))
                             self.tabs[self.current_tab].active = False
                             self.current_tab = len(self.tabs) - 1
@@ -1390,24 +1403,25 @@ class IdentiCurse(object):
                 except Exception, (errmsg):
                     self.status_bar.timed_update("ERROR: Couldn't post status: %s" % (errmsg))
 
-            if update != False:
-                if self.tabs[self.current_tab].name == "Context":  # if we're in a context tab, add notice to there too
-                    self.tabs[self.current_tab].timeline.insert(0, update)
-                    self.tabs[self.current_tab].update_buffer()
-                for tab in self.tabs:
-                    if not hasattr(tab, 'timeline_type'):
-                        continue
-                    if tab.timeline_type == "home":
-                        if isinstance(update, list):
-                            for notice in update:
-                                tab.timeline.insert(0, notice)
-                        else:
-                            tab.timeline.insert(0, update)
-                        tab.update_buffer()
-                self.status_bar.update("Doing nothing.")
-            else:
-                self.tabs[self.current_tab].update()
-                self.status_bar.update("Doing nothing.")
+            if not new_tab:  # don't refresh just to open new tabs
+                if update != False:
+                    if self.tabs[self.current_tab].name == "Context":  # if we're in a context tab, add notice to there too
+                        self.tabs[self.current_tab].timeline.insert(0, update)
+                        self.tabs[self.current_tab].update_buffer()
+                    for tab in self.tabs:
+                        if not hasattr(tab, 'timeline_type'):
+                            continue
+                        if tab.timeline_type == "home":
+                            if isinstance(update, list):
+                                for notice in update:
+                                    tab.timeline.insert(0, notice)
+                            else:
+                                tab.timeline.insert(0, update)
+                            tab.update_buffer()
+                    self.status_bar.update("Doing nothing.")
+                else:
+                    self.tabs[self.current_tab].update()
+                    self.status_bar.update("Doing nothing.")
 
         self.entry_window.clear()
         self.text_entry = Textbox(self.entry_window, self.validate, insert_mode=True)
