@@ -306,7 +306,7 @@ class IdentiCurse(object):
         empty_default_keys = ("firstpage", "newerpage", "olderpage", "refresh",
             "input", "commandinput", "search", "quit", "closetab", "help", "nexttab", "prevtab",
             "qreply", "creply", "cfav", "ccontext", "crepeat", "cnext", "cprev",
-            "cfirst", "nextmatch", "prevmatch")
+            "cfirst", "nextmatch", "prevmatch", "creplymode")
 
         for k in empty_default_keys:
             config.config['keys'][k] = []
@@ -718,6 +718,37 @@ class IdentiCurse(object):
                 self.update_timer.cancel()
                 self.insert_mode = True
                 self.parse_input(self.text_entry.edit("/r " + str(self.tabs[self.current_tab].chosen_one + 1) + " "))
+            elif input == ord("D") or input in [ord(key) for key in config.config['keys']['creplymode']]:
+                self.update_timer.cancel()
+                self.reply_mode = True
+                n = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]
+                user = n['user']['screen_name']
+                id = n ['id']
+                status = self.text_entry.edit("@" + user + " ")
+                self.reply_mode = False
+                update = False
+                try:
+                    update = self.conn.statuses_update(status, "IdentiCurse", int(id), long_dent=config.config['long_dent'], dup_first_word=True)
+                except Exception, (errmsg):
+                    self.status_bar.timed_update("ERROR: Couldn't post status: %s" % (errmsg))
+                if update != False:
+                    if self.tabs[self.current_tab].name == "Context":  # if we're in a context tab, add notice to there too
+                        self.tabs[self.current_tab].timeline.insert(0, update)
+                        self.tabs[self.current_tab].update_buffer()
+                    for tab in self.tabs:
+                        if not hasattr(tab, 'timeline_type'):
+                            continue
+                        if tab.timeline_type == "home":
+                            if isinstance(update, list):
+                                for notice in update:
+                                    tab.timeline.insert(0, notice)
+                            else:
+                                tab.timeline.insert(0, update)
+                            tab.update_buffer()
+                    self.status_bar.update("Doing nothing.")
+                else:
+                    self.tabs[self.current_tab].update()
+                    self.status_bar.update("Doing nothing.")
             elif input == ord("s") or input in [ord(key) for key in config.config['keys']['cnext']]:
                 if self.tabs[self.current_tab].chosen_one != (len(self.tabs[self.current_tab].timeline) - 1):
                     self.tabs[self.current_tab].chosen_one += 1
@@ -1359,24 +1390,23 @@ class IdentiCurse(object):
                 except Exception, (errmsg):
                     self.status_bar.timed_update("ERROR: Couldn't post status: %s" % (errmsg))
 
-            if hasattr(self.tabs[self.current_tab], 'timeline_type'):
-                if update != False:
-                    for tab in self.tabs:
-                        if not hasattr(tab, 'timeline_type'):
-                            continue
-                        if tab.timeline_type == "home":
-                            if isinstance(update, list):
-                                for notice in update:
-                                    tab.timeline.insert(0, notice)
-                            else:
-                                tab.timeline.insert(0, update)
-                            tab.update_buffer()
-                    self.status_bar.update("Doing nothing.")
-                else:
-                    self.tabs[self.current_tab].update()
-            elif update != False and self.tabs[self.current_tab].name == "Context":
-                self.tabs[self.current_tab].timeline.insert(0, update)
-                self.tabs[self.current_tab].update_buffer()
+            if update != False:
+                if self.tabs[self.current_tab].name == "Context":  # if we're in a context tab, add notice to there too
+                    self.tabs[self.current_tab].timeline.insert(0, update)
+                    self.tabs[self.current_tab].update_buffer()
+                for tab in self.tabs:
+                    if not hasattr(tab, 'timeline_type'):
+                        continue
+                    if tab.timeline_type == "home":
+                        if isinstance(update, list):
+                            for notice in update:
+                                tab.timeline.insert(0, notice)
+                        else:
+                            tab.timeline.insert(0, update)
+                        tab.update_buffer()
+                self.status_bar.update("Doing nothing.")
+            else:
+                self.tabs[self.current_tab].update()
                 self.status_bar.update("Doing nothing.")
 
         self.entry_window.clear()
