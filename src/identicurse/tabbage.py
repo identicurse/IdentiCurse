@@ -90,6 +90,7 @@ class TabUpdater(threading.Thread):
         config.session_store.update_error=None
         for tab in self.tabs:
             try:
+                self.callback_object.status_bar.update("Updating '%s'..." % (tab.name))
                 tab.update()
             except StatusNetError, e:
                 config.session_store.update_error="Status.Net error %d in '%s': %s" % (e.errcode, tab.name, e.details)
@@ -211,7 +212,8 @@ class Tab(object):
                     self.window.addstr(part, curses.color_pair(attr))
             if line_num == self.search_highlight_line:
                 self.window.addstr(" "*remaining_line_length, curses.color_pair(identicurse.colour_fields['search_highlight']))
-            self.window.addstr("\n")
+            if line_num <= (maxy - 3 + self.start_line):
+                self.window.addstr("\n")
             line_num += 1
         self.window.refresh()
 

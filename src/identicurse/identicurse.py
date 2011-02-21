@@ -508,6 +508,14 @@ class IdentiCurse(object):
         
         self.tabs = []
         for tabspec in config.config['initial_tabs'].split("|"):
+            if tabspec[0] == "@":
+                tabspec = "user:" + tabspec[1:]
+            elif tabspec[0] == "!":
+                tabspec = "group:" + tabspec[1:]
+            elif tabspec[0] == "#":
+                tabspec = "tag:" + tabspec[1:]
+            elif tabspec[0] == "?":
+                tabspec = "search:" + tabspec[1:]
             tab = tabspec.split(':')
             if tab[0] in ("home", "mentions", "direct", "public", "sentdirect", "favourites"):
                 already_have_one = False
