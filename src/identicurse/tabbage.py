@@ -90,6 +90,7 @@ class TabUpdater(threading.Thread):
         config.session_store.update_error=None
         for tab in self.tabs:
             try:
+                self.callback_object.status_bar.update("Updating '%s'..." % (tab.name))
                 tab.update()
             except StatusNetError, e:
                 config.session_store.update_error="Status.Net error %d in '%s': %s" % (e.errcode, tab.name, e.details)
