@@ -350,6 +350,7 @@ class IdentiCurse(object):
         self.insert_mode = False
         self.search_mode = False
         self.quote_mode = False
+        self.reply_mode = False
         curses.wrapper(self.initialise)
 
     def redraw(self):
@@ -825,6 +826,11 @@ class IdentiCurse(object):
                     self.status_bar.update("Quote Mode: " + str(character_count))
                 else:
                     self.status_bar.update("Quote Mode: " + str(self.conn.length_limit - character_count))
+            elif self.reply_mode:
+                if self.conn.length_limit == 0:
+                    self.status_bar.update("Reply Mode: " + str(character_count))
+                else:
+                    self.status_bar.update("Reply Mode: " + str(self.conn.length_limit - character_count))
             elif self.search_mode:
                 if self.last_page_search['query'] != "":
                     self.status_bar.update("In-page Search (last search: '%s')" % (self.last_page_search['query']))
@@ -871,7 +877,7 @@ class IdentiCurse(object):
             if tokens[0] in self.known_commands:
                 
                 try:
-                    if tokens[0] == "/reply" and len(tokens) >= 3:
+                    if tokens[0] == "/reply" and len(tokens) >= 2:
                         self.status_bar.update("Posting Reply...")
     
                         try:
@@ -888,7 +894,12 @@ class IdentiCurse(object):
                             else:
                                 user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
                                 id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['id']
-                        status = "@" + user + " " + " ".join(tokens[2:])
+                        if len(tokens) > 2:
+                            status = "@" + user + " " + " ".join(tokens[2:])
+                        else:
+                            self.reply_mode = True
+                            status = self.text_entry.edit("@" + user + " ")
+                            self.reply_mode = False
     
                         try:
                             update = self.conn.statuses_update(status, "IdentiCurse", int(id), long_dent=config.config['long_dent'], dup_first_word=True)
