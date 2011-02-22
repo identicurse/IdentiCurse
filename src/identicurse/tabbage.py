@@ -313,7 +313,7 @@ class Timeline(Tab):
                         try:
                             page = urllib2.urlopen(req).read()
                             try:
-                                notice['text'] = helpers.html_unescape_string(helpers.title_regex.findall(page)[0].decode(sys.getfilesystemencoding()))
+                                notice['text'] = helpers.html_unescape_string(helpers.title_regex.findall(page)[0].decode("utf-8"))
                             except IndexError:  # no title could be found
                                 pass
                         except:  # link was broken
@@ -507,10 +507,13 @@ class Context(Tab):
                     if attachment['mimetype'] != "text/html":
                         continue
                     req = urllib2.Request(attachment['url'])
-                    page = urllib2.urlopen(req).read()
                     try:
-                        notice['text'] = helpers.html_unescape_string(helpers.title_regex.findall(page)[0].decode(sys.getfilesystemencoding()))
-                    except IndexError:  # no title could be found
+                        page = urllib2.urlopen(req).read()
+                        try:
+                            notice['text'] = helpers.html_unescape_string(helpers.title_regex.findall(page)[0].decode("utf-8"))
+                        except IndexError:  # no title could be found
+                            pass
+                    except:
                         pass
                     break
             temp_timeline.append(notice)
