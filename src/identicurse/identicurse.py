@@ -54,6 +54,7 @@ colour_fields = {
     "tabbar": 16,
     "tabbar_active": 17,
     "notice_link": 18,
+    "warning": 19,
 }
 
 colours = {
@@ -232,6 +233,7 @@ class IdentiCurse(object):
                 "profile_values": ("none", "none"),
                 "search_highlight": ("white", "blue"),
                 "notice_link": ("green", "none"),
+                "warning": ("black", "red"),
                 "none": ("none", "none")
             }
 

@@ -313,7 +313,7 @@ class Timeline(Tab):
                         try:
                             page = urllib2.urlopen(req).read()
                             try:
-                                notice['text'] = helpers.html_unescape_string(helpers.title_regex.findall(page)[0].decode("utf-8"))
+                                notice['text'] = helpers.html_unescape_string(helpers.title_regex.findall(page)[0])
                             except IndexError:  # no title could be found
                                 pass
                         except:  # link was broken
@@ -454,7 +454,7 @@ class Timeline(Tab):
                 self.buffer.append(line)
 
             except UnicodeDecodeError:
-                self.buffer.append([("Caution: Terminal too shit to display this notice.", identicurse.colour_fields["none"])])
+                self.buffer.append([("Caution: Terminal too shit to display this notice.", identicurse.colour_fields["warning"])])
 
             if not config.config['compact_notices']:
                 line = []
@@ -510,7 +510,7 @@ class Context(Tab):
                     try:
                         page = urllib2.urlopen(req).read()
                         try:
-                            notice['text'] = helpers.html_unescape_string(helpers.title_regex.findall(page)[0].decode("utf-8"))
+                            notice['text'] = helpers.html_unescape_string(helpers.title_regex.findall(page)[0])
                         except IndexError:  # no title could be found
                             pass
                     except:
@@ -636,7 +636,7 @@ class Context(Tab):
                 self.buffer.append(line)
 
             except UnicodeDecodeError:
-                self.buffer.append([("Caution: Terminal too shit to display this notice.", identicurse.colour_fields["none"])])
+                self.buffer.append([("Caution: Terminal too shit to display this notice.", identicurse.colour_fields["warning"])])
 
             if not config.config['compact_notices']:
                 line = []
