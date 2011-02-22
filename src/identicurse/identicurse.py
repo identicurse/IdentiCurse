@@ -306,7 +306,7 @@ class IdentiCurse(object):
         empty_default_keys = ("firstpage", "newerpage", "olderpage", "refresh",
             "input", "commandinput", "search", "quit", "closetab", "help", "nexttab", "prevtab",
             "qreply", "creply", "cfav", "ccontext", "crepeat", "cnext", "cprev",
-            "cfirst", "nextmatch", "prevmatch", "creplymode")
+            "cfirst", "nextmatch", "prevmatch", "creplymode", "cquote")
 
         for k in empty_default_keys:
             config.config['keys'][k] = []
@@ -800,6 +800,49 @@ class IdentiCurse(object):
                         except StatusNetError, e:
                             self.status_bar.timed_update("Status.Net error %d: %s" % (e.errcode, e.details))
                         self.status_bar.update("Doing Nothing.")
+            elif input == ord("E") or input in [ord(key) for key in config.config['keys']['cquote']]:
+                if isinstance(self.tabs[self.current_tab], Timeline) or isinstance(self.tabs[self.current_tab], Context):
+                    can_repeat = True
+                    try:
+                        if self.tabs[self.current_tab].timeline_type in ["direct", "sentdirect"]:
+                            can_repeat = False
+                    except AttributeError:
+                        pass  # we must be in a Context tab, so repeating is fine.
+                    if can_repeat:
+                        self.update_timer.cancel()
+                        self.quote_mode = True
+                        n = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]
+                        user = n['user']['screen_name']
+                        id = n['id']
+                        msg = n['text']
+                        for match in helpers.entity_regex.findall(msg):
+                            if match[0] == "!":
+                                msg = msg.replace(match, "#" + match[1:])
+                        status = self.text_entry.edit("RD @" + user + " " + msg)
+                        self.quote_mode = False
+                        update = False
+                        try:
+                            update = self.conn.statuses_update(status, "IdentiCurse", int(id), long_dent=config.config['long_dent'], dup_first_word=True)
+                        except Exception, (errmsg):
+                            self.status_bar.timed_update("ERROR: Couldn't post status: %s" % (errmsg))
+                        if update != False:
+                            if self.tabs[self.current_tab].name == "Context":  # if we're in a context tab, add notice to there too
+                                self.tabs[self.current_tab].timeline.insert(0, update)
+                                self.tabs[self.current_tab].update_buffer()
+                            for tab in self.tabs:
+                                if not hasattr(tab, 'timeline_type'):
+                                    continue
+                                if tab.timeline_type == "home":
+                                    if isinstance(update, list):
+                                        for notice in update:
+                                            tab.timeline.insert(0, notice)
+                                    else:
+                                        tab.timeline.insert(0, update)
+                                    tab.update_buffer()
+                            self.status_bar.update("Doing nothing.")
+                        else:
+                            self.tabs[self.current_tab].update()
+                            self.status_bar.update("Doing nothing.")
             elif input == ord("c") or input in [ord(key) for key in config.config['keys']['ccontext']]:
                 self.status_bar.update("Loading Context...")
                 if "retweeted_status" in self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]:
