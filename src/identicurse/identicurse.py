@@ -308,7 +308,7 @@ class IdentiCurse(object):
         empty_default_keys = ("firstpage", "newerpage", "olderpage", "refresh",
             "input", "commandinput", "search", "quit", "closetab", "help", "nexttab", "prevtab",
             "qreply", "creply", "cfav", "ccontext", "crepeat", "cnext", "cprev",
-            "cfirst", "nextmatch", "prevmatch", "creplymode", "cquote")
+            "cfirst", "nextmatch", "prevmatch", "creplymode", "cquote", "tabswapleft", "tabswapright")
 
         for k in empty_default_keys:
             config.config['keys'][k] = []
@@ -640,6 +640,14 @@ class IdentiCurse(object):
                         switch_to_tab = self.current_tab + 1
                 elif input == ord("<") or input in [ord(key) for key in config.config['keys']['prevtab']]:
                     if self.current_tab >= 1:
+                        switch_to_tab = self.current_tab - 1
+                elif input == ord(".") or input in [ord(key) for key in config.config['keys']['tabswapright']]:
+                    if self.current_tab < (len(self.tabs) - 1):
+                        self.tabs[self.current_tab], self.tabs[self.current_tab+1] = self.tabs[self.current_tab+1], self.tabs[self.current_tab]
+                        switch_to_tab = self.current_tab + 1
+                elif input == ord(",") or input in [ord(key) for key in config.config['keys']['tabswapleft']]:
+                    if self.current_tab >= 1:
+                        self.tabs[self.current_tab-1], self.tabs[self.current_tab] = self.tabs[self.current_tab], self.tabs[self.current_tab-1]
                         switch_to_tab = self.current_tab - 1
 
                 if switch_to_tab is not None:
