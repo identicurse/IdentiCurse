@@ -281,6 +281,7 @@ class IdentiCurse(object):
             config.config["length_override"] = 0
         if not "prefill_user_cache" in config.config:
             config.config["prefill_user_cache"] = False
+
         if not "keys" in config.config:
             config.config['keys'] = {}
         if not "scrollup" in config.config['keys']:
@@ -295,6 +296,13 @@ class IdentiCurse(object):
             config.config['keys']['scrollbottom'] = ['G']
         if not "pagedown" in config.config['keys']:
             config.config['keys']['pagedown'] = [' ']
+
+        if not "tab_complete_mode" in config.config:
+            config.config["tab_complete_mode"] = "exact"
+        else:
+            config.config["tab_complete_mode"] = config.config["tab_complete_mode"].lower()
+            if not config.config["tab_complete_mode"] in ["exact", "fuzzy"]:
+                config.config["tab_complete_mode"] = "exact"
 
         if not "ui_order" in config.config:
             config.config['ui_order'] = ["divider", "entry", "divider", "notices", "statusbar", "tabbar"]  # this will recreate the same layout as the old UI

@@ -171,7 +171,7 @@ def find_longest_common_start(words):
     return last_match
 
 def find_fuzzy_matches(fragment, words):
-    if len(words) == 0:
+    if len(fragment) == 0:
         return []
     matches = []
     for word in words:

@@ -83,13 +83,24 @@ class Textbox(textpad.Textbox):
                 elif hasattr(config.session_store, "user_cache"):  # if no special char, assume username
                     guess_source = getattr(config.session_store, "user_cache")
                 if guess_source is not None:
-                    possible_guesses = [user for user in guess_source if user[:len(last_word)] == last_word]
-                    guess = helpers.find_longest_common_start(possible_guesses)
-                    if len(guess) > len(last_word):
-                        for char in guess[len(last_word):]:
-                            self.do_command(char)
-                    elif len(possible_guesses) > 0:
-                        self.poll_function(possible_guesses)
+                    if config.config["tab_complete_mode"] == "exact":
+                        possible_guesses = [user for user in guess_source if user[:len(last_word)] == last_word]
+                        guess = helpers.find_longest_common_start(possible_guesses)
+                        if len(guess) > len(last_word):
+                            for char in guess[len(last_word):]:
+                                self.do_command(char)
+                        elif len(possible_guesses) > 0:
+                            self.poll_function(possible_guesses)
+                    else:
+                        possible_guesses = helpers.find_fuzzy_matches(last_word, guess_source)
+                        if len(possible_guesses) == 1:
+                            self.win.move(self.win.getyx()[0], self.win.getyx()[1]-len(last_word))
+                            for i in xrange(len(last_word)):
+                                self.win.delch()
+                            for char in possible_guesses[0]:
+                                self.do_command(char)
+                        elif len(possible_guesses) >= 2:
+                            self.poll_function(possible_guesses)
             elif ch == curses.KEY_HOME:
                 self.win.move(0, 0)
             elif ch == curses.KEY_END:
