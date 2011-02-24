@@ -170,6 +170,20 @@ def find_longest_common_start(words):
         last_match = match_string
     return last_match
 
+def find_fuzzy_match(fragment, words):
+    if len(words) == 0:
+        return []
+    matches = []
+    for word in words:
+        fragment_index = 0
+        for char in word:
+            if char == fragment[fragment_index]:
+                fragment_index += 1
+            if fragment_index == len(fragment):  # all chars existed in order, this is a fuzzy match
+                matches.append(word)
+                break
+    return matches
+
 def ur1ca_shorten(longurl):
     request = urllib2.Request("http://ur1.ca/", urllib.urlencode({'longurl':longurl}))
     response = urllib2.urlopen(request)
