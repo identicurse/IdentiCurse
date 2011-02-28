@@ -381,6 +381,10 @@ class Timeline(Tab):
             else:
                 line.append((' ' * 3, identicurse.colour_fields["selector"]))
 
+            if config.config['compact_notices']:
+                line.append((time_msg, identicurse.colour_fields["time"]))
+                line.append((" <", identicurse.colour_fields["none"]))
+
             if config.config['user_rainbow']:
                 line.append((from_user, config.session_store.user_cache[from_user]))
             else:
@@ -407,16 +411,15 @@ class Timeline(Tab):
             if not config.config['compact_notices']:
                 line.append((' ' * (maxx - ((len(source_msg) + len(time_msg) + user_length + (6 + len(cout))))), identicurse.colour_fields["none"]))
                 line.append((time_msg, identicurse.colour_fields["time"]))
-                line.append((' ', identicurse.colour_fields["none"]))
-                line.append((source_msg, identicurse.colour_fields["source"]))
+                if config.config["show_source"]:
+                    line.append((' ', identicurse.colour_fields["none"]))
+                    line.append((source_msg, identicurse.colour_fields["source"]))
                 self.buffer.append(line)
                 line = []
             else:
                 line.append((" ", identicurse.colour_fields["none"]))
-                line.append((time_msg, identicurse.colour_fields["time"]))
-                line.append((' ', identicurse.colour_fields["none"]))
-                line.append((source_msg, identicurse.colour_fields["source"]))
-                line.append((":  ", identicurse.colour_fields["none"]))
+                if config.config["show_source"]:
+                    line.append((source_msg, identicurse.colour_fields["source"]))
 
             try:
                 notice_parts = helpers.entity_regex.split(n['text'])
@@ -561,6 +564,10 @@ class Context(Tab):
             else:
                 line.append((' ' * 3, identicurse.colour_fields["selector"]))
 
+            if config.config["compact_notices"]:
+                line.append((time_msg, identicurse.colour_fields["time"]))
+                line.append((" ", identicurse.colour_fields["none"]))
+
             if config.config['user_rainbow']:
                 line.append((from_user, config.session_store.user_cache[from_user]))
             else:
@@ -579,16 +586,15 @@ class Context(Tab):
             if not config.config['compact_notices']:
                 line.append((' ' * (maxx - ((len(source_msg) + len(time_msg) + user_length + (6 + len(cout))))), identicurse.colour_fields["none"]))
                 line.append((time_msg, identicurse.colour_fields["time"]))
-                line.append((' ', identicurse.colour_fields["none"]))
-                line.append((source_msg, identicurse.colour_fields["source"]))
+                if config.config["show_source"]:
+                    line.append((' ', identicurse.colour_fields["none"]))
+                    line.append((source_msg, identicurse.colour_fields["source"]))
                 self.buffer.append(line)
                 line = []
             else:
-                line.append((" ", identicurse.colour_fields["none"]))
-                line.append((time_msg, identicurse.colour_fields["time"]))
-                line.append((' ', identicurse.colour_fields["none"]))
-                line.append((source_msg, identicurse.colour_fields["source"]))
-                line.append((":  ", identicurse.colour_fields["none"]))
+                line.append((" | ", identicurse.colour_fields["none"]))
+                if config.config["show_source"]:
+                    line.append((source_msg, identicurse.colour_fields["source"]))
 
             try:
                 notice_parts = helpers.entity_regex.split(n['text'])

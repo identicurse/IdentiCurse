@@ -281,6 +281,8 @@ class IdentiCurse(object):
             config.config["length_override"] = 0
         if not "prefill_user_cache" in config.config:
             config.config["prefill_user_cache"] = False
+        if not "show_source" in config.config:
+            config.config["show_source"] = True
 
         if not "keys" in config.config:
             config.config['keys'] = {}
