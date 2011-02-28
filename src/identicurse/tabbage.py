@@ -383,7 +383,7 @@ class Timeline(Tab):
 
             if config.config['compact_notices']:
                 line.append((time_msg, identicurse.colour_fields["time"]))
-                line.append((" <", identicurse.colour_fields["none"]))
+                line.append((" ", identicurse.colour_fields["none"]))
 
             if config.config['user_rainbow']:
                 line.append((from_user, config.session_store.user_cache[from_user]))
@@ -417,7 +417,7 @@ class Timeline(Tab):
                 self.buffer.append(line)
                 line = []
             else:
-                line.append((" ", identicurse.colour_fields["none"]))
+                line.append((" | ", identicurse.colour_fields["none"]))
                 if config.config["show_source"]:
                     line.append((source_msg, identicurse.colour_fields["source"]))
 
