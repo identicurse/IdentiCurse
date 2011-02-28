@@ -338,6 +338,27 @@ class Timeline(Tab):
         maxx = self.window.getmaxyx()[1]
         c = 1
 
+        longest_user_string_len = 0
+        longest_time_msg_len = 0
+        for n in self.timeline:
+            if "direct" in self.timeline_type:
+                user_string = "%s -> %s" % (n["sender"]["screen_name"], n["recipient"]["screen_name"])
+            else:
+                user_string = "%s" % (n["user"]["screen_name"])
+            if "in_reply_to_status_id" in n and n["in_reply_to_status_id"] is not None:
+                user_string += " +"
+            if "retweeted_status" in n:
+                user_string += " ~"
+            locale.setlocale(locale.LC_TIME, 'C')  # hacky fix because statusnet uses english timestrings regardless of locale
+            created_at_no_offset = helpers.offset_regex.sub("+0000", n['created_at'])
+            datetime_notice = datetime.datetime.strptime(created_at_no_offset, DATETIME_FORMAT) + helpers.utc_offset(n['created_at'])
+            locale.setlocale(locale.LC_TIME, '') # other half of the hacky fix
+            time_msg = helpers.format_time(helpers.time_since(datetime_notice), short_form=True)
+            if len(user_string) > longest_user_string_len:
+                longest_user_string_len = len(user_string)
+            if len(time_msg) > longest_time_msg_len:
+                longest_time_msg_len = len(time_msg)
+
         for n in self.timeline:
             from_user = None
             to_user = None
@@ -347,7 +368,7 @@ class Timeline(Tab):
                 to_user = n["recipient"]["screen_name"]
                 source_msg = ""
             else:
-                if "retweeted_status" in n:
+                if ("retweeted_status" in n) and not config.config["compact_notices"]:  # special RT handling is _not_ even slightly compact, don't do it in compact mode
                     repeating_user = n["user"]["screen_name"]
                     n = n["retweeted_status"]
                 from_user = n["user"]["screen_name"]
@@ -417,7 +438,18 @@ class Timeline(Tab):
                 self.buffer.append(line)
                 line = []
             else:
-                line.append((" | ", identicurse.colour_fields["none"]))
+                detail_char = ""
+                if (not config.config["show_source"]):
+                    if "in_reply_to_status_id" in n and n["in_reply_to_status_id"] is not None:
+                        detail_char = "+"
+                    elif "retweeted_status" in n:
+                        detail_char = "~"
+                    line.append((" %s" % (detail_char), identicurse.colour_fields["source"]))
+                if detail_char != "":
+                    line.append((" "*((longest_user_string_len - user_length) + (longest_time_msg_len - len(time_msg))), identicurse.colour_fields["none"]))
+                else:
+                    line.append((" "*((longest_user_string_len - user_length) + (longest_time_msg_len - len(time_msg)) + 1), identicurse.colour_fields["none"]))
+                line.append(("| ", identicurse.colour_fields["none"]))
                 if config.config["show_source"]:
                     line.append((source_msg, identicurse.colour_fields["source"]))
 
@@ -528,10 +560,28 @@ class Context(Tab):
         c = 1
         maxx = self.window.getmaxyx()[1]
 
+        longest_user_string_len = 0
+        longest_time_msg_len = 0
+        for n in self.timeline:
+            user_string = "%s" % (n["user"]["screen_name"])
+            if "in_reply_to_status_id" in n and n["in_reply_to_status_id"] is not None:
+                user_string += " +"
+            if "retweeted_status" in n:
+                user_string += " ~"
+            locale.setlocale(locale.LC_TIME, 'C')  # hacky fix because statusnet uses english timestrings regardless of locale
+            created_at_no_offset = helpers.offset_regex.sub("+0000", n['created_at'])
+            datetime_notice = datetime.datetime.strptime(created_at_no_offset, DATETIME_FORMAT) + helpers.utc_offset(n['created_at'])
+            locale.setlocale(locale.LC_TIME, '') # other half of the hacky fix
+            time_msg = helpers.format_time(helpers.time_since(datetime_notice), short_form=True)
+            if len(user_string) > longest_user_string_len:
+                longest_user_string_len = len(user_string)
+            if len(time_msg) > longest_time_msg_len:
+                longest_time_msg_len = len(time_msg)
+
         for n in self.timeline:
             from_user = None
             repeating_user = None
-            if "retweeted_status" in n:
+            if ("retweeted_status" in n) and not config.config["compact_notices"]:  # special RT handling is _not_ even slightly compact, don't do it in compact mode
                 repeating_user = n["user"]["screen_name"]
                 n = n["retweeted_status"]
             from_user = n["user"]["screen_name"]
@@ -592,7 +642,18 @@ class Context(Tab):
                 self.buffer.append(line)
                 line = []
             else:
-                line.append((" | ", identicurse.colour_fields["none"]))
+                detail_char = ""
+                if (not config.config["show_source"]):
+                    if "in_reply_to_status_id" in n and n["in_reply_to_status_id"] is not None:
+                        detail_char = "+"
+                    elif "retweeted_status" in n:
+                        detail_char = "~"
+                    line.append((" %s" % (detail_char), identicurse.colour_fields["source"]))
+                if detail_char != "":
+                    line.append((" "*((longest_user_string_len - user_length) + (longest_time_msg_len - len(time_msg))), identicurse.colour_fields["none"]))
+                else:
+                    line.append((" "*((longest_user_string_len - user_length) + (longest_time_msg_len - len(time_msg)) + 1), identicurse.colour_fields["none"]))
+                line.append(("| ", identicurse.colour_fields["none"]))
                 if config.config["show_source"]:
                     line.append((source_msg, identicurse.colour_fields["source"]))
 
