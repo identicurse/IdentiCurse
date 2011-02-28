@@ -407,20 +407,21 @@ class Timeline(Tab):
                 line.append((" ]", identicurse.colour_fields["none"]))
                 user_length += (len(" [ repeat by ") + len(repeating_user) + len(" ]"))
 
-            if config.config['compact_notices']:
+            if not config.config['compact_notices']:
                 line.append((' ' * (maxx - ((len(source_msg) + len(time_msg) + user_length + (6 + len(cout))))), identicurse.colour_fields["none"]))
                 line.append((time_msg, identicurse.colour_fields["time"]))
                 line.append((' ', identicurse.colour_fields["none"]))
                 line.append((source_msg, identicurse.colour_fields["source"]))
+                self.buffer.append(line)
+                line = []
             else:
-                line.append((' ' * (maxx - ((len(source_msg) + user_length + (5 + len(cout))))), identicurse.colour_fields["none"]))
+                line.append((" ", identicurse.colour_fields["none"]))
+                line.append((time_msg, identicurse.colour_fields["time"]))
+                line.append((' ', identicurse.colour_fields["none"]))
                 line.append((source_msg, identicurse.colour_fields["source"]))
-
-            self.buffer.append(line)
+                line.append((":  ", identicurse.colour_fields["none"]))
 
             try:
-                line = []
-
                 notice_parts = helpers.entity_regex.split(n['text'])
                 for part in notice_parts:
                     part_list = list(part)
@@ -456,14 +457,6 @@ class Timeline(Tab):
             except UnicodeDecodeError:
                 self.buffer.append([("Caution: Terminal too shit to display this notice.", identicurse.colour_fields["warning"])])
 
-            if not config.config['compact_notices']:
-                line = []
-                line.append((" " * (maxx - (len(time_msg) + 2)), identicurse.colour_fields["none"]))
-                line.append((time_msg, identicurse.colour_fields["time"]))
-                
-                self.buffer.append(line)
-                self.buffer.append([])
-
             if config.config["show_notice_links"]:
                 line = []
                 base_url = helpers.base_url_regex.findall(self.conn.api_path)[0][0]
@@ -474,7 +467,8 @@ class Timeline(Tab):
                 line.append(("<%s>" % (notice_link), identicurse.colour_fields["notice_link"]))
                 self.buffer.append(line)
 
-            self.buffer.append([])
+            if not config.config['compact_notices']:
+                self.buffer.append([])
 
             c += 1
 
@@ -588,20 +582,21 @@ class Context(Tab):
                 line.append((" ]", identicurse.colour_fields["none"]))
                 user_length += (len(" [ repeat by ") + len(repeating_user) + len(" ]"))
             
-            if config.config['compact_notices']:
+            if not config.config['compact_notices']:
                 line.append((' ' * (maxx - ((len(source_msg) + len(time_msg) + user_length + (6 + len(cout))))), identicurse.colour_fields["none"]))
                 line.append((time_msg, identicurse.colour_fields["time"]))
                 line.append((' ', identicurse.colour_fields["none"]))
                 line.append((source_msg, identicurse.colour_fields["source"]))
+                self.buffer.append(line)
+                line = []
             else:
-                line.append((' ' * (maxx - ((len(source_msg) + user_length + (5 + len(cout))))), identicurse.colour_fields["none"]))
+                line.append((" ", identicurse.colour_fields["none"]))
+                line.append((time_msg, identicurse.colour_fields["time"]))
+                line.append((' ', identicurse.colour_fields["none"]))
                 line.append((source_msg, identicurse.colour_fields["source"]))
-
-            self.buffer.append(line)
+                line.append((":  ", identicurse.colour_fields["none"]))
 
             try:
-                line = []
-
                 notice_parts = helpers.entity_regex.split(n['text'])
                 wtf = False
                 for part in notice_parts:
@@ -639,14 +634,7 @@ class Context(Tab):
                 self.buffer.append([("Caution: Terminal too shit to display this notice.", identicurse.colour_fields["warning"])])
 
             if not config.config['compact_notices']:
-                line = []
-                line.append((" " * (maxx - (len(time_msg) + 2)), identicurse.colour_fields["none"]))
-                line.append((time_msg, identicurse.colour_fields["time"]))
-                
-                self.buffer.append(line)
                 self.buffer.append([])
-
-            self.buffer.append([])
 
             c += 1
            

@@ -258,7 +258,7 @@ class IdentiCurse(object):
         if not "border" in config.config:
             config.config['border'] = True
         if not "compact_notices" in config.config:
-            config.config['compact_notices'] = True
+            config.config['compact_notices'] = False
         if not "user_rainbow" in config.config:
             config.config["user_rainbow"] = False
         if not "group_rainbow" in config.config:
