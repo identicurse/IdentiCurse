@@ -361,10 +361,7 @@ class Timeline(Tab):
             datetime_notice = datetime.datetime.strptime(created_at_no_offset, DATETIME_FORMAT) + helpers.utc_offset(n['created_at'])
             locale.setlocale(locale.LC_TIME, '') # other half of the hacky fix
 
-            if config.config['compact_notices']:
-                time_msg = helpers.format_time(helpers.time_since(datetime_notice), short_form=True)
-            else:
-                time_msg = helpers.format_time(helpers.time_since(datetime_notice))
+            time_msg = helpers.format_time(helpers.time_since(datetime_notice), short_form=True)
 
             for user in [user for user in [from_user, to_user, repeating_user] if user is not None]:
                 if not user in config.session_store.user_cache:
@@ -545,10 +542,7 @@ class Context(Tab):
             created_at_no_offset = helpers.offset_regex.sub("+0000", n['created_at'])
             datetime_notice = datetime.datetime.strptime(created_at_no_offset, DATETIME_FORMAT) + helpers.utc_offset(n['created_at'])
             locale.setlocale(locale.LC_TIME, '') # other half of the hacky fix
-            if config.config['compact_notices']:
-                time_msg = helpers.format_time(helpers.time_since(datetime_notice), short_form=True)
-            else:
-                time_msg = helpers.format_time(helpers.time_since(datetime_notice))
+            time_msg = helpers.format_time(helpers.time_since(datetime_notice), short_form=True)
             
             for user in [user for user in [from_user, repeating_user] if user is not None]:
                 if not user in config.session_store.user_cache:
