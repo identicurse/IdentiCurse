@@ -348,7 +348,9 @@ class Timeline(Tab):
             if "in_reply_to_status_id" in n and n["in_reply_to_status_id"] is not None:
                 user_string += " +"
             if "retweeted_status" in n:
-                user_string += " ~"
+                user_string = "%s [%s's RD]" % (n["retweeted_status"]["user"]["screen_name"], n["user"]["screen_name"])
+                if "in_reply_to_status_id" in n["retweeted_status"]:
+                    user_string += " +"
             locale.setlocale(locale.LC_TIME, 'C')  # hacky fix because statusnet uses english timestrings regardless of locale
             created_at_no_offset = helpers.offset_regex.sub("+0000", n['created_at'])
             datetime_notice = datetime.datetime.strptime(created_at_no_offset, DATETIME_FORMAT) + helpers.utc_offset(n['created_at'])
@@ -368,7 +370,7 @@ class Timeline(Tab):
                 to_user = n["recipient"]["screen_name"]
                 source_msg = ""
             else:
-                if ("retweeted_status" in n) and not config.config["compact_notices"]:  # special RT handling is _not_ even slightly compact, don't do it in compact mode
+                if "retweeted_status" in n:
                     repeating_user = n["user"]["screen_name"]
                     n = n["retweeted_status"]
                 from_user = n["user"]["screen_name"]
@@ -421,13 +423,22 @@ class Timeline(Tab):
                 user_length += (len(" -> ") + len(to_user))
 
             if repeating_user is not None:
-                line.append((" [ repeat by ", identicurse.colour_fields["none"]))
+                if config.config["compact_notices"]:
+                    line.append((" [", identicurse.colour_fields["none"]))
+                else:
+                    line.append((" [ repeat by ", identicurse.colour_fields["none"]))
+
                 if config.config['user_rainbow']:
                     line.append((repeating_user, config.session_store.user_cache[repeating_user]))
                 else:
                     line.append((repeating_user, identicurse.colour_fields["username"]))
-                line.append((" ]", identicurse.colour_fields["none"]))
-                user_length += (len(" [ repeat by ") + len(repeating_user) + len(" ]"))
+
+                if config.config["compact_notices"]:
+                    line.append(("'s RD]", identicurse.colour_fields["none"]))
+                    user_length += (len(" [") + len(repeating_user) + len("'s RD]"))
+                else:
+                    line.append((" ]", identicurse.colour_fields["none"]))
+                    user_length += (len(" [ repeat by ") + len(repeating_user) + len(" ]"))
 
             if not config.config['compact_notices']:
                 line.append((' ' * (maxx - ((len(source_msg) + len(time_msg) + user_length + (6 + len(cout))))), identicurse.colour_fields["none"]))
@@ -449,9 +460,9 @@ class Timeline(Tab):
                     line.append((" "*((longest_user_string_len - user_length) + (longest_time_msg_len - len(time_msg))), identicurse.colour_fields["none"]))
                 else:
                     line.append((" "*((longest_user_string_len - user_length) + (longest_time_msg_len - len(time_msg)) + 1), identicurse.colour_fields["none"]))
-                line.append(("| ", identicurse.colour_fields["none"]))
                 if config.config["show_source"]:
                     line.append((source_msg, identicurse.colour_fields["source"]))
+                line.append((" | ", identicurse.colour_fields["none"]))
 
             try:
                 notice_parts = helpers.entity_regex.split(n['text'])
@@ -567,7 +578,9 @@ class Context(Tab):
             if "in_reply_to_status_id" in n and n["in_reply_to_status_id"] is not None:
                 user_string += " +"
             if "retweeted_status" in n:
-                user_string += " ~"
+                user_string = "%s [%s's RD]" % (n["retweeted_status"]["user"]["screen_name"], n["user"]["screen_name"])
+                if "in_reply_to_status_id" in n["retweeted_status"]:
+                    user_string += " +"
             locale.setlocale(locale.LC_TIME, 'C')  # hacky fix because statusnet uses english timestrings regardless of locale
             created_at_no_offset = helpers.offset_regex.sub("+0000", n['created_at'])
             datetime_notice = datetime.datetime.strptime(created_at_no_offset, DATETIME_FORMAT) + helpers.utc_offset(n['created_at'])
@@ -581,7 +594,7 @@ class Context(Tab):
         for n in self.timeline:
             from_user = None
             repeating_user = None
-            if ("retweeted_status" in n) and not config.config["compact_notices"]:  # special RT handling is _not_ even slightly compact, don't do it in compact mode
+            if "retweeted_status" in n:
                 repeating_user = n["user"]["screen_name"]
                 n = n["retweeted_status"]
             from_user = n["user"]["screen_name"]
@@ -625,13 +638,22 @@ class Context(Tab):
             user_length = len(from_user)
 
             if repeating_user is not None:
-                line.append((" [ repeat by ", identicurse.colour_fields["none"]))
+                if config.config["compact_notices"]:
+                    line.append((" [", identicurse.colour_fields["none"]))
+                else:
+                    line.append((" [ repeat by ", identicurse.colour_fields["none"]))
+
                 if config.config['user_rainbow']:
                     line.append((repeating_user, config.session_store.user_cache[repeating_user]))
                 else:
                     line.append((repeating_user, identicurse.colour_fields["username"]))
-                line.append((" ]", identicurse.colour_fields["none"]))
-                user_length += (len(" [ repeat by ") + len(repeating_user) + len(" ]"))
+
+                if config.config["compact_notices"]:
+                    line.append(("'s RD]", identicurse.colour_fields["none"]))
+                    user_length += (len(" [") + len(repeating_user) + len("'s RD]"))
+                else:
+                    line.append((" ]", identicurse.colour_fields["none"]))
+                    user_length += (len(" [ repeat by ") + len(repeating_user) + len(" ]"))
             
             if not config.config['compact_notices']:
                 line.append((' ' * (maxx - ((len(source_msg) + len(time_msg) + user_length + (6 + len(cout))))), identicurse.colour_fields["none"]))
@@ -653,9 +675,9 @@ class Context(Tab):
                     line.append((" "*((longest_user_string_len - user_length) + (longest_time_msg_len - len(time_msg))), identicurse.colour_fields["none"]))
                 else:
                     line.append((" "*((longest_user_string_len - user_length) + (longest_time_msg_len - len(time_msg)) + 1), identicurse.colour_fields["none"]))
-                line.append(("| ", identicurse.colour_fields["none"]))
                 if config.config["show_source"]:
                     line.append((source_msg, identicurse.colour_fields["source"]))
+                line.append((" | ", identicurse.colour_fields["none"]))
 
             try:
                 notice_parts = helpers.entity_regex.split(n['text'])
