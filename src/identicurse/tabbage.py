@@ -304,7 +304,7 @@ class Timeline(Tab):
                     passes_filters = False
                     break
             if passes_filters:
-                if config.config['expand_remote'] and "attachments" in notice:
+                if (not self.timeline_type in ["direct", "sentdirect"]) and notice["source"] == "ostatus" and config.config['expand_remote'] and "attachments" in notice:
                     import urllib2
                     for attachment in notice['attachments']:
                         if attachment['mimetype'] != "text/html":
@@ -538,7 +538,7 @@ class Context(Tab):
 
         while next_id is not None:
             notice = self.conn.statuses_show(id=next_id)
-            if config.config['expand_remote'] and "attachments" in notice:
+            if notice["source"] == "ostatus" and config.config['expand_remote'] and "attachments" in notice:
                 import urllib2
                 for attachment in notice['attachments']:
                     if attachment['mimetype'] != "text/html":
