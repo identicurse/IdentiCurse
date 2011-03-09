@@ -294,6 +294,16 @@ class Timeline(Tab):
             raw_timeline = self.conn.favorites(page=self.page)
         elif self.timeline_type == "search":
             raw_timeline = self.conn.search(self.type_params['query'], page=self.page, standardise=True)
+        elif self.timeline_type == "context":
+            raw_timeline = []
+            next_id = self.type_params['notice_id']
+            while next_id is not None:
+                notice = self.conn.statuses_show(id=next_id)
+                raw_timeline.append(notice)
+                if "retweeted_status" in notice:
+                    next_id = notice['retweeted_status']['id']
+                else:
+                    next_id = notice['in_reply_to_status_id']
 
         temp_timeline = []
 
@@ -515,211 +525,6 @@ class Timeline(Tab):
 
             c += 1
 
-class Context(Tab):
-    def __init__(self, conn, window, notice_id):
-        self.conn = conn
-        self.notice = notice_id
-        self.timeline = []
-        if not hasattr(config.session_store, 'user_cache'):
-            config.session_store.user_cache = {}
-        if not hasattr(config.session_store, 'tag_cache'):
-            config.session_store.tag_cache = {}
-        if not hasattr(config.session_store, 'group_cache'):
-            config.session_store.group_cache = {}
-        self.chosen_one = 0
-
-        self.name = "Context"
-
-        Tab.__init__(self, window)
-
-    def update(self):
-        temp_timeline = []
-        next_id = self.notice
-
-        while next_id is not None:
-            notice = self.conn.statuses_show(id=next_id)
-            if notice["source"] == "ostatus" and config.config['expand_remote'] and "attachments" in notice:
-                import urllib2
-                for attachment in notice['attachments']:
-                    if attachment['mimetype'] != "text/html":
-                        continue
-                    req = urllib2.Request(attachment['url'])
-                    try:
-                        page = urllib2.urlopen(req).read()
-                        try:
-                            notice['text'] = helpers.html_unescape_string(helpers.title_regex.findall(page)[0])
-                        except IndexError:  # no title could be found
-                            pass
-                    except:
-                        pass
-                    break
-            temp_timeline.append(notice)
-            if "retweeted_status" in temp_timeline[-1]:
-                next_id = temp_timeline[-1]['retweeted_status']['id']
-            else:
-                next_id = temp_timeline[-1]['in_reply_to_status_id']
-
-        self.timeline = temp_timeline
-
-        self.search_highlight_line = -1
-
-        self.update_buffer()
-
-    def update_buffer(self):
-        self.buffer.clear() 
-
-        c = 1
-        maxx = self.window.getmaxyx()[1]
-
-        longest_user_string_len = 0
-        longest_time_msg_len = 0
-        for n in self.timeline:
-            user_string = "%s" % (n["user"]["screen_name"])
-            if "in_reply_to_status_id" in n and n["in_reply_to_status_id"] is not None:
-                user_string += " +"
-            if "retweeted_status" in n:
-                user_string = "%s [%s's RD]" % (n["retweeted_status"]["user"]["screen_name"], n["user"]["screen_name"])
-                if "in_reply_to_status_id" in n["retweeted_status"]:
-                    user_string += " +"
-            locale.setlocale(locale.LC_TIME, 'C')  # hacky fix because statusnet uses english timestrings regardless of locale
-            created_at_no_offset = helpers.offset_regex.sub("+0000", n['created_at'])
-            datetime_notice = datetime.datetime.strptime(created_at_no_offset, DATETIME_FORMAT) + helpers.utc_offset(n['created_at'])
-            locale.setlocale(locale.LC_TIME, '') # other half of the hacky fix
-            time_msg = helpers.format_time(helpers.time_since(datetime_notice), short_form=True)
-            if len(user_string) > longest_user_string_len:
-                longest_user_string_len = len(user_string)
-            if len(time_msg) > longest_time_msg_len:
-                longest_time_msg_len = len(time_msg)
-
-        for n in self.timeline:
-            from_user = None
-            repeating_user = None
-            if "retweeted_status" in n:
-                repeating_user = n["user"]["screen_name"]
-                n = n["retweeted_status"]
-            from_user = n["user"]["screen_name"]
-            raw_source_msg = "from %s" % (n["source"])
-            source_msg = self.html_regex.sub("", raw_source_msg)
-            if n["in_reply_to_status_id"] is not None:
-                source_msg += " [+]"
-            elif "retweeted_status" in n:
-                source_msg += " [~]"
-            locale.setlocale(locale.LC_TIME, 'C')  # hacky fix because statusnet uses english timestrings regardless of locale
-            created_at_no_offset = helpers.offset_regex.sub("+0000", n['created_at'])
-            datetime_notice = datetime.datetime.strptime(created_at_no_offset, DATETIME_FORMAT) + helpers.utc_offset(n['created_at'])
-            locale.setlocale(locale.LC_TIME, '') # other half of the hacky fix
-            time_msg = helpers.format_time(helpers.time_since(datetime_notice), short_form=True)
-            
-            for user in [user for user in [from_user, repeating_user] if user is not None]:
-                if not user in config.session_store.user_cache:
-                    config.session_store.user_cache[user] = random.choice(identicurse.base_colours.items())[1]
-
-            line = []
-
-            if c < 10:
-                cout = " " + str(c)
-            else:
-                cout = str(c)
-            line.append((cout, identicurse.colour_fields["notice_count"]))
-            
-            if (c - 1) == self.chosen_one:
-                line.append((' * ', identicurse.colour_fields["selector"]))
-            else:
-                line.append((' ' * 3, identicurse.colour_fields["selector"]))
-
-            if config.config["compact_notices"]:
-                line.append((time_msg, identicurse.colour_fields["time"]))
-                line.append((" ", identicurse.colour_fields["none"]))
-
-            if config.config['user_rainbow']:
-                line.append((from_user, config.session_store.user_cache[from_user]))
-            else:
-                line.append((from_user, identicurse.colour_fields["username"]))
-            user_length = len(from_user)
-
-            if repeating_user is not None:
-                if config.config["compact_notices"]:
-                    line.append((" [", identicurse.colour_fields["none"]))
-                else:
-                    line.append((" [ repeat by ", identicurse.colour_fields["none"]))
-
-                if config.config['user_rainbow']:
-                    line.append((repeating_user, config.session_store.user_cache[repeating_user]))
-                else:
-                    line.append((repeating_user, identicurse.colour_fields["username"]))
-
-                if config.config["compact_notices"]:
-                    line.append(("'s RD]", identicurse.colour_fields["none"]))
-                    user_length += (len(" [") + len(repeating_user) + len("'s RD]"))
-                else:
-                    line.append((" ]", identicurse.colour_fields["none"]))
-                    user_length += (len(" [ repeat by ") + len(repeating_user) + len(" ]"))
-            
-            if not config.config['compact_notices']:
-                line.append((' ' * (maxx - ((len(source_msg) + len(time_msg) + user_length + (6 + len(cout))))), identicurse.colour_fields["none"]))
-                line.append((time_msg, identicurse.colour_fields["time"]))
-                if config.config["show_source"]:
-                    line.append((' ', identicurse.colour_fields["none"]))
-                    line.append((source_msg, identicurse.colour_fields["source"]))
-                self.buffer.append(line)
-                line = []
-            else:
-                detail_char = ""
-                if (not config.config["show_source"]):
-                    if "in_reply_to_status_id" in n and n["in_reply_to_status_id"] is not None:
-                        detail_char = "+"
-                    elif "retweeted_status" in n:
-                        detail_char = "~"
-                    line.append((" %s" % (detail_char), identicurse.colour_fields["source"]))
-                if detail_char != "":
-                    line.append((" "*((longest_user_string_len - user_length) + (longest_time_msg_len - len(time_msg))), identicurse.colour_fields["none"]))
-                else:
-                    line.append((" "*((longest_user_string_len - user_length) + (longest_time_msg_len - len(time_msg)) + 1), identicurse.colour_fields["none"]))
-                if config.config["show_source"]:
-                    line.append((source_msg, identicurse.colour_fields["source"]))
-                line.append((" | ", identicurse.colour_fields["none"]))
-
-            try:
-                notice_parts = helpers.entity_regex.split(n['text'])
-                wtf = False
-                for part in notice_parts:
-                    part_list = list(part)
-                    if len(part_list) > 0:
-                        if part_list[0] in ['@', '!', '#']:
-                            highlight_part = "".join(part_list[1:])
-                            if part_list[0] == '@':
-                                if not highlight_part in config.session_store.user_cache:
-                                    config.session_store.user_cache[highlight_part] = random.choice(identicurse.base_colours.items())[1]
-                                if config.config['user_rainbow']:
-                                    line.append((part, config.session_store.user_cache[highlight_part]))
-                                else:
-                                    line.append((part, identicurse.colour_fields['username']))
-                            elif part_list[0] == '!':
-                                if not highlight_part in config.session_store.group_cache:
-                                    config.session_store.group_cache[highlight_part] = random.choice(identicurse.base_colours.items())[1]
-                                if config.config['group_rainbow']:
-                                    line.append((part, config.session_store.group_cache[highlight_part]))
-                                else:
-                                    line.append((part, identicurse.colour_fields['group']))
-                            elif part_list[0] == '#':
-                                if not highlight_part in config.session_store.tag_cache:
-                                    config.session_store.tag_cache[highlight_part] = random.choice(identicurse.base_colours.items())[1]
-                                if config.config['tag_rainbow']:
-                                    line.append((part, config.session_store.tag_cache[highlight_part]))
-                                else:
-                                    line.append((part, identicurse.colour_fields['tag']))
-                        else:
-                            line.append((part, identicurse.colour_fields["notice"]))
-
-                self.buffer.append(line)
-
-            except UnicodeDecodeError:
-                self.buffer.append([("Caution: Terminal too shit to display this notice.", identicurse.colour_fields["warning"])])
-
-            if not config.config['compact_notices']:
-                self.buffer.append([])
-
-            c += 1
            
 class Profile(Tab):
     def __init__(self, conn, window, id):
