@@ -752,7 +752,7 @@ class IdentiCurse(object):
                 except Exception, (errmsg):
                     self.status_bar.timed_update("ERROR: Couldn't post status: %s" % (errmsg))
                 if update != False:
-                    if self.tabs[self.current_tab].name == "Context":  # if we're in a context tab, add notice to there too
+                    if hasattr(self.tabs[self.current_tab], "timeline_type") and self.tabs[self.current_tab].timeline_type == "context":  # if we're in a context tab, add notice to there too
                         self.tabs[self.current_tab].timeline.insert(0, update)
                         self.tabs[self.current_tab].update_buffer()
                     for tab in self.tabs:
@@ -796,7 +796,7 @@ class IdentiCurse(object):
                     self.status_bar.timed_update("Status.Net error %d: %s" % (e.errcode, e.details))
                 self.status_bar.update("Doing Nothing.")
             elif input == ord("e") or input in [ord(key) for key in config.config['keys']['crepeat']]:
-                if isinstance(self.tabs[self.current_tab], Timeline) or isinstance(self.tabs[self.current_tab], Context):
+                if isinstance(self.tabs[self.current_tab], Timeline):
                     can_repeat = True
                     try:
                         if self.tabs[self.current_tab].timeline_type in ["direct", "sentdirect"]:
