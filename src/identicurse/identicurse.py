@@ -740,35 +740,10 @@ class IdentiCurse(object):
                 self.parse_input(self.text_entry.edit("/r " + str(self.tabs[self.current_tab].chosen_one + 1) + " "))
             elif input == ord("D") or input in [ord(key) for key in config.config['keys']['creplymode']]:
                 self.update_timer.cancel()
-                self.reply_mode = True
-                n = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]
-                user = n['user']['screen_name']
-                id = n ['id']
-                status = self.text_entry.edit("@" + user + " ")
-                self.reply_mode = False
-                update = False
                 try:
-                    update = self.conn.statuses_update(status, "IdentiCurse", int(id), long_dent=config.config['long_dent'], dup_first_word=True)
+                    self.cmd_reply(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
                 except Exception, (errmsg):
                     self.status_bar.timed_update("ERROR: Couldn't post status: %s" % (errmsg))
-                if update != False:
-                    if hasattr(self.tabs[self.current_tab], "timeline_type") and self.tabs[self.current_tab].timeline_type == "context":  # if we're in a context tab, add notice to there too
-                        self.tabs[self.current_tab].timeline.insert(0, update)
-                        self.tabs[self.current_tab].update_buffer()
-                    for tab in self.tabs:
-                        if not hasattr(tab, 'timeline_type'):
-                            continue
-                        if tab.timeline_type == "home":
-                            if isinstance(update, list):
-                                for notice in update:
-                                    tab.timeline.insert(0, notice)
-                            else:
-                                tab.timeline.insert(0, update)
-                            tab.update_buffer()
-                    self.status_bar.update("Doing nothing.")
-                else:
-                    self.tabs[self.current_tab].update()
-                    self.status_bar.update("Doing nothing.")
             elif input == ord("s") or input in [ord(key) for key in config.config['keys']['cnext']]:
                 if self.tabs[self.current_tab].chosen_one != (len(self.tabs[self.current_tab].timeline) - 1):
                     self.tabs[self.current_tab].chosen_one += 1
@@ -785,16 +760,7 @@ class IdentiCurse(object):
                     self.tabs[self.current_tab].update_buffer()
                     self.tabs[self.current_tab].scrolltodent(self.tabs[self.current_tab].chosen_one)
             elif input == ord("f") or input in [ord(key) for key in config.config['keys']['cfav']]:
-                self.status_bar.update("Favouriting Notice...")
-                if "retweeted_status" in self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]:
-                    id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['retweeted_status']['id']
-                else:
-                    id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['id']
-                try:
-                    self.conn.favorites_create(id)
-                except StatusNetError, e:
-                    self.status_bar.timed_update("Status.Net error %d: %s" % (e.errcode, e.details))
-                self.status_bar.update("Doing Nothing.")
+                self.cmd_favourite(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
             elif input == ord("e") or input in [ord(key) for key in config.config['keys']['crepeat']]:
                 if isinstance(self.tabs[self.current_tab], Timeline):
                     can_repeat = True
@@ -804,22 +770,7 @@ class IdentiCurse(object):
                     except AttributeError:
                         pass  # we must be in a Context tab, so repeating is fine.
                     if can_repeat:
-                        self.status_bar.update("Repeating Notice...")
-                        if "retweeted_status" in self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]:
-                            id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['retweeted_status']['id']
-                        else:
-                            id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['id']
-                        try:
-                            update = self.conn.statuses_retweet(id, source="IdentiCurse")
-                            if isinstance(update, list):
-                                for notice in update:
-                                    self.tabs[self.current_tab].timeline.insert(0, notice)
-                            else:
-                                self.tabs[self.current_tab].timeline.insert(0, update)
-                            self.tabs[self.current_tab].update_buffer()
-                        except StatusNetError, e:
-                            self.status_bar.timed_update("Status.Net error %d: %s" % (e.errcode, e.details))
-                        self.status_bar.update("Doing Nothing.")
+                        self.cmd_repeat(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
             elif input == ord("E") or input in [ord(key) for key in config.config['keys']['cquote']]:
                 if isinstance(self.tabs[self.current_tab], Timeline) or isinstance(self.tabs[self.current_tab], Context):
                     can_repeat = True
@@ -984,50 +935,25 @@ class IdentiCurse(object):
                         self.status_bar.update("Posting Reply...")
     
                         try:
-                            float(tokens[1])
-                        except ValueError:
-                            user = tokens[1]
-                            if user[0] == "@":
-                                    user = user[1:]
-                            id = 0  # this is not a reply to a dent
-                        else:
-                            if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
-                                user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["retweeted_status"]["user"]["screen_name"]
-                                id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['retweeted_status']['id']
+                            try:
+                                float(tokens[1])
+                            except ValueError:
+                                user = tokens[1]
+                                if user[0] == "@":
+                                        user = user[1:]
+                                update = self.cmd_mention(user, " ".join(tokens[2:]))
                             else:
-                                user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
-                                id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['id']
-                        if len(tokens) > 2:
-                            status = "@" + user + " " + " ".join(tokens[2:])
-                        else:
-                            self.reply_mode = True
-                            status = self.text_entry.edit("@" + user + " ")
-                            self.reply_mode = False
-    
-                        try:
-                            update = self.conn.statuses_update(status, "IdentiCurse", int(id), long_dent=config.config['long_dent'], dup_first_word=True)
+                                update = self.cmd_reply(self.tabs[self.current_tab].timeline[int(tokens[1]) - 1], " ".join(tokens[2:]))
                         except Exception, (errmsg):
                             self.status_bar.timed_update("ERROR: Couldn't post status: %s" % (errmsg))
     
                     elif tokens[0] == "/favourite" and len(tokens) == 2:
-                        self.status_bar.update("Favouriting Notice...")
-                        if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
-                            id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['retweeted_status']['id']
-                        else:
-                            id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['id']
-                        self.conn.favorites_create(id)
+                        self.cmd_favourite(self.tabs[self.current_tab].timeline[int(tokens[1]) - 1])
     
                     elif tokens[0] == "/repeat" and len(tokens) == 2:
-                        self.status_bar.update("Repeating Notice...")
-                        if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
-                            id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['retweeted_status']['id']
-                        else:
-                            id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['id']
-                        update = self.conn.statuses_retweet(id, source="IdentiCurse")
+                        update = self.cmd_repeat(self.tabs[self.current_tab].timeline[int(tokens[1]) - 1])
                         
                     elif tokens[0] == "/direct" and len(tokens) >= 3:
-                        self.status_bar.update("Sending Direct...")
-                        
                         try:
                             float(tokens[1])
                         except ValueError:
@@ -1042,22 +968,10 @@ class IdentiCurse(object):
                                     screen_name = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['retweeted_status']['user']['screen_name']
                                 else:
                                     screen_name = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['user']['screen_name']
-                        id = self.conn.users_show(screen_name=screen_name)['id']
-                        
-                        self.conn.direct_messages_new(screen_name, id, " ".join(tokens[2:]), source="IdentiCurse")
+                        self.cmd_direct(screen_name, " ".join(tokens[2:]))
     
                     elif tokens[0] == "/delete" and len(tokens) == 2:
-                        self.status_bar.update("Deleting Notice...")
-                        if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
-                            repeat_id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['retweeted_status']['id']
-                        id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['id']
-                        try:
-                            self.conn.statuses_destroy(id)
-                        except StatusNetError, e:
-                            if e.errcode == 403:  # user doesn't own the original status, so is probably trying to delete the repeat
-                                self.conn.statuses_destroy(repeat_id)
-                            else:  # it wasn't a 403, so re-raise
-                                raise(e)
+                        self.cmd_delete(self.tabs[self.current_tab].timeline[int(tokens[1]) - 1])
     
                     elif tokens[0] == "/profile" and len(tokens) == 2:
                         self.status_bar.update("Loading Profile...")
@@ -1074,7 +988,6 @@ class IdentiCurse(object):
                             else:
                                 user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
     
-                        new_tab = True
                         self.tabs.append(Profile(self.conn, self.notice_window,user))
                         self.tabs[self.current_tab].active = False
                         self.current_tab = len(self.tabs) - 1
@@ -1460,28 +1373,12 @@ class IdentiCurse(object):
                 except StatusNetError, e:
                     self.status_bar.timed_update("Status.Net error %d: %s" % (e.errcode, e.details))
             else:
-                self.status_bar.update("Posting Notice...")
                 try:
-                    update = self.conn.statuses_update(input, source="IdentiCurse", long_dent=config.config['long_dent'])
-                except Exception, (errmsg):
-                    self.status_bar.timed_update("ERROR: Couldn't post status: %s" % (errmsg))
+                    update = self.cmd_post(input)
+                except StatusNetError, e:
+                    self.status_bar.timed_update("Status.Net error %d: %s" % (e.errcode, e.details))
 
-            if (not new_tab) and (update != False):
-                if self.tabs[self.current_tab].name == "Context":  # if we're in a context tab, add notice to there too
-                    self.tabs[self.current_tab].timeline.insert(0, update)
-                    self.tabs[self.current_tab].update_buffer()
-                for tab in self.tabs:
-                    if not hasattr(tab, 'timeline_type'):
-                        continue
-                    if tab.timeline_type == "home":
-                        if isinstance(update, list):
-                            for notice in update:
-                                tab.timeline.insert(0, notice)
-                        else:
-                            tab.timeline.insert(0, update)
-                        tab.update_buffer()
-                self.status_bar.update("Doing nothing.")
-            else:
+            if not update:
                 self.tabs[self.current_tab].update()
                 self.status_bar.update("Doing nothing.")
 
@@ -1494,6 +1391,243 @@ class IdentiCurse(object):
         self.insert_mode = False
         self.update_timer = Timer(config.config['update_interval'], self.update_tabs)
         self.update_timer.start()
+
+    def opens_tab(fail_on_exists=None):  # decorator factory, creates decorators to deal with the standard switching to tab stuff
+        def tabopen_decorator(cmd):
+            def outcmd(*largs, **kargs):
+                self = largs[0]
+                already_have_one = False
+                if fail_on_exists is not None:
+                    for tab in self.tabs:
+                        if hasattr(tab, "timeline_type") and tab.timeline_type == fail_on_exists:
+                            already_have_one = True
+                            break
+                if not already_have_one:
+                    self.tabs.append(cmd(*largs, **kargs))
+                    self.tabs[self.current_tab].active = False
+                    self.current_tab = len(self.tabs) - 1
+                    self.tabs[self.current_tab].active = True
+                    self.tab_order.insert(0, self.current_tab)
+                    self.tabs[self.current_tab].update()
+                return True
+            return outcmd
+        return tabopen_decorator
+
+    def shows_status(status_msg):  # decorator factory, creates status decorators for commands that show statuses
+        def status_decorator(cmd):
+            def outcmd(*largs, **kargs):
+                self = largs[0]
+                self.status_bar.update(status_msg + "...")
+                retval = cmd(*largs, **kargs)
+                self.status_bar.update("Doing nothing.")
+                return retval
+            return outcmd
+        return status_decorator
+
+    def posts_notice(cmd):  # decorator which inserts the newly-posted notice(s) for commands that post
+        def outcmd(*largs, **kargs):
+            self = largs[0]
+            update = cmd(*largs, **kargs)
+            if self.tabs[self.current_tab].name == "Context":  # if we're in a context tab, add notice to there too
+                self.tabs[self.current_tab].timeline.insert(0, update)
+                self.tabs[self.current_tab].update_buffer()
+            for tab in self.tabs:
+                if not hasattr(tab, 'timeline_type'):
+                    continue
+                if tab.timeline_type == "home":
+                    if isinstance(update, list):
+                        for notice in update:
+                            tab.timeline.insert(0, notice)
+                    else:
+                        tab.timeline.insert(0, update)
+                    tab.update_buffer()
+            self.status_bar.update("Doing nothing.")
+            return True
+        return outcmd
+
+    def repeat_passthrough(cmd):  # decorator which unpacks repeats for any commands that should handle only the original notice
+        def outcmd(*largs, **kargs):  # requires that notice is the *second* argument, for now at least
+            largs = list(largs)  # largs is a tuple, we need it mutable
+            if "retweeted_status" in largs[1]:
+                largs[1] = largs[1]["retweeted_status"]
+            return cmd(*largs, **kargs)
+        return outcmd
+
+    @shows_status("Posting reply")
+    @posts_notice
+    @repeat_passthrough
+    def cmd_reply(self, notice, message=""):
+        user = notice["user"]["screen_name"]
+        if message == "":
+            self.reply_mode = True
+            status = self.text_entry.edit("@%s " % (user))
+            self.reply_mode = False
+        else:
+            status = "@%s %s" % (notice["user"]["screen_name"], message)
+        return self.conn.statuses_update(status, "IdentiCurse", int(notice["id"]), long_dent=config.config["long_dent"], dup_first_word=True)
+
+    @shows_status("Posting mention")
+    @posts_notice
+    def cmd_mention(self, username, message):
+        status = "@%s %s" % (username, message)
+        return self.conn.statuses_update(status, "IdentiCurse", long_dent=config.config["long_dent"], dup_first_word=True)
+
+    @shows_status("Posting notice")
+    @posts_notice
+    def cmd_post(self, message):
+        return self.conn.statuses_update(message, "IdentiCurse", long_dent=config.config["long_dent"], dup_first_word=True)
+
+    @shows_status("Favouriting notice")
+    @repeat_passthrough
+    def cmd_favourite(self, notice):
+        self.conn.favorites_create(notice["id"]) 
+
+    @shows_status("Repeating notice")
+    @posts_notice
+    @repeat_passthrough
+    def cmd_repeat(self, notice):
+        return self.conn.statuses_retweet(notice["id"], source="IdentiCurse")
+
+    @shows_status("Quoting notice")
+    @posts_notice
+    @repeat_passthrough
+    def cmd_quote(self, notice):
+        pass
+
+    @shows_status("Sending direct message")
+    def cmd_direct(self, username, message):
+        user_id = self.conn.users_show(screen_name=username)['id']
+        self.conn.direct_messages_new(username, user_id, message, source="IdentiCurse")
+
+    @shows_status("Deleting notice")
+    def cmd_delete(self, notice):
+        try:
+            self.conn.statuses_destroy(notice["id"])
+        except StatusNetError, e:
+            if e.errcode == 403 and "retweeted_status" in notice:  # user doesn't own the repeat, so is probably trying to delete the original status
+                self.conn.statuses_destroy(notice["retweeted_status"]["id"])
+            else:  # it wasn't a 403, so re-raise
+                raise(e)
+
+    @shows_status("Loading profile")
+    @opens_tab()
+    def cmd_profile(self, username):
+        return Profile(self.conn, self.notice_window, username)
+
+    @shows_status("Killing it with fire")
+    @posts_notice
+    def cmd_spamreport(self, username, reason=""):
+        pass
+
+    @shows_status("Blocking user")
+    def cmd_block(self, username):
+        pass
+
+    @shows_status("Unblocking user")
+    def cmd_unblock(self, username):
+        pass
+
+    @shows_status("Loading user timeline")
+    @opens_tab()
+    def cmd_user(self, username):
+        pass
+
+    @shows_status("Loading group timeline")
+    @opens_tab()
+    def cmd_group(self, group):
+        pass
+
+    @shows_status("Loading tag timeline")
+    @opens_tab()
+    def cmd_tag(self, tag):
+        pass
+
+    @shows_status("Loading context")
+    @opens_tab()
+    @repeat_passthrough
+    def cmd_context(self, notice):
+        pass
+
+    @shows_status("Subscribing to user")
+    def cmd_subscribe(self, username):
+        pass
+
+    @shows_status("Unsubscribing from user")
+    def cmd_unsubscribe(self, username):
+        pass
+
+    @shows_status("Joining group")
+    def cmd_groupjoin(self, group):
+        pass
+
+    @shows_status("Leaving group")
+    def cmd_groupleave(self, group):
+        pass
+
+    @shows_status("Checking if user is a member of group")
+    def cmd_groupmember(self, username, group):
+        pass
+
+    @shows_status("Loading received direct messages")
+    @opens_tab("direct")
+    def cmd_directs(self):
+        pass
+
+    @shows_status("Loading sent direct messages")
+    @opens_tab("sentdirect")
+    def cmd_sentdirects(self):
+        pass
+
+    @shows_status("Loading favourites")
+    @opens_tab("favourites")
+    def cmd_favourites(self):
+        pass
+
+    @shows_status("Searching")
+    @opens_tab()
+    def cmd_search(self, query):
+        pass
+
+    @shows_status("Loading home timeline")
+    @opens_tab("home")
+    def cmd_home(self):
+        pass
+
+    @shows_status("Loading mentions timeline")
+    @opens_tab("mentions")
+    def cmd_mentions(self):
+        pass
+
+    @shows_status("Loading public timeline")
+    @opens_tab("public")
+    def cmd_public(self):
+        pass
+
+    @shows_status("Changing config")
+    def cmd_config(self, key, value):
+        pass
+
+    @shows_status("Aliasing command")
+    def cmd_alias(self, alias, command):
+        pass
+
+    @shows_status("Opening link(s)")
+    def cmd_link(self, notice, link_num):
+        pass
+
+    @shows_status("Sending bug report")
+    @posts_notice
+    def cmd_bugreport(self, report):
+        pass
+
+    @shows_status("Sending feature request")
+    @posts_notice
+    def cmd_featurerequest(self, request):
+        pass
+
+    @shows_status("Quitting")
+    def cmd_quit(self):
+        pass
 
     def parse_search(self, query):
         if query is not None:
