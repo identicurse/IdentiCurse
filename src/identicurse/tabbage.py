@@ -268,10 +268,12 @@ class Timeline(Tab):
         if self.prev_page != self.page:
             self.timeline = []
 
+        last_id = 0
         if len(self.timeline) > 0:
-            last_id = self.timeline[0]['id']
-        else:
-            last_id = 0
+            for notice in self.timeline:
+                if notice["ic__from_web"]:  # don't consider inserted posts latest
+                    last_id = notice['id']
+                    break
 
         if self.timeline_type == "home":
             raw_timeline = self.conn.statuses_home_timeline(count=get_count, page=self.page, since_id=last_id)
@@ -311,6 +313,7 @@ class Timeline(Tab):
         old_ids = [n['id'] for n in self.timeline]
 
         for notice in raw_timeline:
+            notice["ic__from_web"] = True
             passes_filters = True
             if notice['id'] in old_ids:
                 passes_filters = False

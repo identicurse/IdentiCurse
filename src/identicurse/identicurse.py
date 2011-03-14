@@ -1178,6 +1178,7 @@ class IdentiCurse(object):
         def outcmd(*largs, **kargs):
             self = largs[0]
             update = cmd(*largs, **kargs)
+            update["ic__from_web"] = False
             if update is not None:
                 if self.tabs[self.current_tab].name == "Context":  # if we're in a context tab, add notice to there too
                     self.tabs[self.current_tab].timeline.insert(0, update)
