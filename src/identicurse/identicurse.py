@@ -783,18 +783,7 @@ class IdentiCurse(object):
                         self.update_timer.cancel()
                         self.cmd_quote(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
             elif input == ord("c") or input in [ord(key) for key in config.config['keys']['ccontext']]:
-                self.status_bar.update("Loading Context...")
-                if "retweeted_status" in self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]:
-                    id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['retweeted_status']['id']
-                else:
-                    id = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]['id']
-                self.tabs.append(Timeline(self.conn, self.notice_window, "context", {'notice_id':id}))
-                self.tabs[self.current_tab].active = False
-                self.current_tab = len(self.tabs) - 1
-                self.tabs[self.current_tab].active = True
-                self.tab_order.insert(0, self.current_tab)
-                self.tabs[self.current_tab].update()
-                self.status_bar.update("Doing Nothing.")
+                self.cmd_context(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
             elif input == ord("n") or input in [ord(key) for key in config.config['keys']['nextmatch']]:
                 if (self.last_page_search['query'] != "") and (self.last_page_search['tab'] == self.current_tab):
                     if self.last_page_search['viewing'] < (len(self.last_page_search['occurs']) - 1):
@@ -942,7 +931,6 @@ class IdentiCurse(object):
                         self.cmd_delete(self.tabs[self.current_tab].timeline[int(tokens[1]) - 1])
     
                     elif tokens[0] == "/profile" and len(tokens) == 2:
-                        self.status_bar.update("Loading Profile...")
                         # Yeuch
                         try:
                             float(tokens[1])
@@ -955,16 +943,9 @@ class IdentiCurse(object):
                                 user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["retweeted_status"]["user"]["screen_name"]
                             else:
                                 user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
-    
-                        self.tabs.append(Profile(self.conn, self.notice_window,user))
-                        self.tabs[self.current_tab].active = False
-                        self.current_tab = len(self.tabs) - 1
-                        self.tabs[self.current_tab].active = True
-                        self.tab_order.insert(0, self.current_tab)
-                        self.tabs[self.current_tab].update()
+                        self.cmd_profile(user)
     
                     elif tokens[0] == "/spamreport" and len(tokens) >= 3:
-                        self.status_bar.update("Firing Orbital Laser Cannon...")
                         # Yeuch
                         try:
                             float(tokens[1])
@@ -972,20 +953,14 @@ class IdentiCurse(object):
                             username = tokens[1]
                             if username[0] == "@":
                                     username = username[1:]
-                            id = self.conn.users_show(screen_name=username)['id']
                         else:
                             if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
-                                id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['retweeted_status']['user']['id']
                                 username = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["retweeted_status"]["user"]["screen_name"]
                             else:
-                                id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['user']['id']
                                 username = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
-                        status = "@support !sr @%s UID %d %s" % (username, id, " ".join(tokens[2:]))
-                        update = self.conn.statuses_update(status, "IdentiCurse")
-                        self.conn.blocks_create(user_id=id, screen_name=username)
+                        update = self.cmd_spamreport(username, " ".join(tokens[2:]))
     
                     elif tokens[0] == "/block" and len(tokens) >= 2:
-                        self.status_bar.update("Creating Block(s)...")
                         for token in tokens[1:]:
                             # Yeuch
                             try:
@@ -994,15 +969,12 @@ class IdentiCurse(object):
                                 user = token
                                 if user[0] == "@":
                                     user = user[1:]
-                                id = self.conn.users_show(screen_name=user)['id']
                             else:
                                 if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
                                     user = self.tabs[self.current_tab].timeline[int(token) - 1]["retweeted_status"]["user"]["screen_name"]
-                                    id = self.tabs[self.current_tab].timeline[int(token) - 1]['retweeted_status']['user']['id']
                                 else:
                                     user = self.tabs[self.current_tab].timeline[int(token) - 1]["user"]["screen_name"]
-                                    id = self.tabs[self.current_tab].timeline[int(token) - 1]['user']['id']
-                            self.conn.blocks_create(user_id=id, screen_name=user)
+                            self.cmd_block(user)
     
                     elif tokens[0] == "/unblock" and len(tokens) >= 2:
                         self.status_bar.update("Removing Block(s)...")
@@ -1014,18 +986,14 @@ class IdentiCurse(object):
                                 user = token
                                 if user[0] == "@":
                                     user = user[1:]
-                                id = self.conn.users_show(screen_name=user)['id']
                             else:
                                 if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
                                     user = self.tabs[self.current_tab].timeline[int(token) - 1]["retweeted_status"]["user"]["screen_name"]
-                                    id = self.tabs[self.current_tab].timeline[int(token) - 1]['retweeted_status']['user']['id']
                                 else:
                                     user = self.tabs[self.current_tab].timeline[int(token) - 1]["user"]["screen_name"]
-                                    id = self.tabs[self.current_tab].timeline[int(token) - 1]['user']['id']
-                            self.conn.blocks_destroy(user_id=id, screen_name=user)
+                            self.cmd_unblock(user)
     
                     elif tokens[0] == "/user" and len(tokens) == 2:
-                        self.status_bar.update("Loading User Timeline...")
                         # Yeuch
                         try:
                             float(tokens[1])
@@ -1033,39 +1001,18 @@ class IdentiCurse(object):
                             user = tokens[1]
                             if user[0] == "@":
                                 user = user[1:]
-                            id = self.conn.users_show(screen_name=user)['id']
                         else:
                             if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
                                 user = self.tabs[self.current_tab].timeline[int(token) - 1]["retweeted_status"]["user"]["screen_name"]
-                                id = self.tabs[self.current_tab].timeline[int(token) - 1]['retweeted_status']['user']['id']
                             else:
                                 user = self.tabs[self.current_tab].timeline[int(token) - 1]["user"]["screen_name"]
-                                id = self.tabs[self.current_tab].timeline[int(token) - 1]['user']['id']
                         
-                        new_tab = True
-                        self.tabs.append(Timeline(self.conn, self.notice_window, "user", {'user_id':id, 'screen_name':user}))
-                        self.tabs[self.current_tab].active = False
-                        self.current_tab = len(self.tabs) - 1
-                        self.tabs[self.current_tab].active = True
-                        self.tab_order.insert(0, self.current_tab)
+                        self.cmd_user(user)
     
                     elif tokens[0] == "/context" and len(tokens) == 2:
-                        self.status_bar.update("Loading Context...")
-                        if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
-                            id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["retweeted_status"]["id"]
-                        else:
-                            id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["id"]
-    
-                        new_tab = True
-                        self.tabs.append(Timeline(self.conn, self.notice_window, "context", {'notice_id':id}))
-                        self.tabs[self.current_tab].active = False
-                        self.current_tab = len(self.tabs) - 1
-                        self.tabs[self.current_tab].active = True
-                        self.tab_order.insert(0, self.current_tab)
-                        self.tabs[self.current_tab].update()
+                            self.cmd_context(self.tabs[self.current_tab].timeline[int(tokens[1]) - 1])
     
                     elif tokens[0] == "/subscribe" and len(tokens) == 2:
-                        self.status_bar.update("Subscribing...")
                         # Yeuch
                         try:
                             float(tokens[1])
@@ -1073,19 +1020,14 @@ class IdentiCurse(object):
                             user = tokens[1]
                             if user[0] == "@":
                                     user = user[1:]
-                            id = self.conn.users_show(screen_name=user)['id']
                         else:
                             if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
                                 user = self.tabs[self.current_tab].timeline[int(token) - 1]["retweeted_status"]["user"]["screen_name"]
-                                id = self.tabs[self.current_tab].timeline[int(token) - 1]['retweeted_status']['user']['id']
                             else:
                                 user = self.tabs[self.current_tab].timeline[int(token) - 1]["user"]["screen_name"]
-                                id = self.tabs[self.current_tab].timeline[int(token) - 1]['user']['id']
-    
-                        self.conn.friendships_create(user_id=id, screen_name=user)
+                        self.cmd_subscribe(user)
                         
                     elif tokens[0] == "/unsubscribe" and len(tokens) == 2:
-                        self.status_bar.update("Unsubscribing...")
                         # Yeuch
                         try:
                             float(tokens[1])
@@ -1093,225 +1035,84 @@ class IdentiCurse(object):
                             user = tokens[1]
                             if user[0] == "@":
                                     user = user[1:]
-                            id = self.conn.users_show(screen_name=user)['id']
                         else:
                             if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
                                 user = self.tabs[self.current_tab].timeline[int(token) - 1]["retweeted_status"]["user"]["screen_name"]
-                                id = self.tabs[self.current_tab].timeline[int(token) - 1]['retweeted_status']['user']['id']
                             else:
                                 user = self.tabs[self.current_tab].timeline[int(token) - 1]["user"]["screen_name"]
-                                id = self.tabs[self.current_tab].timeline[int(token) - 1]['user']['id']
-    
-                        self.conn.friendships_destroy(user_id=id, screen_name=user)
+                        self.cmd_unsubscribe(user)
     
                     elif tokens[0] == "/group" and len(tokens) == 2:
                         self.status_bar.update("Loading Group Timeline...")
                         group = tokens[1]
                         if group[0] == "!":
                             group = group[1:]
-                        id = int(self.conn.statusnet_groups_show(nickname=group)['id'])
-    
-                        new_tab = True
-                        self.tabs.append(Timeline(self.conn, self.notice_window, "group", {'group_id':id, 'nickname':group}))
-                        self.tabs[self.current_tab].active = False
-                        self.current_tab = len(self.tabs) - 1
-                        self.tabs[self.current_tab].active = True
-                        self.tab_order.insert(0, self.current_tab)
+                        self.cmd_group(group)
     
                     elif tokens[0] == "/groupjoin" and len(tokens) == 2:
                         self.status_bar.update("Joining Group...")
                         group = tokens[1]
                         if group[0] == "!":
                             group = group[1:]
-                        id = int(self.conn.statusnet_groups_show(nickname=group)['id'])
-    
-                        self.conn.statusnet_groups_join(group_id=id, nickname=group)
+                        self.cmd_groupjoin(group)
     
                     elif tokens[0] == "/groupleave" and len(tokens) == 2:
                         self.status_bar.update("Leaving Group...")
                         group = tokens[1]
                         if group[0] == "!":
                             group = group[1:]
-                        id = int(self.conn.statusnet_groups_show(nickname=group)['id'])
-    
-                        self.conn.statusnet_groups_leave(group_id=id, nickname=group)
+                        self.cmd_groupleave(group)
     
                     elif tokens[0] == "/groupmember" and len(tokens) == 2:
                         self.status_bar.update("Checking membership...")
                         group = tokens[1]
                         if group[0] == "!":
                             group = group[1:]
-                        group_id = int(self.conn.statusnet_groups_show(nickname=group)['id'])
-                        user_id = int(self.conn.users_show(screen_name=config.config['username'])['id'])
-
-                        if self.conn.statusnet_groups_is_member(user_id, group_id):
-                            self.status_bar.timed_update("You are a member of !%s." % (group))
-                        else:
-                            self.status_bar.timed_update("You are not a member of !%s." % (group))
+                        self.cmd_groupmember(group)
 
                     elif tokens[0] == "/tag" and len(tokens) == 2:
                         self.status_bar.update("Loading Tag Timeline...")
                         tag = tokens[1]
                         if tag[0] == "#":
                             tag = tag[1:]
-    
-                        new_tab = True
-                        self.tabs.append(Timeline(self.conn, self.notice_window, "tag", {'tag':tag}))
-                        self.tabs[self.current_tab].active = False
-                        self.current_tab = len(self.tabs) - 1
-                        self.tabs[self.current_tab].active = True
-                        self.tab_order.insert(0, self.current_tab)
+                        self.cmd_tag(tag)
     
                     elif tokens[0] == "/sentdirects" and len(tokens) == 1:
-                        already_have_one = False
-                        for tab in self.tabs:
-                            if hasattr(tab, 'timeline_type'):
-                                if tab.timeline_type == "sentdirect":
-                                    already_have_one = True
-                                    break
-                        if not already_have_one:
-                            self.status_bar.update("Loading Sent Directs...")
-                            new_tab = True
-                            self.tabs.append(Timeline(self.conn, self.notice_window, "sentdirect"))
-                            self.tabs[self.current_tab].active = False
-                            self.current_tab = len(self.tabs) - 1
-                            self.tabs[self.current_tab].active = True
-                            self.tab_order.insert(0, self.current_tab)
+                        self.cmd_sentdirects()                            
     
                     elif tokens[0] == "/favourites" and len(tokens) == 1:
-                        already_have_one = False
-                        for tab in self.tabs:
-                            if hasattr(tab, 'timeline_type'):
-                                if tab.timeline_type == "favourites":
-                                    already_have_one = True
-                                    break
-                        if not already_have_one:
-                            self.status_bar.update("Loading Favourites...")
-                            new_tab = True
-                            self.tabs.append(Timeline(self.conn, self.notice_window, "favourites"))
-                            self.tabs[self.current_tab].active = False
-                            self.current_tab = len(self.tabs) - 1
-                            self.tabs[self.current_tab].active = True
-                            self.tab_order.insert(0, self.current_tab)
+                        self.cmd_favourites()
                         
                     elif tokens[0] == "/search" and len(tokens) >= 2:
-                        self.status_bar.update("Searching...")
                         query = " ".join(tokens[1:])
-                        new_tab = True
-                        self.tabs.append(Timeline(self.conn, self.notice_window, "search", type_params={'query':query}))
-                        self.tabs[self.current_tab].active = False
-                        self.current_tab = len(self.tabs) - 1
-                        self.tabs[self.current_tab].active = True
-                        self.tab_order.insert(0, self.current_tab)
+                        self.cmd_search(query)
                     
                     elif tokens[0] == "/home" and len(tokens) == 1:
-                        already_have_one = False
-                        for tab in self.tabs:
-                            if hasattr(tab, 'timeline_type'):
-                                if tab.timeline_type == "home":
-                                    already_have_one = True
-                                    break
-                        if not already_have_one:
-                            new_tab = True
-                            self.tabs.append(Timeline(self.conn, self.notice_window, "home"))
-                            self.tabs[self.current_tab].active = False
-                            self.current_tab = len(self.tabs) - 1
-                            self.tabs[self.current_tab].active = True
-                            self.tab_order.insert(0, self.current_tab)
+                        self.cmd_home()
                     
                     elif tokens[0] == "/mentions" and len(tokens) == 1:
-                        already_have_one = False
-                        for tab in self.tabs:
-                            if hasattr(tab, 'timeline_type'):
-                                if tab.timeline_type == "mentions":
-                                    already_have_one = True
-                                    break
-                        if not already_have_one:
-                            new_tab = True
-                            self.tabs.append(Timeline(self.conn, self.notice_window, "mentions"))
-                            self.tabs[self.current_tab].active = False
-                            self.current_tab = len(self.tabs) - 1
-                            self.tabs[self.current_tab].active = True
-                            self.tab_order.insert(0, self.current_tab)
+                        self.cmd_mentions()
                     
                     elif tokens[0] == "/directs" and len(tokens) == 1:
-                        already_have_one = False
-                        for tab in self.tabs:
-                            if hasattr(tab, 'timeline_type'):
-                                if tab.timeline_type == "direct":
-                                    already_have_one = True
-                                    break
-                        if not already_have_one:
-                            new_tab = True
-                            self.tabs.append(Timeline(self.conn, self.notice_window, "direct"))
-                            self.tabs[self.current_tab].active = False
-                            self.current_tab = len(self.tabs) - 1
-                            self.tabs[self.current_tab].active = True
-                            self.tab_order.insert(0, self.current_tab)
+                        self.cmd_directs()
                     
                     elif tokens[0] == "/public" and len(tokens) == 1:
-                        already_have_one = False
-                        for tab in self.tabs:
-                            if hasattr(tab, 'timeline_type'):
-                                if tab.timeline_type == "public":
-                                    already_have_one = True
-                                    break
-                        if not already_have_one:
-                            new_tab = True
-                            self.tabs.append(Timeline(self.conn, self.notice_window, "public"))
-                            self.tabs[self.current_tab].active = False
-                            self.current_tab = len(self.tabs) - 1
-                            self.tabs[self.current_tab].active = True
-                            self.tab_order.insert(0, self.current_tab)
+                        self.cmd_public()
                         
                     elif tokens[0] == "/config" and len(tokens) >= 3:
-                        keys, value = tokens[1].split('.'), " ".join(tokens[2:])
-                        if len(keys) == 2:      # there has to be a clean way to avoid hardcoded len checks, but I can't think what right now, and technically it works for all currently valid config keys
-                            config.config[keys[0]][keys[1]] = value
-                        else:
-                            config.config[keys[0]] = value
-                        config.config.save()
+                        self.cmd_config(tokens[1], " ".join(tokens[2:]))
     
                     elif tokens[0] == "/alias" and len(tokens) >= 3:
-                        self.status_bar.update("Creating alias...")
-                        alias, command = tokens[1], " ".join(tokens[2:])
-                        if alias[0] != "/":
-                            alias = "/" + alias
-                        if command[0] != "/":
-                            command = "/" + command
-                        config.config["aliases"][alias] = command
-                        config.config.save()
+                        self.cmd_alias(tokens[1], " ".join(tokens[2:]))
 
                     elif tokens[0] == "/link":
-                        dent_index = int(tokens[2]) - 1
-                        if tokens[1] == "*":
-                            self.status_bar.update("Opening links...")
-                            if "retweeted_status" in self.tabs[self.current_tab].timeline[dent_index]:
-                                for target_url in helpers.url_regex.findall(self.tabs[self.current_tab].timeline[dent_index]['retweeted_status']['text']):
-                                    subprocess.Popen(config.config['browser'] % (target_url), shell=True, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
-                            else:
-                                for target_url in helpers.url_regex.findall(self.tabs[self.current_tab].timeline[dent_index]['text']):
-                                    subprocess.Popen(config.config['browser'] % (target_url), shell=True, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
-                        else:
-                            self.status_bar.update("Opening link...")
-                            link_index = int(tokens[1]) - 1
-                            if "retweeted_status" in self.tabs[self.current_tab].timeline[dent_index]:
-                                target_url = helpers.url_regex.findall(self.tabs[self.current_tab].timeline[dent_index]['retweeted_status']['text'])[link_index]
-                            else:
-                                target_url = helpers.url_regex.findall(self.tabs[self.current_tab].timeline[dent_index]['text'])[link_index]
-                            subprocess.Popen(config.config['browser'] % (target_url), shell=True, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
+                        self.cmd_link(self.tabs[self.current_tab].timeline[int(tokens[2]) - 1], tokens[1])
 
                     elif tokens[0] == "/bugreport" and len(tokens) >= 2:
-                        self.status_bar.update("Reporting bug...")
-    
-                        status = "#icursebug " + " ".join(tokens[1:])
-                        update = self.conn.statuses_update(status, "IdentiCurse", long_dent=config.config['long_dent'], dup_first_word=True)
+                        update = self.cmd_bugreport(" ".join(tokens[1:]))
    
                     elif tokens[0] == "/featurerequest" and len(tokens) >= 2:
-                        self.status_bar.update("Posting feature request...")
-    
-                        status = "#icurserequest " + " ".join(tokens[1:])
-                        update = self.conn.statuses_update(status, "IdentiCurse", long_dent=config.config['long_dent'], dup_first_word=True)
+                        update = self.cmd_featurerequest(" ".join(tokens[1:]))
 
                     elif tokens[0] == "/quote" and len(tokens) == 2:
                         update = self.cmd_quote(self.tabs[self.current_tab].timeline[int(tokens[1]) - 1])
@@ -1481,117 +1282,159 @@ class IdentiCurse(object):
     @shows_status("Killing it with fire")
     @posts_notice
     def cmd_spamreport(self, username, reason=""):
-        pass
+        user_id = self.conn.users_show(screen_name=username)["id"]
+        status = "@support !sr @%s UID %d" % (username, user_id)
+        if len(reason) > 0:
+            status += " %s" % (reason)
+        self.conn.blocks_create(user_id=user_id, screen_name=username)
+        return self.conn.statuses_update(status, "IdentiCurse")
 
     @shows_status("Blocking user")
     def cmd_block(self, username):
-        pass
+        user_id = self.conn.users_show(screen_name=username)["id"]
+        self.conn.blocks_create(user_id=user_id, screen_name=username)
 
     @shows_status("Unblocking user")
     def cmd_unblock(self, username):
-        pass
+        user_id = self.conn.users_show(screen_name=username)["id"]
+        self.conn.blocks_destroy(user_id=user_id, screen_name=username)
 
     @shows_status("Loading user timeline")
     @opens_tab()
     def cmd_user(self, username):
-        pass
+        user_id = self.conn.users_show(screen_name=username)["id"]
+        return Timeline(self.conn, self.notice_window, "user", {'user_id':user_id, 'screen_name':username})
 
     @shows_status("Loading group timeline")
     @opens_tab()
     def cmd_group(self, group):
-        pass
+        group_id = int(self.conn.statusnet_groups_show(nickname=group)['id'])
+        return Timeline(self.conn, self.notice_window, "group", {'group_id':group_id, 'nickname':group})
 
     @shows_status("Loading tag timeline")
     @opens_tab()
     def cmd_tag(self, tag):
-        pass
+        return Timeline(self.conn, self.notice_window, "tag", {'tag':tag})
 
     @shows_status("Loading context")
     @opens_tab()
     @repeat_passthrough
     def cmd_context(self, notice):
-        pass
+        return Timeline(self.conn, self.notice_window, "context", {'notice_id':notice['id']})
 
     @shows_status("Subscribing to user")
     def cmd_subscribe(self, username):
-        pass
+        user_id = self.conn.users_show(screen_name=username)["id"]
+        self.conn.friendships_create(user_id=user_id, screen_name=username)
 
     @shows_status("Unsubscribing from user")
     def cmd_unsubscribe(self, username):
-        pass
+        user_id = self.conn.users_show(screen_name=username)["id"]
+        self.conn.friendships_destroy(user_id=user_id, screen_name=username)
 
     @shows_status("Joining group")
     def cmd_groupjoin(self, group):
-        pass
+        group_id = int(self.conn.statusnet_groups_show(nickname=group)['id'])
+        self.conn.statusnet_groups_join(group_id=group_id, nickname=group)
 
     @shows_status("Leaving group")
     def cmd_groupleave(self, group):
-        pass
+        group_id = int(self.conn.statusnet_groups_show(nickname=group)['id'])
+        self.conn.statusnet_groups_leave(group_id=group_id, nickname=group)
 
-    @shows_status("Checking if user is a member of group")
-    def cmd_groupmember(self, username, group):
-        pass
+    @shows_status("Checking if you are a member of that group")
+    def cmd_groupmember(self, group):
+        user_id = self.conn.users_show()['id']
+        group_id = self.conn.statusnet_groups_show(nickname=group)['id']
+        if self.conn.statusnet_groups_is_member(user_id, group_id):
+            self.status_bar.timed_update("You are a member of !%s." % (group))
+        else:
+            self.status_bar.timed_update("You are not a member of !%s." % (group))
 
     @shows_status("Loading received direct messages")
     @opens_tab("direct")
     def cmd_directs(self):
-        pass
+        return Timeline(self.conn, self.notice_window, "direct")
 
     @shows_status("Loading sent direct messages")
     @opens_tab("sentdirect")
     def cmd_sentdirects(self):
-        pass
+        return Timeline(self.conn, self.notice_window, "sentdirect")
 
     @shows_status("Loading favourites")
     @opens_tab("favourites")
     def cmd_favourites(self):
-        pass
+        return Timeline(self.conn, self.notice_window, "favourites")
 
     @shows_status("Searching")
     @opens_tab()
     def cmd_search(self, query):
-        pass
+        return Timeline(self.conn, self.notice_window, "search", type_params={'query':query})
 
     @shows_status("Loading home timeline")
     @opens_tab("home")
     def cmd_home(self):
-        pass
+        return Timeline(self.conn, self.notice_window, "home")
 
     @shows_status("Loading mentions timeline")
     @opens_tab("mentions")
     def cmd_mentions(self):
-        pass
+        return Timeline(self.conn, self.notice_window, "mentions")
 
     @shows_status("Loading public timeline")
     @opens_tab("public")
     def cmd_public(self):
-        pass
+        return Timeline(self.conn, self.notice_window, "public")
 
     @shows_status("Changing config")
     def cmd_config(self, key, value):
-        pass
+        key = key.split('.')
+        if len(key) == 2:      # there has to be a clean way to avoid hardcoded len checks, but I can't think what right now, and technically it works for all currently valid config keys
+            config.config[key[0]][key[1]] = value
+        else:
+            config.config[key[0]] = value
+        config.config.save()
 
     @shows_status("Aliasing command")
     def cmd_alias(self, alias, command):
-        pass
+        if alias[0] != "/":
+            alias = "/" + alias
+        if command[0] != "/":
+            command = "/" + command
+        config.config["aliases"][alias] = command
+        config.config.save()
 
     @shows_status("Opening link(s)")
+    @repeat_passthrough
     def cmd_link(self, notice, link_num):
-        pass
+        links_to_open = []
+        if link_num == "*":
+            for target_url in helpers.url_regex.findall(notice["text"]):
+                if not target_url in links_to_open:
+                    links_to_open.append(target_url)
+        else:
+            link_index = int(link_num) - 1
+            target_url = helpers.url_regex.findall(notice["text"])[link_index]
+            if not target_url in links_to_open:
+                links_to_open.append(target_url)
+        for link in links_to_open:
+            subprocess.Popen(config.config['browser'] % (link), shell=True, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
 
     @shows_status("Sending bug report")
     @posts_notice
     def cmd_bugreport(self, report):
-        pass
+        status = "#icursebug " + report
+        return self.conn.statuses_update(status, "IdentiCurse", long_dent=config.config['long_dent'], dup_first_word=True)
 
     @shows_status("Sending feature request")
     @posts_notice
     def cmd_featurerequest(self, request):
-        pass
+        status = "#icurserequest " + request
+        return self.conn.statuses_update(status, "IdentiCurse", long_dent=config.config['long_dent'], dup_first_word=True)
 
     @shows_status("Quitting")
     def cmd_quit(self):
-        pass
+        self.running = False
 
     def parse_search(self, query):
         if query is not None:
