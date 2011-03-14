@@ -235,8 +235,6 @@ class Timeline(Tab):
     def __init__(self, conn, window, timeline, type_params={}):
         self.conn = conn
         self.timeline = []
-        self.raw_mentions_timeline = []
-        self.raw_directs_timeline = []
         self.prev_page = -1
         if not hasattr(config.session_store, 'user_cache'):
             config.session_store.user_cache = {}
@@ -266,49 +264,57 @@ class Timeline(Tab):
 
     def update(self):
         get_count = config.config['notice_limit']
+
+        if self.prev_page != self.page:
+            self.timeline = []
+
+        if len(self.timeline) > 0:
+            last_id = self.timeline[0]['id']
+        else:
+            last_id = 0
+
         if self.timeline_type == "home":
-            raw_timeline = self.conn.statuses_home_timeline(count=get_count, page=self.page)
+            raw_timeline = self.conn.statuses_home_timeline(count=get_count, page=self.page, since_id=last_id)
         elif self.timeline_type == "mentions":
-            raw_timeline = self.conn.statuses_mentions(count=get_count, page=self.page)
-            if (len(self.raw_mentions_timeline) > 0) and ([n['id'] for n in raw_timeline] != [n['id'] for n in self.raw_mentions_timeline]) and self.prev_page == self.page:
-                curses.flash()
-            self.raw_mentions_timeline = raw_timeline
-            self.prev_page = self.page
+            raw_timeline = self.conn.statuses_mentions(count=get_count, page=self.page, since_id=last_id)
         elif self.timeline_type == "direct":
-            raw_timeline = self.conn.direct_messages(count=get_count, page=self.page)
-            if (len(self.raw_directs_timeline) > 0) and ([n['id'] for n in raw_timeline] != [n['id'] for n in self.raw_directs_timeline]) and self.prev_page == self.page:
-                curses.flash()
-            self.raw_directs_timeline = raw_timeline
-            self.prev_page = self.page
+            raw_timeline = self.conn.direct_messages(count=get_count, page=self.page, since_id=last_id)
         elif self.timeline_type == "user":
-            raw_timeline = self.conn.statuses_user_timeline(user_id=self.type_params['user_id'], screen_name=self.type_params['screen_name'], count=get_count, page=self.page)
+            raw_timeline = self.conn.statuses_user_timeline(user_id=self.type_params['user_id'], screen_name=self.type_params['screen_name'], count=get_count, page=self.page, since_id=last_id)
         elif self.timeline_type == "group":
-            raw_timeline = self.conn.statusnet_groups_timeline(group_id=self.type_params['group_id'], nickname=self.type_params['nickname'], count=get_count, page=self.page)
+            raw_timeline = self.conn.statusnet_groups_timeline(group_id=self.type_params['group_id'], nickname=self.type_params['nickname'], count=get_count, page=self.page, since_id=last_id)
         elif self.timeline_type == "tag":
-            raw_timeline = self.conn.statusnet_tags_timeline(tag=self.type_params['tag'], count=get_count, page=self.page)
+            raw_timeline = self.conn.statusnet_tags_timeline(tag=self.type_params['tag'], count=get_count, page=self.page, since_id=last_id)
         elif self.timeline_type == "sentdirect":
-            raw_timeline = self.conn.direct_messages_sent(count=get_count, page=self.page)
+            raw_timeline = self.conn.direct_messages_sent(count=get_count, page=self.page, since_id=last_id)
         elif self.timeline_type == "public":
             raw_timeline = self.conn.statuses_public_timeline()
         elif self.timeline_type == "favourites":
-            raw_timeline = self.conn.favorites(page=self.page)
+            raw_timeline = self.conn.favorites(page=self.page, since_id=last_id)
         elif self.timeline_type == "search":
-            raw_timeline = self.conn.search(self.type_params['query'], page=self.page, standardise=True)
+            raw_timeline = self.conn.search(self.type_params['query'], page=self.page, standardise=True, since_id=last_id)
         elif self.timeline_type == "context":
             raw_timeline = []
-            next_id = self.type_params['notice_id']
-            while next_id is not None:
-                notice = self.conn.statuses_show(id=next_id)
-                raw_timeline.append(notice)
-                if "retweeted_status" in notice:
-                    next_id = notice['retweeted_status']['id']
-                else:
-                    next_id = notice['in_reply_to_status_id']
+            if last_id == 0:  # don't run this if we've already filled the timeline
+                next_id = self.type_params['notice_id']
+                while next_id is not None:
+                    notice = self.conn.statuses_show(id=next_id)
+                    raw_timeline.append(notice)
+                    if "retweeted_status" in notice:
+                        next_id = notice['retweeted_status']['id']
+                    else:
+                        next_id = notice['in_reply_to_status_id']
+
+        self.prev_page = self.page
 
         temp_timeline = []
+        old_ids = [n['id'] for n in self.timeline]
 
         for notice in raw_timeline:
             passes_filters = True
+            if notice['id'] in old_ids:
+                passes_filters = False
+                continue
             for filter_item in config.config['filters']:
                 if filter_item.lower() in notice['text'].lower():
                     passes_filters = False
@@ -331,7 +337,16 @@ class Timeline(Tab):
                         break
                 temp_timeline.append(notice)
 
-        self.timeline = temp_timeline[:]
+        if self.timeline_type in ["direct", "mentions"]:  # alert on changes to these. maybe config option later?
+            if (len(self.timeline) > 0) and (len(temp_timeline) > 0):  # only fire when there's new stuff _and_ we've already got something in the timeline
+                curses.flash()
+
+        if len(self.timeline) == 0:
+            self.timeline = temp_timeline[:]
+        else:
+            self.timeline = temp_timeline + self.timeline
+            if len(self.timeline) > get_count:  # truncate long timelines
+                self.timeline = self.timeline[:get_count]
 
         if self.page > 1:
             self.name = self.basename + "+%d" % (self.page - 1)

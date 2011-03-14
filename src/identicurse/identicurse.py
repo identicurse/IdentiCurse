@@ -1273,6 +1273,9 @@ class IdentiCurse(object):
                 self.conn.statuses_destroy(notice["retweeted_status"]["id"])
             else:  # it wasn't a 403, so re-raise
                 raise(e)
+        for timeline in [tab.timeline for tab in self.tabs if hasattr(tab, "timeline_type")]:
+            if notice in timeline:
+                timeline.remove(notice)
 
     @shows_status("Loading profile")
     @opens_tab()
