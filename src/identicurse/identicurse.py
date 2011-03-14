@@ -781,39 +781,7 @@ class IdentiCurse(object):
                         pass  # we must be in a Context tab, so repeating is fine.
                     if can_repeat:
                         self.update_timer.cancel()
-                        self.quote_mode = True
-                        n = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]
-                        user = n['user']['screen_name']
-                        id = n['id']
-                        msg = n['text']
-                        for match in helpers.entity_regex.findall(msg):
-                            if match[0] == "!":
-                                msg = msg.replace(match, "#" + match[1:])
-                        status = self.text_entry.edit("RD @" + user + " " + msg)
-                        self.quote_mode = False
-                        update = False
-                        try:
-                            update = self.conn.statuses_update(status, "IdentiCurse", int(id), long_dent=config.config['long_dent'], dup_first_word=True)
-                        except Exception, (errmsg):
-                            self.status_bar.timed_update("ERROR: Couldn't post status: %s" % (errmsg))
-                        if update != False:
-                            if self.tabs[self.current_tab].name == "Context":  # if we're in a context tab, add notice to there too
-                                self.tabs[self.current_tab].timeline.insert(0, update)
-                                self.tabs[self.current_tab].update_buffer()
-                            for tab in self.tabs:
-                                if not hasattr(tab, 'timeline_type'):
-                                    continue
-                                if tab.timeline_type == "home":
-                                    if isinstance(update, list):
-                                        for notice in update:
-                                            tab.timeline.insert(0, notice)
-                                    else:
-                                        tab.timeline.insert(0, update)
-                                    tab.update_buffer()
-                            self.status_bar.update("Doing nothing.")
-                        else:
-                            self.tabs[self.current_tab].update()
-                            self.status_bar.update("Doing nothing.")
+                        self.cmd_quote(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
             elif input == ord("c") or input in [ord(key) for key in config.config['keys']['ccontext']]:
                 self.status_bar.update("Loading Context...")
                 if "retweeted_status" in self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]:
@@ -1346,26 +1314,7 @@ class IdentiCurse(object):
                         update = self.conn.statuses_update(status, "IdentiCurse", long_dent=config.config['long_dent'], dup_first_word=True)
 
                     elif tokens[0] == "/quote" and len(tokens) == 2:
-                        self.quote_mode = True
-
-                        if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
-                            original_id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['retweeted_status']['id']
-                        else:
-                            original_id = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['id']
-                        original_status = self.conn.statuses_show(original_id)
-                        new_status_base = "RD @%s %s" % (original_status['user']['screen_name'], original_status['text'])
-                        for match in helpers.entity_regex.findall(new_status_base):
-                            if match[0] == "!":
-                                new_status_base = new_status_base.replace(match, "#" + match[1:])
-
-                        status = self.text_entry.edit(new_status_base)
-                        self.quote_mode = False
-
-                        if status is None:
-                            status = ""
-                        if len(status) > 0:
-                            self.status_bar.update("Posting Notice...")
-                            update = self.conn.statuses_update(status, "IdentiCurse", original_id, long_dent=config.config['long_dent'])
+                        update = self.cmd_quote(self.tabs[self.current_tab].timeline[int(tokens[1]) - 1])
 
                     elif tokens[0] == "/quit" and len(tokens) == 1:
                         self.running = False
@@ -1428,19 +1377,20 @@ class IdentiCurse(object):
         def outcmd(*largs, **kargs):
             self = largs[0]
             update = cmd(*largs, **kargs)
-            if self.tabs[self.current_tab].name == "Context":  # if we're in a context tab, add notice to there too
-                self.tabs[self.current_tab].timeline.insert(0, update)
-                self.tabs[self.current_tab].update_buffer()
-            for tab in self.tabs:
-                if not hasattr(tab, 'timeline_type'):
-                    continue
-                if tab.timeline_type == "home":
-                    if isinstance(update, list):
-                        for notice in update:
-                            tab.timeline.insert(0, notice)
-                    else:
-                        tab.timeline.insert(0, update)
-                    tab.update_buffer()
+            if update is not None:
+                if self.tabs[self.current_tab].name == "Context":  # if we're in a context tab, add notice to there too
+                    self.tabs[self.current_tab].timeline.insert(0, update)
+                    self.tabs[self.current_tab].update_buffer()
+                for tab in self.tabs:
+                    if not hasattr(tab, 'timeline_type'):
+                        continue
+                    if tab.timeline_type == "home":
+                        if isinstance(update, list):
+                            for notice in update:
+                                tab.timeline.insert(0, notice)
+                        else:
+                            tab.timeline.insert(0, update)
+                        tab.update_buffer()
             self.status_bar.update("Doing nothing.")
             return True
         return outcmd
@@ -1475,7 +1425,10 @@ class IdentiCurse(object):
     @shows_status("Posting notice")
     @posts_notice
     def cmd_post(self, message):
-        return self.conn.statuses_update(message, "IdentiCurse", long_dent=config.config["long_dent"], dup_first_word=True)
+        if message is None:
+            message = ""
+        if len(message) > 0:
+            return self.conn.statuses_update(message, "IdentiCurse", long_dent=config.config["long_dent"], dup_first_word=True)
 
     @shows_status("Favouriting notice")
     @repeat_passthrough
@@ -1492,7 +1445,18 @@ class IdentiCurse(object):
     @posts_notice
     @repeat_passthrough
     def cmd_quote(self, notice):
-        pass
+        self.quote_mode = True
+        new_status_base = "RD @%s %s" % (notice['user']['screen_name'], notice['text'])
+        for match in helpers.entity_regex.findall(new_status_base):
+            if match[0] == "!":
+                new_status_base = new_status_base.replace(match, "#" + match[1:])
+        status = self.text_entry.edit(new_status_base)
+        self.quote_mode = False
+
+        if status is None:
+            status = ""
+        if len(status) > 0:
+            return self.conn.statuses_update(status, "IdentiCurse", int(notice["id"]), long_dent=config.config["long_dent"], dup_first_word=True)
 
     @shows_status("Sending direct message")
     def cmd_direct(self, username, message):
