@@ -17,6 +17,7 @@
 
 from helpers import DATETIME_FORMAT
 import os.path, re, sys, threading, datetime, locale, helpers, curses, random, identicurse, config, httplib
+from operator import itemgetter
 from statusnet import StatusNetError
 
 class Buffer(list):
@@ -313,7 +314,13 @@ class Timeline(Tab):
         old_ids = [n['id'] for n in self.timeline]
 
         for notice in raw_timeline:
+            locale.setlocale(locale.LC_TIME, 'C')  # hacky fix because statusnet uses english timestrings regardless of locale
+            created_at_no_offset = helpers.offset_regex.sub("+0000", notice['created_at'])
+            notice["ic__raw_datetime"] = datetime.datetime.strptime(created_at_no_offset, DATETIME_FORMAT) + helpers.utc_offset(notice['created_at'])
+            locale.setlocale(locale.LC_TIME, '') # other half of the hacky fix
+
             notice["ic__from_web"] = True
+
             passes_filters = True
             if notice['id'] in old_ids:
                 passes_filters = False
@@ -350,6 +357,8 @@ class Timeline(Tab):
             self.timeline = temp_timeline + self.timeline
             if len(self.timeline) > get_count:  # truncate long timelines
                 self.timeline = self.timeline[:get_count]
+
+        self.timeline.sort(key=itemgetter('ic__raw_datetime'), reverse=True)
 
         if self.page > 1:
             self.name = self.basename + "+%d" % (self.page - 1)

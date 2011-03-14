@@ -1178,6 +1178,12 @@ class IdentiCurse(object):
         def outcmd(*largs, **kargs):
             self = largs[0]
             update = cmd(*largs, **kargs)
+
+            locale.setlocale(locale.LC_TIME, 'C')  # hacky fix because statusnet uses english timestrings regardless of locale
+            created_at_no_offset = helpers.offset_regex.sub("+0000", update['created_at'])
+            update["ic__raw_datetime"] = datetime.datetime.strptime(created_at_no_offset, DATETIME_FORMAT) + helpers.utc_offset(update['created_at'])
+            locale.setlocale(locale.LC_TIME, '') # other half of the hacky fix
+
             update["ic__from_web"] = False
             if update is not None:
                 if self.tabs[self.current_tab].name == "Context":  # if we're in a context tab, add notice to there too
