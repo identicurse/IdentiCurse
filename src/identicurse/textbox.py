@@ -28,6 +28,14 @@ class Textbox(textpad.Textbox):
         self.poll_function = poll
 
     def edit(self, initial_input=""):
+        old_curs_state = 0
+        try:
+            old_curs_state = curses.curs_set(2)  # try to get a "very visible" cursor, which is a block where this is differentiated from "visible"
+        except:
+            try:
+                old_curs_state = curses.curs_set(1)  # if no "very visible" mode, try for plain "visible"
+            except:
+                pass
         for char in list(initial_input):
             self.do_command(char)
         self.poll_function(self.count())
@@ -121,6 +129,10 @@ class Textbox(textpad.Textbox):
             self.poll_function(self.count())
             self.win.refresh()
 
+        try:
+            curses.curs_set(old_curs_state)  # try to restore the cursor's state before returning to normal operation
+        except:
+            pass
         if abort == False:
             return self.gather()
         else:

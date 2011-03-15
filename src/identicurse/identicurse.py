@@ -481,6 +481,11 @@ class IdentiCurse(object):
     def initialise(self, screen):
         self.screen = screen
 
+        try:
+            curses.curs_set(0)  # try to hide the cursor. Textbox makes it visible again, then hides it on exit
+        except:
+            pass
+
         curses.noecho()
         curses.cbreak()
         curses.use_default_colors()
