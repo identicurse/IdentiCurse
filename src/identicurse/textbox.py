@@ -130,6 +130,7 @@ class Textbox(textpad.Textbox):
 
     def gather(self):
         "Collect and return the contents of the window."
+        cursor_position = self.win.getyx()
         result = ""
         for y in range(self.maxy+1):
             self.win.move(y, 0)
@@ -142,8 +143,7 @@ class Textbox(textpad.Textbox):
                 result = result + chr(curses.ascii.ascii(self.win.inch(y, x)))
             if self.maxy > 0:
                 result = result + "\n"
-        self.win.clear()
-        self.win.refresh()
+        self.win.move(*cursor_position)
         return result
 
     def count(self):

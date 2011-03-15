@@ -1133,6 +1133,7 @@ class IdentiCurse(object):
                 self.status_bar.update("Doing nothing.")
 
         self.entry_window.clear()
+        self.entry_window.refresh()
         self.text_entry = Textbox(self.entry_window, self.validate, insert_mode=True)
         self.text_entry.stripspaces = 1
         self.tabs[self.current_tab].search_highlight_line = -1
@@ -1217,6 +1218,8 @@ class IdentiCurse(object):
             self.reply_mode = True
             status = self.text_entry.edit("@%s " % (user))
             self.reply_mode = False
+            self.entry_window.clear()
+            self.entry_window.refresh()
         else:
             status = "@%s %s" % (notice["user"]["screen_name"], message)
         return self.conn.statuses_update(status, "IdentiCurse", int(notice["id"]), long_dent=config.config["long_dent"], dup_first_word=True)
@@ -1257,6 +1260,8 @@ class IdentiCurse(object):
                 new_status_base = new_status_base.replace(match, "#" + match[1:])
         status = self.text_entry.edit(new_status_base)
         self.quote_mode = False
+        self.entry_window.clear()
+        self.entry_window.refresh()
 
         if status is None:
             status = ""
@@ -1493,6 +1498,7 @@ class IdentiCurse(object):
             self.status_bar.update("Doing nothing.")
 
         self.entry_window.clear()
+        self.entry_window.refresh()
         self.text_entry = Textbox(self.entry_window, self.validate, insert_mode=True)
         self.text_entry.stripspaces = 1
         self.display_current_tab()
