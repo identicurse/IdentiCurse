@@ -131,7 +131,7 @@ class Textbox(textpad.Textbox):
     def gather(self):
         "Collect and return the contents of the window."
         cursor_position = self.win.getyx()
-        result = ""
+        result = [""]
         for y in range(self.maxy+1):
             self.win.move(y, 0)
             stop = self._end_of_line(y)
@@ -139,12 +139,18 @@ class Textbox(textpad.Textbox):
                 continue
             for x in range(self.maxx+1):
                 if self.stripspaces and x > stop:
+                    result.append("")
                     break
-                result = result + chr(curses.ascii.ascii(self.win.inch(y, x)))
-            if self.maxy > 0:
-                result = result + "\n"
+                char = chr(curses.ascii.ascii(self.win.inch(y, x)))
+                if char == " ":
+                    result.append("")
+                else:
+                    result[-1] += chr(curses.ascii.ascii(self.win.inch(y, x)))
+            #if self.maxy > 0:
+            #    result.append("")
+        result = [word for word in result if word != ""]
         self.win.move(*cursor_position)
-        return result
+        return " ".join(result)
 
     def count(self):
         cursor_position = self.win.getyx()
