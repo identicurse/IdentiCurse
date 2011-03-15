@@ -1132,8 +1132,6 @@ class IdentiCurse(object):
                 self.tabs[self.current_tab].update()
                 self.status_bar.update("Doing nothing.")
 
-        self.entry_window.clear()
-        self.entry_window.refresh()
         self.text_entry = Textbox(self.entry_window, self.validate, insert_mode=True)
         self.text_entry.stripspaces = 1
         self.tabs[self.current_tab].search_highlight_line = -1
@@ -1213,13 +1211,9 @@ class IdentiCurse(object):
     def cmd_reply(self, notice, message=""):
         user = notice["user"]["screen_name"]
         if message == "":
-            self.entry_window.clear()
-            self.entry_window.refresh()
             self.reply_mode = True
             status = self.text_entry.edit("@%s " % (user))
             self.reply_mode = False
-            self.entry_window.clear()
-            self.entry_window.refresh()
         else:
             status = "@%s %s" % (notice["user"]["screen_name"], message)
         if status is None:
@@ -1256,8 +1250,6 @@ class IdentiCurse(object):
     @posts_notice
     @repeat_passthrough
     def cmd_quote(self, notice):
-        self.entry_window.clear()
-        self.entry_window.refresh()
         self.quote_mode = True
         new_status_base = "RD @%s %s" % (notice['user']['screen_name'], notice['text'])
         for match in helpers.entity_regex.findall(new_status_base):
@@ -1265,8 +1257,6 @@ class IdentiCurse(object):
                 new_status_base = new_status_base.replace(match, "#" + match[1:])
         status = self.text_entry.edit(new_status_base)
         self.quote_mode = False
-        self.entry_window.clear()
-        self.entry_window.refresh()
 
         if status is None:
             status = ""
@@ -1502,8 +1492,6 @@ class IdentiCurse(object):
         else:
             self.status_bar.update("Doing nothing.")
 
-        self.entry_window.clear()
-        self.entry_window.refresh()
         self.text_entry = Textbox(self.entry_window, self.validate, insert_mode=True)
         self.text_entry.stripspaces = 1
         self.display_current_tab()

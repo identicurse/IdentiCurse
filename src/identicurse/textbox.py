@@ -128,7 +128,7 @@ class Textbox(textpad.Textbox):
             self.win.refresh()
             return None
 
-    def gather(self):
+    def gather_only(self):
         "Collect and return the contents of the window."
         cursor_position = self.win.getyx()
         result = [""]
@@ -146,11 +146,16 @@ class Textbox(textpad.Textbox):
                     result.append("")
                 else:
                     result[-1] += chr(curses.ascii.ascii(self.win.inch(y, x)))
-            #if self.maxy > 0:
-            #    result.append("")
         result = [word for word in result if word != ""]
         self.win.move(*cursor_position)
         return " ".join(result)
+
+    def gather(self):
+        "Return the contents of the window, and also clear it. Explicitly use gather_only() if you need to preserve the contents."
+        result = self.gather_only()
+        self.win.clear()
+        self.win.refresh()
+        return result
 
     def count(self):
         cursor_position = self.win.getyx()
