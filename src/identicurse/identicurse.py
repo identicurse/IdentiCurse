@@ -1213,6 +1213,8 @@ class IdentiCurse(object):
     def cmd_reply(self, notice, message=""):
         user = notice["user"]["screen_name"]
         if message == "":
+            self.entry_window.clear()
+            self.entry_window.refresh()
             self.reply_mode = True
             status = self.text_entry.edit("@%s " % (user))
             self.reply_mode = False
@@ -1254,6 +1256,8 @@ class IdentiCurse(object):
     @posts_notice
     @repeat_passthrough
     def cmd_quote(self, notice):
+        self.entry_window.clear()
+        self.entry_window.refresh()
         self.quote_mode = True
         new_status_base = "RD @%s %s" % (notice['user']['screen_name'], notice['text'])
         for match in helpers.entity_regex.findall(new_status_base):
