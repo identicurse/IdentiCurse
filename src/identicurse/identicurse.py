@@ -1179,11 +1179,9 @@ class IdentiCurse(object):
         def outcmd(*largs, **kargs):
             self = largs[0]
             update = cmd(*largs, **kargs)
-
-            update["ic__raw_datetime"] = helpers.notice_datetime(update)
-
-            update["ic__from_web"] = False
             if update is not None:
+                update["ic__raw_datetime"] = helpers.notice_datetime(update)
+                update["ic__from_web"] = False
                 if self.tabs[self.current_tab].name == "Context":  # if we're in a context tab, add notice to there too
                     self.tabs[self.current_tab].timeline.insert(0, update)
                     self.tabs[self.current_tab].update_buffer()
@@ -1222,7 +1220,10 @@ class IdentiCurse(object):
             self.entry_window.refresh()
         else:
             status = "@%s %s" % (notice["user"]["screen_name"], message)
-        return self.conn.statuses_update(status, "IdentiCurse", int(notice["id"]), long_dent=config.config["long_dent"], dup_first_word=True)
+        if status is None:
+            status = ""
+        if len(status) > 0:
+            return self.conn.statuses_update(status, "IdentiCurse", int(notice["id"]), long_dent=config.config["long_dent"], dup_first_word=True)
 
     @shows_status("Posting mention")
     @posts_notice
