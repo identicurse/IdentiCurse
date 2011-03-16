@@ -27,7 +27,14 @@ url_regex = re.compile("http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-
 def notice_datetime(notice):
     locale.setlocale(locale.LC_TIME, 'C')  # hacky fix because statusnet uses english timestrings regardless of locale
     created_at_no_offset = offset_regex.sub("+0000", notice['created_at'])
-    normalised_datetime = datetime.datetime.strptime(created_at_no_offset, DATETIME_FORMAT) + utc_offset(notice['created_at'])
+    attempts = 10
+    while attempts > 0:
+        attempts -= 1
+        try:
+            normalised_datetime = datetime.datetime.strptime(created_at_no_offset, DATETIME_FORMAT) + utc_offset(notice['created_at'])
+            break
+        except ValueError:  # something else changed the locale, and Python threw a hissy fit
+            pass
     locale.setlocale(locale.LC_TIME, '') # other half of the hacky fix
     return normalised_datetime
 
