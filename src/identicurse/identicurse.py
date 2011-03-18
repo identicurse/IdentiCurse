@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import os, sys, curses, locale, re, subprocess, random
+import os, sys, curses, locale, re, subprocess, random, platform
 try:
     import json
 except ImportError:
@@ -57,25 +57,46 @@ colour_fields = {
     "warning": 19,
 }
 
-colours = {
-    "none": -1,
-    "black": 0,
-    "red": 1,
-    "green": 2,
-    "brown": 3,
-    "blue": 4,
-    "magenta": 5,
-    "cyan": 6,
-    "white": 7,
-    "grey": 8,
-    "light_red": 9,
-    "light_green": 10,
-    "yellow": 11,
-    "light_blue": 12,
-    "light_magenta": 13,
-    "light_cyan": 14,
-    "light_white": 15
-}
+if platform.system() == "Windows":  # Handle Windows' colour-order fuckery. This is only true if we are running on pure Windows. If we're on Cygwin, which handles colours correctly anyway, this won't match.
+    colours = {
+        "none": -1,
+        "black": 0,
+        "blue": 1,
+        "green": 2,
+        "cyan": 3,
+        "red": 4,
+        "magenta": 5,
+        "brown": 6,
+        "white": 7,
+        "grey": 8,
+        "light_blue": 9,
+        "light_green": 10,
+        "light_cyan": 11,
+        "light_red": 12,
+        "light_magenta": 13,
+        "yellow": 14,
+        "light_white": 15
+    }
+else:
+    colours = {
+        "none": -1,
+        "black": 0,
+        "red": 1,
+        "green": 2,
+        "brown": 3,
+        "blue": 4,
+        "magenta": 5,
+        "cyan": 6,
+        "white": 7,
+        "grey": 8,
+        "light_red": 9,
+        "light_green": 10,
+        "yellow": 11,
+        "light_blue": 12,
+        "light_magenta": 13,
+        "light_cyan": 14,
+        "light_white": 15
+    }
 
 base_colours = {}
 
