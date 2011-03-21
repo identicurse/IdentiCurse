@@ -1259,7 +1259,7 @@ class IdentiCurse(object):
         if message is None:
             message = ""
         if len(message) > 0:
-            return self.conn.statuses_update(message, "IdentiCurse", long_dent=config.config["long_dent"], dup_first_word=True)
+            return self.conn.statuses_update(message, "IdentiCurse", long_dent=config.config["long_dent"], dup_first_word=False)
 
     @shows_status("Favouriting notice")
     @repeat_passthrough
@@ -1287,7 +1287,7 @@ class IdentiCurse(object):
         if status is None:
             status = ""
         if len(status) > 0:
-            return self.conn.statuses_update(status, "IdentiCurse", int(notice["id"]), long_dent=config.config["long_dent"], dup_first_word=True)
+            return self.conn.statuses_update(status, "IdentiCurse", int(notice["id"]), long_dent=config.config["long_dent"], dup_first_word=False)
 
     @shows_status("Sending direct message")
     def cmd_direct(self, username, message):
