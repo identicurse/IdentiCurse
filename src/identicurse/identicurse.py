@@ -339,7 +339,8 @@ class IdentiCurse(object):
         empty_default_keys = ("firstpage", "newerpage", "olderpage", "refresh",
             "input", "commandinput", "search", "quit", "closetab", "help", "nexttab", "prevtab",
             "qreply", "creply", "cfav", "ccontext", "crepeat", "cnext", "cprev",
-            "cfirst", "nextmatch", "prevmatch", "creplymode", "cquote", "tabswapleft", "tabswapright")
+            "cfirst", "nextmatch", "prevmatch", "creplymode", "cquote", "tabswapleft", "tabswapright",
+            "cdelete")
 
         for k in empty_default_keys:
             config.config['keys'][k] = []
@@ -836,6 +837,8 @@ class IdentiCurse(object):
                     else:
                         self.status_bar.update("Viewing result #%d for '%s'" % (self.last_page_search['viewing'] + 1, self.last_page_search['query']))
                     self.display_current_tab()
+            elif input == ord("#") or input in [ord(key) for key in config.config['keys']['cdelete']]:
+                self.cmd_delete(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
             elif input == curses.ascii.ctrl(ord("l")):
                 self.redraw()
 
@@ -1303,10 +1306,10 @@ class IdentiCurse(object):
                 self.conn.statuses_destroy(notice["retweeted_status"]["id"])
             else:  # it wasn't a 403, so re-raise
                 raise(e)
-        for timeline in [tab.timeline for tab in self.tabs if hasattr(tab, "timeline_type")]:
-            if notice in timeline:
-                timeline.remove(notice)
-
+        for tab in [tab for tab in self.tabs if hasattr(tab, "timeline_type")]:
+            if notice in tab.timeline:
+                tab.timeline.remove(notice)
+            tab.update_buffer()
     @shows_status("Loading profile")
     @opens_tab()
     def cmd_profile(self, username):
