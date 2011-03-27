@@ -1315,7 +1315,7 @@ class IdentiCurse(object):
     def cmd_profile(self, username):
         return Profile(self.conn, self.notice_window, username)
 
-    @shows_status("Killing it with fire")
+    @shows_status("Deploying orbital nukes")
     @posts_notice
     def cmd_spamreport(self, username, reason=""):
         user_id = self.conn.users_show(screen_name=username)["id"]
