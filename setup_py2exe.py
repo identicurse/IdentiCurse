@@ -17,7 +17,9 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 """
-py2exe build script.
+py2exe build script. Requires that you have an appropriate curses library, such
+as http://www.lfd.uci.edu/~gohlke/pythonlibs/#curses installed, and will do
+until such time as Python finally includes Windows curses support as standard.
 """
 
 __docformat__ = 'restructuredtext'
