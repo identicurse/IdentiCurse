@@ -1306,6 +1306,10 @@ class IdentiCurse(object):
                 self.conn.statuses_destroy(notice["retweeted_status"]["id"])
             else:  # it wasn't a 403, so re-raise
                 raise(e)
+        try:
+            self.conn.statuses_destroy(notice["id"])  # for now, we try it twice, since identi.ca at least seems to have an issue where deleting must be done twice
+        except:
+            pass  # since we should've already got it (in an ideal situation), ignore the errors from this attempt.
         for tab in [tab for tab in self.tabs if hasattr(tab, "timeline_type")]:
             if notice in tab.timeline:
                 tab.timeline.remove(notice)
