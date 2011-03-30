@@ -1311,8 +1311,10 @@ class IdentiCurse(object):
         except:
             pass  # since we should've already got it (in an ideal situation), ignore the errors from this attempt.
         for tab in [tab for tab in self.tabs if hasattr(tab, "timeline_type")]:
-            if notice in tab.timeline:
-                tab.timeline.remove(notice)
+            n_id = notice["id"]  # keep this in a variable of it's own, so deleting the original notice doesn't break the test in the next bit
+            for tl_notice in tab.timeline:
+                if tl_notice["id"] == n_id:
+                    tab.timeline.remove(tl_notice)
             tab.update_buffer()
     @shows_status("Loading profile")
     @opens_tab()
