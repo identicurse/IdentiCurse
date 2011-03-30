@@ -214,7 +214,10 @@ class Tab(object):
             if line_num == self.search_highlight_line:
                 self.window.addstr(" "*remaining_line_length, curses.color_pair(identicurse.colour_fields['search_highlight']))
             if line_num <= (maxy - 3 + self.start_line):
-                self.window.addstr("\n")
+                try:
+                    self.window.addstr("\n")
+                except:  # if we somehow already hit the bottom (maybe there were weird chars?)
+                    pass  # just ignore it and move on
             line_num += 1
         self.window.refresh()
 
