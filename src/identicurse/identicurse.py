@@ -799,7 +799,7 @@ class IdentiCurse(object):
                     if can_repeat:
                         self.cmd_repeat(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
             elif input == ord("E") or input in [ord(key) for key in config.config['keys']['cquote']]:
-                if isinstance(self.tabs[self.current_tab], Timeline) or isinstance(self.tabs[self.current_tab], Context):
+                if isinstance(self.tabs[self.current_tab], Timeline):
                     can_repeat = True
                     try:
                         if self.tabs[self.current_tab].timeline_type in ["direct", "sentdirect"]:
