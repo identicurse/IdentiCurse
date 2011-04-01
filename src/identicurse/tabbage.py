@@ -205,19 +205,19 @@ class Tab(object):
         line_num = self.start_line
         for line in buffer[self.start_line:maxy - 3 + self.start_line]:
             remaining_line_length = maxx - 2
-            for (part, attr) in line:
+            try:
+                for (part, attr) in line:
+                    if line_num == self.search_highlight_line:
+                        remaining_line_length -= len(part)
+                        self.window.addstr(part, curses.color_pair(identicurse.colour_fields['search_highlight']))
+                    else:
+                        self.window.addstr(part, curses.color_pair(attr))
                 if line_num == self.search_highlight_line:
-                    remaining_line_length -= len(part)
-                    self.window.addstr(part, curses.color_pair(identicurse.colour_fields['search_highlight']))
-                else:
-                    self.window.addstr(part, curses.color_pair(attr))
-            if line_num == self.search_highlight_line:
-                self.window.addstr(" "*remaining_line_length, curses.color_pair(identicurse.colour_fields['search_highlight']))
-            if line_num <= (maxy - 3 + self.start_line):
-                try:
-                    self.window.addstr("\n")
-                except:  # if we somehow already hit the bottom (maybe there were weird chars?)
-                    pass  # just ignore it and move on
+                    self.window.addstr(" "*remaining_line_length, curses.color_pair(identicurse.colour_fields['search_highlight']))
+                if line_num <= (maxy - 3 + self.start_line):
+                        self.window.addstr("\n")
+            except:  # if we somehow already hit the bottom (maybe there were weird chars?)
+                pass  # just ignore it and move on
             line_num += 1
         self.window.refresh()
 
