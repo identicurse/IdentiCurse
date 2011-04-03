@@ -98,6 +98,8 @@ def main():
     print "Welcome to IdentiCurse 0.7-dev (Gomerland) - %s" % (random.choice(slogans))
     if platform.system() != "Windows":
         sys.stdout.write("\x1b]0;IdentiCurse\x07")  # Set terminal title via control codes, since curses doesn't offer a wrapper for this. Obviously, this won't work in a windows command prompt window.
+    else:
+        os.system("title IdentiCurse")
     IdentiCurse(additional_config)
 
 def colour_check():
