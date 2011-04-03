@@ -113,6 +113,7 @@ class IdentiCurse(object):
     """Contains Main IdentiCurse application"""
     
     def __init__(self, additional_config={}):
+        helpers.set_terminal_title("IdentiCurse")
         self.path = os.path.dirname(os.path.realpath( __file__ ))
         self.qreply = False
         

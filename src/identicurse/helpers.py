@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import time, datetime, htmlentitydefs, re, urllib, urllib2, locale
+import time, datetime, htmlentitydefs, re, urllib, urllib2, locale, os, platform, sys
 DATETIME_FORMAT = "%a %b %d %H:%M:%S +0000 %Y"
 offset_regex = re.compile("[+-][0-9]{4}")
 base_url_regex = re.compile("(http(s|)://.+?)/.*")
@@ -207,3 +207,9 @@ def ur1ca_shorten(longurl):
         return results[0]
     else:  # something went wrong, return the original url
         return longurl
+
+def set_terminal_title(title_text):
+    if platform.system() != "Windows":
+        sys.stdout.write("\x1b]0;" + title_text + "\x07")  # set the title the unix-y way
+    else:
+        os.system("title " + title_text)  # do it the windows-y way
