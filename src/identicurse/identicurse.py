@@ -1299,23 +1299,31 @@ class IdentiCurse(object):
 
     @shows_status("Deleting notice")
     def cmd_delete(self, notice):
+        delete_succeeded = False
         try:
             self.conn.statuses_destroy(notice["id"])
+            delete_succeeded = True
         except StatusNetError, e:
-            if e.errcode == 403 and "retweeted_status" in notice:  # user doesn't own the repeat, so is probably trying to delete the original status
-                self.conn.statuses_destroy(notice["retweeted_status"]["id"])
+            if e.errcode == 403:
+                if "retweeted_status" in notice:  # user doesn't own the repeat, so is probably trying to delete the original status
+                    self.conn.statuses_destroy(notice["retweeted_status"]["id"])
+                    delete_succeeded = True
+                else:  # user is trying to delete something they don't own. the API doesn't like this
+                    self.status_bar.timed_update("You cannot delete others' notices.", 3)
             else:  # it wasn't a 403, so re-raise
                 raise(e)
         try:
             self.conn.statuses_destroy(notice["id"])  # for now, we try it twice, since identi.ca at least seems to have an issue where deleting must be done twice
         except:
             pass  # since we should've already got it (in an ideal situation), ignore the errors from this attempt.
-        for tab in [tab for tab in self.tabs if hasattr(tab, "timeline_type")]:
-            n_id = notice["id"]  # keep this in a variable of it's own, so deleting the original notice doesn't break the test in the next bit
-            for tl_notice in tab.timeline:
-                if tl_notice["id"] == n_id:
-                    tab.timeline.remove(tl_notice)
-            tab.update_buffer()
+        if delete_succeeded:
+            for tab in [tab for tab in self.tabs if hasattr(tab, "timeline_type")]:
+                n_id = notice["id"]  # keep this in a variable of it's own, so deleting the original notice doesn't break the test in the next bit
+                for tl_notice in tab.timeline:
+                    if tl_notice["id"] == n_id:
+                        tab.timeline.remove(tl_notice)
+                tab.update_buffer()
+
     @shows_status("Loading profile")
     @opens_tab()
     def cmd_profile(self, username):
