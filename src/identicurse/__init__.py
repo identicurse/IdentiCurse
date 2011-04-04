@@ -69,7 +69,7 @@ def main():
         help="specify an alternative slogans file to use", action="store",
         type="string", dest="slogans_filename", metavar="FILE")
     parser.add_option("--colour-check",
-        help="check if system curses library supports colours, and how many",
+        help="check if colour support is available, and if so, how many colours",
         action="store_true", dest="colour_check")
     options = parser.parse_args()[0]
 
@@ -105,16 +105,16 @@ def main():
 def colour_check():
     """
     Display brief message informing user how many colours their system's
-    curses library supports.
+    curses library reports as available.
     """
     import curses
     curses.initscr()
     if curses.has_colors():
         curses.start_color()
         curses.use_default_colors()
-        msg = "System curses library supports %d colours." % (curses.COLORS)
+        msg = "System curses library reports that in your current system state, it supports %d colours. For many terminals, adding \"export TERM=xterm-256color\" to your startup scripts will make far more colours available to curses." % (curses.COLORS)
     else:
-        msg = "System curses library does not support colours."
+        msg = "System curses library reports that (at least in your current system state) colour support is not available."
     curses.endwin()
     print msg
 
