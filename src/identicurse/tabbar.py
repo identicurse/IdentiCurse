@@ -26,10 +26,20 @@ class TabBar(object):
 
     def update(self):
         tab_list = []
+        maxx = self.window.getmaxyx()[1] - 2
         total_length = 0
         for tab_num in xrange(len(self.tabs)):
-            tab_list.append((" "*2, identicurse.colour_fields['tabbar']))
+            if tab_num == 0:
+                tab_list.append((" ", identicurse.colour_fields['tabbar']))
+                total_length += 1
+            else:
+                tab_list.append((" "*2, identicurse.colour_fields['tabbar']))
+                total_length += 2
             if tab_num == self.current_tab:
+                if (total_length + len(self.tabs[tab_num])) > (maxx + self.left_index):  # if this tab would end beyond the right-hand edge
+                    self.left_index = (total_length + len(self.tabs[tab_num])) - (maxx - 1)
+                elif total_length < self.left_index:  # if this tab would begin beyond the left-hand edge
+                    self.left_index = total_length - 1
                 attr = identicurse.colour_fields['tabbar_active']
             else:
                 attr = identicurse.colour_fields['tabbar']
@@ -37,8 +47,7 @@ class TabBar(object):
                 tab_list.append((self.tabs[tab_num].upper(), attr))
             else:
                 tab_list.append((self.tabs[tab_num], attr))
-            total_length += (2 + len(self.tabs[tab_num]))
-        maxx = self.window.getmaxyx()[1] - 2
+            total_length += len(self.tabs[tab_num])
         self.window.erase()
         char_index = 0
         for block in tab_list:
