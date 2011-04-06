@@ -1,3 +1,46 @@
+New for 0.7:
+ - New slogans.
+ - The screen will now flash when an update fetches new mentions/direct messages.
+ - Smoother scrolling when using a/s to switch notices; when moving to a notice that is partially/fully off the screen, IdentiCurse will now only scroll enough to make it visible, rather than scroll by an entire page. Controlled by the 'smooth_cscroll' config option, default true.
+ - /quote command added, for adding/changing text when repeating a notice.
+ - If HTTPS is not used when initially creating an account, IdentiCurse now double-checks that this is definitely what the user wants.
+ - There is now a tab bar, which displays all tabs in order. This replaces the former "Tab x: Name" that was on the right of the status bar.
+ - UI elements can now be placed in an arbitrary order, with the default layout remaining the same as the fixed layout of previous versions (except for the addition of the tab bar). See README for syntax details.
+ - OAuth is now supported, and can be enabled either on initial setup, or by setting the config option 'use_oauth' to true.
+ - Links for the web view of each notice can be displayed after them. Config option 'show_notice_links', default false.
+ - Size of the input box can now be changed, by setting the 'length_override' config option to the minimum number of characters that should be able to fit in the input box.
+ - Tab completion of usernames, groups, and tags. Determines whether to use groups/tags by looking for # or ! at the start of the word. Defaults to usernames if either @ or no sign present. Only aware of users/groups/tags already seen, unless config option 'prefill_user_cache' is set to true (this will result in all users you follow being available for tab completion, at the cost of slower startup).
+ - Tab completion of commands, identified by an initial /.
+ - URLs will be shortened using ur1.ca on pressing tab immediately after them (as if you were trying to tab-complete them).
+ - In-development (-dev) versions now have distinct codenames from their corresponding final releases, though they share the same initial letter.
+ - /quit command, has the same effect as the q keybinding.
+ - 'initial_tabs' now supports the favourites tab type, and also has a terser syntax for some tab types. See README for more detail.
+ - "Updating" status message now also states which tab is currently being updated.
+ - Reply mode: normal replying, but with the ability to edit the entire notice, rather than automatically getting the target user's name added.
+ - Compact mode is now extremely compact, but disabled by default. The new non-compact is the same as 0.6's compact.
+ - 'show_source' option, to show/hide the source messages ("from $client") for notices. Default is true.
+ - Refreshing now only fetches notices not already received, resulting in speed improvements for refreshing.
+ - The cursor is now hidden when not in the input box.
+ - There is now support for building on Windows.
+ - The terminal's title is now set to "IdentiCurse".
+ - Messages from the --colour-support command-line option are now more correct.
+ - New keybindings (case sensitive: E is different to e, for example):
+      - : goes into insert mode with an initial / already present. Useful for quick commands.
+      - E goes into quote mode with the currently selected notice.
+      - D goes into reply mode with the currently selected notice.
+      - , moves the current tab one place left in the tab bar.
+      - . moves the current tab one place right in the tab bar.
+      - # deletes the currently selected notice.
+ - Bugfixes for:
+      - HOME/END do not work in input box.
+      - HTML entities are not expanded when encountered during remote notice expansion.
+      - All known remaining reflowing bugs.
+      - IdentiCurse crashes on very fast resizing of window.
+      - IdentiCurse crashes when certain Unicode characters are present in a notice and are not supported by the user's system.
+      - Notice time/date is displayed incorrectly when the instance has non-zero offset in its timestrings.
+      - IdentiCurse crashes on attempting to view the profile of a non-existent user.
+      - Spaces are discarded when at the start/end of lines in multi-line input box.
+
 New for 0.6:
  - New slogans.
  - Borders can now be switched off, with the 'border' config option.
@@ -11,7 +54,7 @@ New for 0.6:
  - New /alias command for creating aliases from within IdentiCurse.
  - Usernames in notices are highlighted in the same colour as usernames in the notice details.
  - User, tag, and group rainbows, where each user/group/tag is assigned a random colour that persists wherever that user/group/tag is mentioned in the timeline. Config options are "user_rainbow", "group_rainbow", "tag_rainbow", possible values true or false.
- - Experimental expansion for remote notices that were truncated due to local instance having shorter length_limit Config option is "expand_remote", possible values true or false.
+ - Experimental expansion for remote notices that were truncated due to local instance having shorter length_limit. Config option is "expand_remote", possible values true or false.
  - Search results are now highlighted (provided colour is enabled).
  - Bugfixes for:
       - Time is several hours out for notices whose post time (according to the server) is ahead of local time.
