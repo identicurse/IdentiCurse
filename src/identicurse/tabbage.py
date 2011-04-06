@@ -479,7 +479,10 @@ class Timeline(Tab):
                     user_length += (len(" [ repeat by ") + len(repeating_user) + len(" ]"))
 
             if not config.config['compact_notices']:
-                line.append((' ' * (maxx - ((len(source_msg) + len(time_msg) + user_length + (6 + len(cout))))), identicurse.colour_fields["none"]))
+                if config.config["show_source"]:
+                    line.append((' ' * (maxx - ((len(source_msg) + len(time_msg) + user_length + (6 + len(cout))))), identicurse.colour_fields["none"]))
+                else:
+                    line.append((' ' * (maxx - ((len(time_msg) + user_length + (5 + len(cout))))), identicurse.colour_fields["none"]))
                 line.append((time_msg, identicurse.colour_fields["time"]))
                 if config.config["show_source"]:
                     line.append((' ', identicurse.colour_fields["none"]))
