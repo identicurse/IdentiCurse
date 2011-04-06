@@ -356,7 +356,7 @@ class Timeline(Tab):
             if len(self.timeline) > get_count:  # truncate long timelines
                 self.timeline = self.timeline[:get_count]
 
-        self.timeline.sort(key=itemgetter('ic__raw_datetime'), reverse=True)
+        self.timeline.sort(key=itemgetter('id'), reverse=True)
 
         if self.page > 1:
             self.name = self.basename + "+%d" % (self.page - 1)
