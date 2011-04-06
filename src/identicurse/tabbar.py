@@ -26,6 +26,7 @@ class TabBar(object):
 
     def update(self):
         tab_list = []
+        total_length = 0
         for tab_num in xrange(len(self.tabs)):
             tab_list.append((" "*2, identicurse.colour_fields['tabbar']))
             if tab_num == self.current_tab:
@@ -36,6 +37,7 @@ class TabBar(object):
                 tab_list.append((self.tabs[tab_num].upper(), attr))
             else:
                 tab_list.append((self.tabs[tab_num], attr))
+            total_length += (2 + len(self.tabs[tab_num]))
         maxx = self.window.getmaxyx()[1] - 2
         self.window.erase()
         char_index = 0
