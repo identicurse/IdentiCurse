@@ -22,6 +22,7 @@ class TabBar(object):
         self.window = window
         self.tabs = []
         self.current_tab = -1
+        self.left_index = 0
 
     def update(self):
         tab_list = []
@@ -36,17 +37,17 @@ class TabBar(object):
                 tab_list.append((self.tabs[tab_num].upper(), attr))
             else:
                 tab_list.append((self.tabs[tab_num], attr))
-            total_length += (1 + len(self.tabs[tab_num]))
-        maxx = self.window.getmaxyx()[1]
+            total_length += (2 + len(self.tabs[tab_num]))
+        maxx = self.window.getmaxyx()[1] - 2
         self.window.erase()
-        if total_length >= (maxx - 1):  # if the full tab list would be wider than the available display area
-            # TODO: handle this
-            pass
-        else:
-            remaining_line_length = maxx - 2
-            for block in tab_list:
-                self.window.addstr(block[0], curses.color_pair(block[1]))
-                remaining_line_length -= len(block[0])
-            if remaining_line_length > 0:
-                self.window.addstr(" "*remaining_line_length, curses.color_pair(identicurse.colour_fields['tabbar']))
+        char_index = 0
+        for block in tab_list:
+            for char in block[0]:
+                if char_index < self.left_index:
+                    pass
+                elif char_index > (maxx + self.left_index):
+                    pass
+                else:
+                    self.window.addstr(char, curses.color_pair(block[1]))
+                char_index += 1
         self.window.refresh()
