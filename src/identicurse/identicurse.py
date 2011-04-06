@@ -1545,6 +1545,9 @@ class IdentiCurse(object):
         self.update_timer.start()
 
     def quit(self):
-        self.update_timer.cancel()
+        try:
+            self.update_timer.cancel()
+        except ValueError:  # it may already have been cancelled if it fired shortly before we quit, in which case we can't end it
+            pass
         curses.endwin()
         sys.exit()
