@@ -373,25 +373,34 @@ class Timeline(Tab):
         maxx = self.window.getmaxyx()[1]
         c = 1
 
-        longest_user_string_len = 0
-        longest_time_msg_len = 0
+        longest_metadata_string_len = 0
         for n in self.timeline:
             if "direct" in self.timeline_type:
                 user_string = "%s -> %s" % (n["sender"]["screen_name"], n["recipient"]["screen_name"])
+                source_msg = ""
             else:
                 user_string = "%s" % (n["user"]["screen_name"])
+                raw_source_msg = "from %s" % (n["source"])
+                source_msg = self.html_regex.sub("", raw_source_msg)
             if "in_reply_to_status_id" in n and n["in_reply_to_status_id"] is not None:
-                user_string += " +"
+                if not config.config["show_source"]:
+                    user_string += " +"
+                else:
+                    source_msg += " [+]"
             if "retweeted_status" in n:
                 user_string = "%s [%s's RD]" % (n["retweeted_status"]["user"]["screen_name"], n["user"]["screen_name"])
                 if "in_reply_to_status_id" in n["retweeted_status"]:
-                    user_string += " +"
+                    if not config.config["show_source"]:
+                        user_string += " +"
+                    else:
+                        source_msg += " [+]"
             datetime_notice = helpers.notice_datetime(n)
             time_msg = helpers.format_time(helpers.time_since(datetime_notice), short_form=True)
-            if len(user_string) > longest_user_string_len:
-                longest_user_string_len = len(user_string)
-            if len(time_msg) > longest_time_msg_len:
-                longest_time_msg_len = len(time_msg)
+            metadata_string = time_msg + " " + user_string
+            if config.config["show_source"]:
+                metadata_string += " " + source_msg
+            if len(metadata_string) > longest_metadata_string_len:
+                longest_metadata_string_len = len(metadata_string)
 
         for n in self.timeline:
             from_user = None
@@ -485,12 +494,13 @@ class Timeline(Tab):
                     elif "retweeted_status" in n:
                         detail_char = "~"
                     line.append((" %s" % (detail_char), identicurse.colour_fields["source"]))
-                if detail_char != "":
-                    line.append((" "*((longest_user_string_len - user_length) + (longest_time_msg_len - len(time_msg))), identicurse.colour_fields["none"]))
-                else:
-                    line.append((" "*((longest_user_string_len - user_length) + (longest_time_msg_len - len(time_msg)) + 1), identicurse.colour_fields["none"]))
                 if config.config["show_source"]:
-                    line.append((source_msg, identicurse.colour_fields["source"]))
+                        line.append((" " + source_msg, identicurse.colour_fields["source"]))
+                        line.append((" "*((longest_metadata_string_len - (user_length + len(time_msg) + len(source_msg) + 2))), identicurse.colour_fields["none"]))
+                else:
+                    if detail_char == "":
+                        line.append((" ", identicurse.colour_fields["none"]))
+                    line.append((" "*((longest_metadata_string_len - (user_length + len(time_msg) + 1))), identicurse.colour_fields["none"]))
                 line.append((" | ", identicurse.colour_fields["none"]))
 
             try:
