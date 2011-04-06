@@ -48,6 +48,11 @@ class TabBar(object):
             else:
                 tab_list.append((self.tabs[tab_num], attr))
             total_length += len(self.tabs[tab_num])
+            if (self.left_index + maxx) > total_length:
+                if total_length > maxx:  # we've still got more than a screen's worth, we just happen to have closed a tab (most likely)
+                    self.left_index = (total_length) - (maxx - 1)
+                else:  # we're getting the above match because we've got less than a screenfull
+                    self.left_index = 0
         self.window.erase()
         char_index = 0
         for block in tab_list:
