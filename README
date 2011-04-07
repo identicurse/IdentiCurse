@@ -318,6 +318,9 @@ The exception to this is that if the word before the cursor looks like a URL,
 IdentiCurse will instead use the ur1.ca service to get a shortened version of
 the URL, and replace it with that shorter URL.
 
+There are two different matching modes for tab-completion, see the "Tab
+Completion Modes" section of Advanced Configuration for more detail.
+
 After submitting your message/command, you will be back in non-text
 entry mode until you next press i. You can submit an empty text field
 or press ESC to leave text entry mode without performing any action.
@@ -348,6 +351,19 @@ will still fill the entire available width, but it cannot give _less than_
 This setting is mainly of use on unlimited-length instances, where the text
 entry box would otherwise be set to 3 lines high, which may be far more or
 far less than desired.
+
+Tab completion modes:
+The "tab_complete_mode" config setting is used to switch between two
+tab completion modes. These are:
+
+"exact", which will match only possibilities which start with exactly the
+characters given. For example, "win" would match "wind", but not "gwin".
+This is the default if the setting is not given.
+
+"fuzzy", which will match anything where the characters given all appear in
+the same order. For example, "wgo" would match "windigo", even though other
+letters do appear. It would also match "mightywargod", since that still has
+all the letters, even though it doesn't start with w.
 
 Colours:
 To use colours, the config setting "enable_colours" must be set to
