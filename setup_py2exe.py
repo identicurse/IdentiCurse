@@ -29,7 +29,7 @@ import py2exe
 
 setup(
     name="identicurse",
-    version='0.7',  # 0.7-dev, but py2exe doesn't like the -dev bit.
+    version='0.8',  # 0.8-dev, but py2exe doesn't like the -dev bit.
     description="A simple Identi.ca client with a curses-based UI.",
     long_description=("A simple Identi.ca client with a curses-based UI."),
     author="Psychedelic Squid and Reality",
