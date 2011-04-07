@@ -31,8 +31,8 @@ USING IDENTICURSE
 Once you've configured IdentiCurse for your account, start it by
 running the 'identicurse' command. You will see a message, "Welcome to
 IdentiCurse!", and then after a short while, IdentiCurse itself will
-load (this delay is due to fetching all the initial dents). Once you
-are at this screen, you can press various keys to do the following:
+load. Once you are at this screen, you can press various keys to do
+the following:
     
     KEY             ACTION
     1               Switch to tab 1 (initial tab: Personal Timeline).
@@ -46,23 +46,30 @@ are at this screen, you can press various keys to do the following:
     9               Switch to tab 9 (no initial tab).
     <               Switch to the previous tab.
     >               Switch to the next tab.
+    ,               Move the current tab one place to the left.
+    .               Move the current tab one place to the right.
     x               Close the currently visible tab.
     r               Refresh.
     q               Quit IdentiCurse.
     h               Open a tab that displays this README.
-    i               Switch to text entry mode.
+    i               Switch to input mode.
     /               Do an in-page search.
+    :               Go into insert mode with an initial / already present.
     n               Move to the next match for latest in-page search.
     N               Move to the previous match for latest in-page search.
     l               Followed by a number between 1 and 9,
                      quickly reply to that notice on the timeline.
-    d               Reply to currently selected dent.
+    d               Reply to currently selected dent, name of the user whose
+                     dent you are replying to is added before posting.
+    D               Reply to currently selected dent, full reply editable.
     f               Favourite currently selected dent.
     e               Repeat currently selected dent.
+    E               Quote currently selected dent.
     c               View context for currently selected dent.
-    s               Move selected dent down (indicated by * character).
-    a               Move selected dent up (indicated by * character).
-    z               Move selected dent to first (indicated by *).
+    #               Attempt to delete the currently selected dent.
+    s               Move dent selection down (indicated by * character).
+    a               Move dent selection up (indicated by * character).
+    z               Move dent selection to the 1st in the tab (indicated by *).
     UP or k         Scroll up one line (in the current tab).
     DOWN or j       Scroll down one line (in the current tab).
     PgUp or b       Scroll up one screen (in the current tab).
@@ -85,6 +92,14 @@ then press enter to submit. A plain message will simply be posted as a
 normal dent, but you can also use various commands by starting the
 message with a / (for example "/reply 1 Hello!" would trigger the
 /reply command rather than post "/reply 1 Hello!"  as a dent).
+
+As of 0.7, there are multiple text entry modes. The standard one is
+Input Mode, and this is the only one where commands work. Commands
+will *not* work in Reply Mode and Quote Mode, and will instead be
+posted exactly as entered. Reply Mode and Quote Mode both create
+dents that are in context of their target dents, the only difference
+is what text is initially present in the text entry.
+
 Available commands are as follows:
 
 /reply [notice number] [message]                (aliases: /r)
@@ -98,6 +113,10 @@ Available commands are as follows:
    If your current tab is Directs or Sent Directs, the reply will be
    sent as a DM.
 
+/reply [notice number]                          (aliases: /r)
+   This will enter Reply Mode, with the notice indicated by your notice
+   number as its target notice.
+
 /favourite [notice number]            (aliases: /favorite, /fav, /f)
    This will add the notice with the notice number specified to your
    favourites.
@@ -105,6 +124,10 @@ Available commands are as follows:
 /repeat [notice number]                         (aliases: /rt)
    This will create a repeat of the notice with the notice number
    specified.
+
+/quote  [notice number]
+   This will enter Quote Mode, with the notice indicated by your notice
+   number as its target notice.
 
 /direct [(@)username] [message]                 (aliases: /dm, /d)
    This will send a direct message to the user specified. As with
@@ -269,6 +292,32 @@ Available commands are as follows:
         particular key is only read in on startup, so changing
         credentials this way would require a restart of IdentiCurse.
 
+/quit
+   This will cause IdentiCurse to quit, exactly the same as if it
+   were quit using the q keybinding.
+
+While in text entry mode, you can press tab to attempt to auto-complete the
+word before the cursor, if it matches any of the following:
+
+   BEGINS WITH         IDENTICURSE WILL TRY TO COMPLETE IT AS A
+   /                   command
+   @ or no symbol      username, unless it's a URL (see below)
+   #                   tag
+   !                   group
+
+For commands, all commands are known to IdentiCurse, so if it exists, it
+can be tab-completed. For usernames, groups and tags, IdentiCurse keeps a
+cache of all those that it has seen, so any that have not yet been used
+during the current session will not be available. However, for usernames,
+the "prefill_user_cache" setting can be set to true (it defaults to false),
+which will have IdentiCurse, on start-up, fill the username cache with the
+usernames of everyone you follow. This is somewhat slow, so it is not
+recommended on slow connections.
+
+The exception to this is that if the word before the cursor looks like a URL,
+IdentiCurse will instead use the ur1.ca service to get a shortened version of
+the URL, and replace it with that shorter URL.
+
 After submitting your message/command, you will be back in non-text
 entry mode until you next press i. You can submit an empty text field
 or press ESC to leave text entry mode without performing any action.
@@ -286,6 +335,20 @@ The "notice_limit" config setting sets how many notices should be
 fetched per page, on timeline types where the API allows choosing how
 many notices to send (at the time of writing, most except public do).
 
+Length override:
+The "length_override" config setting sets the minimum number of characters
+that should be able to fit in the text entry box. So for example,
+
+    "length_override": 280
+
+would always give a text entry box that can hold 280 characters or more.
+In practice, it may well give, for example, 300 or so, since the last line
+will still fill the entire available width, but it cannot give _less than_
+280, so you will be guaranteed the amount you want.
+This setting is mainly of use on unlimited-length instances, where the text
+entry box would otherwise be set to 3 lines high, which may be far more or
+far less than desired.
+
 Colours:
 To use colours, the config setting "enable_colours" must be set to
 true. This will already be the case if you first started with version
@@ -302,6 +365,8 @@ need to configure the "colours" setting, which uses this format:
 
 The possible field names are:
     "statusbar"         The status bar.
+    "tabbar"            The tab bar, except the active tab.
+    "tabbar_active"     The active tab.
     "timelines"         Any part of the timeline view not already dealt
                             with by the fields below.
     "selector"          The '*' current notice indicator.
@@ -318,10 +383,14 @@ The possible field names are:
     "profile_values"    Values in profile tabs.
     "search_highlight"  Anything on the line of the currently
                             highlighted search result.
+    "notice_link"       The links added when show_notice_links is enabled.
+    "warning"           Any error/warning messages.
 
 The possible colours differ depending on whether your system's curses
-library was compiled with 16-colour support or not. You can check by
-running identicurse with the --colour-check command-line option.
+library can access 16-colour support or not. You can check by running
+identicurse with the --colour-check command-line option.
+For a sizable proportion of terminals, setting your TERM environment
+variable to "xterm-256color" will give you full colour support.
 
 As long as colour is supported at all, the following are usable:
     "black", "red", "green", "brown", "blue", "magenta", "cyan",
@@ -332,6 +401,36 @@ If all 16 colours *are* supported, the following are also usable:
     "grey", "light_red", "light_green", "yellow", "light_blue",
     "light_magenta", "light_cyan", "light_white"
 
+UI order:
+The "ui_order" config setting allows you to place the various sections
+of the UI in a different vertical order to default. It is in the format of
+an array of strings, like so:
+
+    "ui_order": [                                                               
+        "divider",                                                              
+        "entry",                                                                
+        "divider",                                                              
+        "notices",                                                              
+        "statusbar",                                                            
+        "tabbar"                                                                                                                                                     
+        ]
+
+The valid UI elements you can use in this setting are as follows:
+
+    ELEMENT         DESCRIPTION
+    entry           The text entry field, height determined by notice length.
+    notices         The notice window. This will expand to fill all vertical
+                     space not taken by other elements.
+    statusbar       The status bar. One line high.
+    tabbar          The tab bar. One line high.
+    divider         An empty line, used for spacing. One line high.
+
+Any duplicate elements (except dividers) or unrecognised element names will be
+ignored, and any element types omitted entirely (again, except dividers) will
+be added to the bottom. So for example, the example setting given above would
+produce the same layout with or without the tabbar line, since the tab bar
+would simply be added there since it was missing.
+
 Initial tabs:
 The tabs that are automatically loaded on startup can be configured by
 editing the initial_tabs key. This key should contain tab names,
@@ -341,16 +440,21 @@ separated by vertical bars (|). The valid tab names are as follows:
           direct           The received direct messages tab.
           sentdirect       The sent direct messages tab.
           public           The public timeline tab.
+          favourites       The favourites tab.
           user:NAME        A user timeline tab for the user with
                            username @NAME.
+          @NAME            Same as user:NAME.
           tag:TAG          A tag timeline tab for the #TAG tag.
+          #TAG             Same as tag:TAG.
           group:GROUP      A group timeline tab for the !GROUP group.
+          !GROUP           Same as group:GROUP.
           help             A help tab, the same as is opened when h
                            is pressed during use.
           profile:NAME     A user profile tab for the user with
                            username @NAME.
           search:QUERY     A search tab with results from searching
                            for QUERY.
+          ?QUERY           Same as search:QUERY.
           context:ID       A context tab for the notice with id of ID.
 
 Aliases:
@@ -413,10 +517,13 @@ The full range of keys you can set custom bindings for is as follows:
     olderpage      Move to an older page.
     refresh        Refresh.
     input          Go into input mode.
+    commandinput   Go into input mode with an initial / already present.
     quit           Quit IdentiCurse.
     closetab       Close the current tab.
     nexttab        Move to the next tab.
     prevtab        Move to the previous tab.
+    tabswapleft    Swap the current tab's place with the one to its left.
+    tabswapright   Swap the current tab's place with the one to its right.
     help           Show the help.
     search         Start an in-page search.
     qreply         Start a reply to the notice with notice number
@@ -428,6 +535,9 @@ The full range of keys you can set custom bindings for is as follows:
     cfav           Favourite selected notice.
     crepeat        Repeat selected notice.
     ccontext       View context for selected notice.
+    creplymode     Go into Reply Mode, with selected notice as target.
+    cquote         Go into Quote Mode, with selected notice as target.
+    cdelete        Delete selected notice.
     nextmatch      Move to next match for in-page search.
     prevmatch      Move to previous match for in-page search.
 
@@ -447,6 +557,21 @@ browser.  In this case the following configuration line should work:
 
     "browser": "screen elinks '%s'"
 
+Notice links:
+The "show_notice_links" config setting, if set to true (default false),
+adds the web UI link for each notice below it.
+
+Compact mode:
+The "compact_notices" config setting determines whether to display
+notices in a compact, single-line style (if set to true), or a slightly
+less compact style (if set to false; this is the default).
+
+Show source:
+The "show_source" config setting, which can be either true or false
+(true by default), determines whether or not to show which client was
+used to post each notice. The main use of this is to free up additional
+screen space in compact mode.
+
 Personalised slogans:
 If you'd rather use your own slogans instead of the built-in ones,
 you'll need to create a file called .identicurse_slogans in your home
@@ -454,6 +579,39 @@ directory. In this file, you should place slogans, one per line. These
 will then be displayed on starting IdentiCurse. The default slogans
 will not be used in this case, so if there are any you want to keep,
 you will need to add them to your slogans file.
+
+OAuth:
+If not enabled on first run, OAuth can be enabled at a later date using
+the "use_oauth" config setting, which can be either true or false.
+
+Additionally, the "oauth_token" and "oauth_token_secret" settings hold your
+OAuth connection details if/when you have successfully used OAuth to connect.
+
+To use OAuth with any instance, IdentiCurse must be registered with that
+instance as an app, which will give it a consumer key/secret that identify
+it to that instance as being IdentiCurse. As of version 0.7, the consumer
+key/secret for identi.ca are built in, so anyone using that will not need to
+read any more of this section.
+
+For other instances, IdentiCurse will first check the "consumer_key" and
+"consumer_secret" config settings, and if that also fails, it will fetch
+the list at http://identicurse.net/api_keys.json, which is intended to hold
+all public instance keys that have been registered for IdentiCurse. Also,
+with each new release, any new keys in http://identicurse.net/api_keys.json
+will also be added to its local store, so it doesn't have to access
+identicurse.net for them. If it has to do this, the resulting key/secret will
+be stored in "consumer_key" and "consumer_secret", so IdentiCurse does not
+need to fetch the list on future start-ups.
+
+If you are using a public instance not already added to that list, please
+contact @psquid with the name of the instance, and IdentiCurse will be added
+to it as a valid app, and the consumer key/secret added to the online store at
+http://identicurse.net/api_keys.json
+
+If you are using a private/single-user instance, we will not be able to
+access it to register IdentiCurse as an app, so you will need to do so
+yourself, and add the consumer key/secret to your config file manually,
+in the "consumer_key" and "consumer_secret" settings, as listed above.
 
 
 COMMAND-LINE OPTIONS
@@ -463,5 +621,5 @@ IdentiCurse takes the following command-line options:
   -h, --help               show the list of available options and exit
   -c FILE, --config=FILE   specify an alternative config file to use
   -s FILE, --slogans=FILE  specify an alternative slogans file to use
-  --colour-check           check if system curses library supports
-                               colours, and how many
+  --colour-check           check if system curses library can aceess colours,
+                           and how many
