@@ -17,6 +17,8 @@ WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\IdentiCurs
                  "DisplayName" "IdentiCurse"
 WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\IdentiCurse" \
                  "UninstallString" "$\"$INSTDIR\uninstall.exe$\""
+WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\IdentiCurse" \
+                 "DisplayIcon" "$\"$INSTDIR\identicurse.exe$\",0"
  
 sectionEnd
  
