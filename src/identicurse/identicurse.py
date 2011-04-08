@@ -114,7 +114,11 @@ class IdentiCurse(object):
     
     def __init__(self, additional_config={}):
         helpers.set_terminal_title("IdentiCurse")
-        self.path = os.path.dirname(os.path.realpath( __file__ ))
+        if hasattr(sys, "frozen"):  # if this matches, we're running under py2exe, so we need to do some magic to get the correct path
+            executable_path = sys.executable
+        else:
+            executable_path = __file__
+        self.path = os.path.dirname(os.path.realpath(unicode(executable_path, sys.getfilesystemencoding())))
         self.qreply = False
         
         if "config_filename" in additional_config:
@@ -129,6 +133,7 @@ class IdentiCurse(object):
             else:
                 import getpass, time
                 # no config yet, so let's build one
+                print os.path.join(self.path, "config.json")
                 config.config.load(os.path.join(self.path, "config.json"))
                 print "No config was found, so we will now run through a few quick questions to set up a basic config for you (which will be saved as %s so you can manually edit it later). If the default (where defaults are available, they're stated in []) is already fine for any question, just press Enter without typing anything, and the default will be used." % (config.config.filename)
                 print "This version of IdentiCurse supports OAuth login. Using OAuth to log in means that you do not need to enter your username and password."

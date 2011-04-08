@@ -39,7 +39,7 @@ setup(
     download_url=("http://identicurse.net/release/"),
     license="GPLv3+",
 
-    data_files=[('identicurse',['README', 'conf/config.json'])],
+    data_files=[('',['README', 'conf/config.json'])],
     packages=find_packages('src'),
     package_dir={'': 'src'},
     include_package_data=True,
