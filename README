@@ -70,6 +70,8 @@ the following:
     s               Move dent selection down (indicated by * character).
     a               Move dent selection up (indicated by * character).
     z               Move dent selection to the 1st in the tab (indicated by *).
+    p               Toggle the current tab's pause state.
+    P               Toggle all tabs' pause states.
     UP or k         Scroll up one line (in the current tab).
     DOWN or j       Scroll down one line (in the current tab).
     PgUp or b       Scroll up one screen (in the current tab).
@@ -401,6 +403,8 @@ The possible field names are:
                             highlighted search result.
     "notice_link"       The links added when show_notice_links is enabled.
     "warning"           Any error/warning messages.
+    "pause_line"        The line(s) indicating which dents come before/after
+                            a pause.
 
 The possible colours differ depending on whether your system's curses
 library can access 16-colour support or not. You can check by running
