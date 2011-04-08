@@ -1,3 +1,7 @@
+New for 0.8:
+ - New slogan.
+ - Pausing (p to toggle pause on the current tab, P for all tabs), with a pause line to indicate which notices are before/after a pause.
+
 New for 0.7:
  - New slogans.
  - The screen will now flash when an update fetches new mentions/direct messages.

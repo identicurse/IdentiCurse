@@ -55,6 +55,7 @@ PRESET_SLOGANS = [
     "Making \"git pull\" fun again, since 2010.",
     "like a compact disc to the head!",
     "along with his mechanical ass-kicking leg.",
+    "TIME FOR GROUP HUG.",
     ]
 
 def main():

@@ -110,6 +110,7 @@ class Tab(object):
         self.page = 1
         self.search_highlight_line = -1
         self.active = False
+        self.paused = False
         
     def prevpage(self, n=1):
         if hasattr(self, "timeline"):
@@ -207,6 +208,8 @@ class Tab(object):
             remaining_line_length = maxx - 2
             try:
                 for (part, attr) in line:
+                    if attr == identicurse.colour_fields["pause_line"]:  # we want pause lines to fill the width
+                        self.window.addstr("-"*(remaining_line_length-1), curses.color_pair(identicurse.colour_fields['pause_line']))
                     if line_num == self.search_highlight_line:
                         remaining_line_length -= len(part)
                         self.window.addstr(part, curses.color_pair(identicurse.colour_fields['search_highlight']))
@@ -266,7 +269,22 @@ class Timeline(Tab):
         
         Tab.__init__(self, window)
 
+    def update_name(self):
+        if self.page > 1:
+            self.name = self.basename + "+%d" % (self.page - 1)
+        else:
+            self.name = self.basename
+
+        if self.paused:
+            self.name = self.name + " (paused)"
+
     def update(self):
+        self.update_name()
+
+        if self.paused:
+            self.update_buffer()
+            return
+
         get_count = config.config['notice_limit']
 
         if self.prev_page != self.page:
@@ -358,11 +376,6 @@ class Timeline(Tab):
 
         self.timeline.sort(key=itemgetter('id'), reverse=True)
 
-        if self.page > 1:
-            self.name = self.basename + "+%d" % (self.page - 1)
-        else:
-            self.name = self.basename
-
         self.search_highlight_line = -1
 
         self.update_buffer()
@@ -428,6 +441,10 @@ class Timeline(Tab):
                 if not user in config.session_store.user_cache:
                     config.session_store.user_cache[user] = random.choice(identicurse.base_colours.items())[1]
            
+            if "ic__paused_on" in n and c != 1:
+                self.buffer.append([("-", identicurse.colour_fields["pause_line"])])
+                self.buffer.append([("", identicurse.colour_fields["none"])])
+
             # Build the line
             line = []
 

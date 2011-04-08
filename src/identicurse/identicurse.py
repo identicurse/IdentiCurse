@@ -55,6 +55,7 @@ colour_fields = {
     "tabbar_active": 17,
     "notice_link": 18,
     "warning": 19,
+    "pause_line": 20,
 }
 
 if platform.system() == "Windows":  # Handle Windows' colour-order fuckery. This is only true if we are running on pure Windows. If we're on Cygwin, which handles colours correctly anyway, this won't match.
@@ -261,6 +262,7 @@ class IdentiCurse(object):
                 "search_highlight": ("white", "blue"),
                 "notice_link": ("green", "none"),
                 "warning": ("black", "red"),
+                "pause_line": ("white", "red"),
                 "none": ("none", "none")
             }
 
@@ -346,7 +348,7 @@ class IdentiCurse(object):
             "input", "commandinput", "search", "quit", "closetab", "help", "nexttab", "prevtab",
             "qreply", "creply", "cfav", "ccontext", "crepeat", "cnext", "cprev",
             "cfirst", "nextmatch", "prevmatch", "creplymode", "cquote", "tabswapleft", "tabswapright",
-            "cdelete")
+            "cdelete", "pausetoggle", "pausetoggleall")
 
         for k in empty_default_keys:
             config.config['keys'][k] = []
@@ -797,7 +799,18 @@ class IdentiCurse(object):
                 self.cmd_delete(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
             elif input == curses.ascii.ctrl(ord("l")):
                 self.redraw()
-            # and now the c* actions, in a block to prevent running them on non-timeline tabs
+            elif input == ord("P") or input in [ord(key) for key in config.config['keys']['pausetoggleall']]:
+                for tab in self.tabs:
+                    if hasattr(tab, "timeline"):
+                        tab.paused = not tab.paused
+                        if tab.paused and (len(tab.timeline) > 0):
+                            self.tabs[self.current_tab].timeline[0]["ic__paused_on"] = True
+                        tab.update_buffer()
+                        tab.update_name()
+                self.tab_bar.tabs = [tab.name for tab in self.tabs]
+                self.tab_bar.current_tab = self.current_tab
+                self.tab_bar.update()
+            # and now the c* actions, and anything else that shouldn't run on non-timeline tabs
             if isinstance(self.tabs[self.current_tab], Timeline):  # don't try to do the c* actions unless on a timeline
                 if input == ord("d") or input in [ord(key) for key in config.config['keys']['creply']]:
                     self.update_timer.cancel()
@@ -847,6 +860,16 @@ class IdentiCurse(object):
                         self.cmd_quote(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
                 elif input == ord("c") or input in [ord(key) for key in config.config['keys']['ccontext']]:
                     self.cmd_context(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
+                elif input == ord("p") or input in [ord(key) for key in config.config['keys']['pausetoggle']]:
+                    self.tabs[self.current_tab].paused = not self.tabs[self.current_tab].paused
+                    if self.tabs[self.current_tab].paused and (len(self.tabs[self.current_tab].timeline) > 0):
+                        self.tabs[self.current_tab].timeline[0]["ic__paused_on"] = True
+                    self.tabs[self.current_tab].update_buffer()  # get the pauseline drawn
+                    self.tabs[self.current_tab].update_name()  # force the tab names to update
+                    self.tab_bar.tabs = [tab.name for tab in self.tabs]
+                    self.tab_bar.current_tab = self.current_tab
+                    self.tab_bar.update()
+
 
             y, x = self.screen.getmaxyx()
             if y != self.y or x != self.x:
