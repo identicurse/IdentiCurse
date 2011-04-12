@@ -122,10 +122,20 @@ class IdentiCurse(object):
         self.path = os.path.dirname(os.path.realpath(unicode(executable_path, sys.getfilesystemencoding())))
         self.qreply = False
         
+        config.config.basedir = os.path.join(os.path.expanduser("~") ,".identicurse")
         if "config_filename" in additional_config:
             config.config.filename = os.path.expanduser(additional_config['config_filename'])
         else:
-            config.config.filename = os.path.join(os.path.expanduser("~") ,".identicurse")
+            config.config.filename = os.path.join(config.config.basedir, "config.json")
+
+        if os.path.exists(config.config.basedir) and not os.path.isdir(config.config.basedir):  # (if a .identicurse file, as used by <= 0.7.x, exists)
+            config_temp = open(config.config.basedir, "r").read()
+            os.remove(config.config.basedir)
+            os.mkdir(config.config.basedir)
+            open(config.config.filename, "w").write(config_temp)
+
+        if not os.path.exists(config.config.basedir):
+            os.mkdir(config.config.basedir)
 
         try:
             if os.path.exists(config.config.filename) or os.path.exists(os.path.join("/etc", "identicurse.conf")):

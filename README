@@ -17,13 +17,22 @@ changing "api_path" to the API home for the instance you wish to use.
 
 Important note:
 IdentiCurse looks for your config file in two locations. First it
-checks .identicurse in your home directory, and then it checks
-config.json in its installed directory. It is highly recommended,
-if you intend to manually edit it, that you copy the supplied
-config.json (found in conf/ in the tarball) to $HOME and rename it to
-.identicurse before modifying this copy, as that way future updates
-(which *will* overwrite config.json with the newest version of it)
-will not erase any customisation you have made.
+looks for config.json in .identicurse (a directory which is in your
+home directory), and then it checks config.json in its installed
+location. It is highly recommended, if you intend to manually edit
+it, that you copy the supplied config.json (found in conf/ in the
+tarball) to $HOME/.identicurse (create the directory first if it
+doesn't exist yet) before modifying this copy, as that way future
+updates (which *will* overwrite the original config.json with the
+newest version) will not erase any customisation you have made.
+
+Further note:
+Prior to version 0.8, config was stored in a file called .identicurse
+in the home directory. This is no longer the case. However, you do not
+have to do anything about this, as IdentiCurse will move the config
+to the correct place automatically the first time you run it after
+updating. This note is just so that you're aware that there has been
+a change.
 
 
 USING IDENTICURSE
