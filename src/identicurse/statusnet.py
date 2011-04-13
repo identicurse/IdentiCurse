@@ -515,12 +515,14 @@ class StatusNet(object):
 
 ######## Favorite resources ########
 
-    def favorites(self, id=0, page=0):
+    def favorites(self, id=0, page=0, since_id=0):
         params = {}
         if not (id == 0):
             params['id'] = id
         if not (page == 0):
             params['page'] = page
+        if not (since_id == 0):
+            params['since_id'] = since_id
         return self.__makerequest("favorites", params)
 
     def favorites_create(self, id):
