@@ -107,7 +107,7 @@
       - Timestamp is " ago" if the dent was created within a second of current time. (Fixed timestamp in this situation is "Now".)
 
 0.4.1:
- - Absence of license headers in some files fixed.
+ - Incorrect license in setup.py fixed.
 
 0.4:
  - Tabs know if they are active, so the display can be updated for the active tab as soon as its data is finished updating.
@@ -161,7 +161,7 @@
  - Long dent handling, default behaviour is to truncate.
  - IdentiCurse now looks for config in ~/.identicurse before trying ./config.json.
  - IdentiCurse inherits terminal colours (previously defaulted to an ugly grey on some terms).
- - Multiline input, requires CTRL+G to submit. (CTRL+G no longer required as of 0.2.1)
+ - Multiline input, requires CTRL+G to submit.
  - Stacked tab order, so you return to the last tab you were on when closing another.
  - Timelines auto-update, except while in insert mode.
  - Dents have timestamps.
