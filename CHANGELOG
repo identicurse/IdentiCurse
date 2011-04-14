@@ -1,9 +1,15 @@
-New for 0.8:
+0.8:
  - New slogan.
  - Pausing (p to toggle pause on the current tab, P for all tabs), with a pause line to indicate which notices are before/after a pause.
  - Config is now stored in ~/.identicurse/config.json. Any existing setups will be automatically converted upon start.
 
-New for 0.7:
+0.7.2:
+ - The favourites tab no longer crashes on load.
+
+0.7.1:
+ - No longer gets the wrong path on initial setup on Windows, which would crash it.
+
+0.7:
  - New slogans.
  - The screen will now flash when an update fetches new mentions/direct messages.
  - Smoother scrolling when using a/s to switch notices; when moving to a notice that is partially/fully off the screen, IdentiCurse will now only scroll enough to make it visible, rather than scroll by an entire page. Controlled by the 'smooth_cscroll' config option, default true.
@@ -46,7 +52,19 @@ New for 0.7:
       - IdentiCurse crashes on attempting to view the profile of a non-existent user.
       - Spaces are discarded when at the start/end of lines in multi-line input box.
 
-New for 0.6:
+0.6.4:
+ - API implementation changed to fit with changes to the Status.net API.
+
+0.6.3:
+ - Buffer errors on Cygwin fixed.
+
+0.6.2:
+ - Fixed broken codepath encountered only by upgrading users.
+
+0.6.1:
+ - Colours enabled by default.
+
+0.6:
  - New slogans.
  - Borders can now be switched off, with the 'border' config option.
  - Notices can now be displayed in compact mode (new default), or non-compact mode (as in old versions), as dictated by the 'compact_notices' config option..
@@ -65,7 +83,12 @@ New for 0.6:
       - Time is several hours out for notices whose post time (according to the server) is ahead of local time.
       - Profile crashes if URL, Bio or Location is not set for a user.
 
-New for 0.5:
+0.5.1:
+ - Initial setup documentation clarified.
+ - Failure to revert to correct status after in-page search fixed.
+ - README reflowed to thinner width.
+
+0.5:
  - New slogans.
  - Directs can now be sent by notice number as well as by name.
  - In-page search, activated with / key. n/N can be used to quickly move between matches.
@@ -83,7 +106,10 @@ New for 0.5:
       - Split statuses cause crashes if set to preserve the first word (i.e., replies, bug reports, and feature requests).
       - Timestamp is " ago" if the dent was created within a second of current time. (Fixed timestamp in this situation is "Now".)
 
-New for 0.4:
+0.4.1:
+ - Absence of license headers in some files fixed.
+
+0.4:
  - Tabs know if they are active, so the display can be updated for the active tab as soon as its data is finished updating.
  - Links in a notice can now be opened in a browser with the /link command.
  - Daily average for number of notices.
@@ -98,7 +124,13 @@ New for 0.4:
  - Bugfixes for:
       - Viewing profiles where bio/location contains non-ascii characters causes an exception.
 
-New for 0.3:
+0.3.2:
+ - Incorrect version number in setup.py fixed.
+
+0.3.1:
+ - Incorrect first-run instructions fixed.
+
+0.3:
  - Filters
  - Adjust number of notices fetched per page (all timelines excluding Public, Search, Favourites)
  - Scrolling with j/k.
@@ -109,8 +141,6 @@ New for 0.3:
  - Clean reflowing of buffers to prevent overflowing the screen and causing crashes.
  - Aliases can alias to commands with parameters included, instead of just bare commands.
  - Commands can now contain an arbitrary number of spaces between parameters.
- - Python 2.5 compatibility. (also backported to 0.2 as of 0.2.1)
- - Enter now works to submit in multiline text-boxes. (also backported to 0.2 as of 0.2.1)
  - Long dent handling now defaults to splitting.
  - Context view now follows repeats back to the original notice, as if they were a reply - repeats that can be followed this way are denoted by [~].
  - Expanded profile pages.
@@ -120,7 +150,14 @@ New for 0.3:
  - Bugfixes for:
       - Exceptions occurred when ending, even on clean quit.
 
-New for 0.2:
+0.2.2:
+ - Textbox crashing fixed.
+
+0.2.1:
+ - Enter now works to submit in multiline text-boxes.
+ - Python 2.5 compatibility.
+
+0.2:
  - Long dent handling, default behaviour is to truncate.
  - IdentiCurse now looks for config in ~/.identicurse before trying ./config.json.
  - IdentiCurse inherits terminal colours (previously defaulted to an ugly grey on some terms).
