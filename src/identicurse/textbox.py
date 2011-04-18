@@ -36,7 +36,7 @@ class Textbox(textpad.Textbox):
             pass
 
         for char in list(initial_input):
-            self.do_command(char)
+            self.do_command(ord(char))
         self.poll_function(self.count())
 
         abort = False
@@ -95,7 +95,7 @@ class Textbox(textpad.Textbox):
                         guess = helpers.find_longest_common_start(possible_guesses)
                         if len(guess) > len(last_word):
                             for char in guess[len(last_word):]:
-                                self.do_command(char)
+                                self.do_command(ord(char))
                         elif len(possible_guesses) > 0:
                             self.poll_function(possible_guesses)
                     else:
@@ -105,7 +105,7 @@ class Textbox(textpad.Textbox):
                             for i in xrange(len(last_word)):
                                 self.win.delch()
                             for char in possible_guesses[0]:
-                                self.do_command(char)
+                                self.do_command(ord(char))
                         elif len(possible_guesses) >= 2:
                             self.poll_function(possible_guesses)
             elif ch == curses.KEY_HOME:
