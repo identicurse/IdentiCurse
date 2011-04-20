@@ -267,6 +267,9 @@ Available commands are as follows:
    There is also an alias for this: "/links [notice number]".
    (See also 'ADVANCED CONFIGURATION, Link opening' section below.)
 
+/link [notice number]
+   As above, but the first link in the notice is selected.
+
 /alias [alias] [command]
    This will create the alias given as an alias for the command
    given. For example:
