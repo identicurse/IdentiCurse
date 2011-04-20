@@ -1173,8 +1173,11 @@ class IdentiCurse(object):
                     elif tokens[0] == "/alias" and len(tokens) >= 3:
                         self.cmd_alias(tokens[1], " ".join(tokens[2:]))
 
-                    elif tokens[0] == "/link":
-                        self.cmd_link(self.tabs[self.current_tab].timeline[int(tokens[2]) - 1], tokens[1])
+                    elif tokens[0] == "/link" and len(tokens) >= 2:
+                        if len(tokens) == 2:  # only notice number given, assume first link
+                            self.cmd_link(self.tabs[self.current_tab].timeline[int(tokens[1]) - 1], 1)
+                        else:  # notice number and link number given
+                            self.cmd_link(self.tabs[self.current_tab].timeline[int(tokens[2]) - 1], tokens[1])
 
                     elif tokens[0] == "/bugreport" and len(tokens) >= 2:
                         update = self.cmd_bugreport(" ".join(tokens[1:]))
