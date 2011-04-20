@@ -130,6 +130,32 @@ class Textbox(textpad.Textbox):
                 self.delch()
             elif ch == curses.KEY_DC:
                 self.delch()
+            elif ch == curses.ascii.ctrl(ord("u")):  # delete entire line up to the cursor
+                cursor_y, cursor_x = self.win.getyx()
+                self.win.move(cursor_y, 0)
+                for char_count in xrange(0, cursor_x):
+                    self.delch()
+            elif ch == curses.ascii.ctrl(ord("w")):  # delete all characters before the current one until the beginning of the word
+                cursor_y, cursor_x = self.win.getyx()
+                x, y = cursor_x, cursor_y
+                while True:
+                    if x == 0:
+                        if y == 0:
+                            break
+                        else:
+                            y -= 1
+                            x = self.maxx
+                    else:
+                        x -= 1
+                    if curses.ascii.ascii(self.win.inch(y, x)) != ord(" "):
+                        self.win.move(y, x)
+                        self.delch()
+                    else:
+                        if x == self.maxx:
+                            self.win.move(y + 1, 0)
+                        else:
+                            self.win.move(y, x + 1)
+                        break
             elif not ch:
                 continue
             elif not self.do_command(ch):
