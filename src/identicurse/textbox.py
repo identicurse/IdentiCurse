@@ -51,7 +51,7 @@ class Textbox(textpad.Textbox):
             elif ch == 27:
                 abort = True
                 break
-            elif ch ==9:
+            elif ch == 9:
                 cursor_position = self.win.getyx()
                 x = cursor_position[1]
                 last_word = ""
@@ -72,7 +72,7 @@ class Textbox(textpad.Textbox):
                     shorturl = helpers.ur1ca_shorten(last_word)
                     for n in xrange(len(last_word)):
                         self.win.move(self.win.getyx()[0], self.win.getyx()[1]-1)
-                        self.win.delch()
+                        self.delch()
                     for char in shorturl:
                         self.do_command(ord(char))
                 elif last_word[0] == "@" and hasattr(config.session_store, "user_cache"):
@@ -103,7 +103,7 @@ class Textbox(textpad.Textbox):
                         if len(possible_guesses) == 1:
                             self.win.move(self.win.getyx()[0], self.win.getyx()[1]-len(last_word))
                             for i in xrange(len(last_word)):
-                                self.win.delch()
+                                self.delch()
                             for char in possible_guesses[0]:
                                 self.do_command(ord(char))
                         elif len(possible_guesses) >= 2:
@@ -118,8 +118,18 @@ class Textbox(textpad.Textbox):
                     if self._end_of_line(y+1) == 0:
                         self.win.move(y, self._end_of_line(y))
                         break
+            elif ch == curses.KEY_BACKSPACE:
+                cursor_y, cursor_x = self.win.getyx()
+                if cursor_x == 0:
+                    if cursor_y == 0:
+                        continue
+                    else:
+                        self.win.move(cursor_y - 1, self.maxx)
+                else:
+                    self.win.move(cursor_y, cursor_x - 1)
+                self.delch()
             elif ch == curses.KEY_DC:
-                self.win.delch()
+                self.delch()
             elif not ch:
                 continue
             elif not self.do_command(ch):
@@ -138,6 +148,15 @@ class Textbox(textpad.Textbox):
             self.win.clear()
             self.win.refresh()
             return None
+
+    def delch(self):  # delch, but with provisions for moving characters across lines
+        cursor_y, cursor_x = self.win.getyx()
+        self.win.delch()
+        if cursor_y < self.maxy:
+            for line_offset in xrange(0, self.maxy - cursor_y):
+                self.win.insch(cursor_y + line_offset, self.maxx, curses.ascii.ascii(self.win.inch(cursor_y + line_offset + 1, 0)))
+                self.win.delch(cursor_y + line_offset + 1, 0)
+            self.win.move(cursor_y, cursor_x)
 
     def gather_only(self):
         "Collect and return the contents of the window."
