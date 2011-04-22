@@ -138,6 +138,7 @@ class Textbox(textpad.Textbox):
             elif ch == curses.ascii.ctrl(ord("w")):  # delete all characters before the current one until the beginning of the word
                 cursor_y, cursor_x = self.win.getyx()
                 x, y = cursor_x, cursor_y
+                only_spaces_so_far = True
                 while True:
                     if x == 0:
                         if y == 0:
@@ -150,12 +151,17 @@ class Textbox(textpad.Textbox):
                     if curses.ascii.ascii(self.win.inch(y, x)) != ord(" "):
                         self.win.move(y, x)
                         self.delch()
+                        only_spaces_so_far = False
                     else:
-                        if x == self.maxx:
-                            self.win.move(y + 1, 0)
+                        if only_spaces_so_far:
+                            self.win.move(y, x)
+                            self.delch()
                         else:
-                            self.win.move(y, x + 1)
-                        break
+                            if x == self.maxx:
+                                self.win.move(y + 1, 0)
+                            else:
+                                self.win.move(y, x + 1)
+                            break
             elif not ch:
                 continue
             elif not self.do_command(ch):
