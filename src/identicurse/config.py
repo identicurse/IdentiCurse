@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import json
+import json, os.path
 
 auth_fields = ["username", "password", "api_path", "consumer_key", "consumer_secret", "oauth_token", "oauth_token_secret", "use_oauth"]
 
@@ -35,6 +35,8 @@ class Config(dict):
             for key, value in unclean_config.items():
                 if key in auth_fields:
                     auth_config[key] = value
+                elif key == "colours" and self.colourscheme_filename is not None:
+                    open(self.colourscheme_filename, "w").write(json.dumps(value, indent=4))
                 else:
                     clean_config[key] = value
             open(filename, "w").write(json.dumps(clean_config, indent=4))
@@ -52,6 +54,17 @@ class Config(dict):
             self.clear()
             self.update(json.loads(open(filename, "r").read()))
             self.update(json.loads(open(auth_filename, "r").read()))
+            if "colourscheme" in self:
+                colours = None
+                try:
+                    self.colourscheme_filename = os.path.join(self.basedir, "colours", "%s.json" % (self['colourscheme']))
+                    colourscheme = json.loads(open(self.colourscheme_filename, "r").read())
+                    colours = {"colours":colourscheme}
+                except IOError:  # couldn't load colourscheme
+                    print "Couldn't load your colourscheme (%s) successfully." % (self['colourscheme'])
+                    self.colourscheme_filename = None
+                if colours is not None:
+                    self.update(colours)
         except IOError:
             return False
         return True
