@@ -19,7 +19,6 @@ import time, datetime, htmlentitydefs, re, urllib, urllib2, locale, os, platform
 DATETIME_FORMAT = "%a %b %d %H:%M:%S +0000 %Y"
 offset_regex = re.compile("[+-][0-9]{4}")
 base_url_regex = re.compile("(http(s|)://.+?)/.*")
-entity_regex = re.compile(r'([@!#]\w+)')
 title_regex = re.compile("\<title\>(.*)\<\/title\>")
 ur1_regex = re.compile("Your ur1 is: <a.+?>(http://ur1\.ca/[0-9A-Za-z]+)")
 url_regex = re.compile("http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+")
@@ -213,3 +212,30 @@ def set_terminal_title(title_text):
         sys.stdout.write("\x1b]0;" + title_text + "\x07")  # set the title the unix-y way
     else:
         os.system("title " + title_text)  # do it the windows-y way
+
+def split_entities(raw_notice_text):
+    entities = [{"text":"", "type":"plaintext"}]
+    raw_notice_text = " " + raw_notice_text
+    char_index = 0
+    while char_index < len(raw_notice_text):
+        if entities[-1]['type'] != "plaintext" and not raw_notice_text[char_index].isalnum() and not raw_notice_text[char_index] in [".", "_", "-"]:
+            entities.append ({"text":"", "type":"plaintext"})
+        if raw_notice_text[char_index] in [" ", "\n", "\t"] and char_index < (len(raw_notice_text) - 2):
+            entities[-1]['text'] += raw_notice_text[char_index]
+            char_index += 1
+            if raw_notice_text[char_index] in ["@", "!", "#"] and (raw_notice_text[char_index+1].isalnum() or (raw_notice_text[char_index+1] in [".", "_", "-"])):
+                if raw_notice_text[char_index] == "@":
+                    entities.append({"text":"@", "type":"user"})
+                elif raw_notice_text[char_index] == "!":
+                    entities.append({"text":"!", "type":"group"})
+                elif raw_notice_text[char_index] == "#":
+                    entities.append({"text":"#", "type":"tag"})
+                char_index += 1
+        else:
+            entities[-1]['text'] += raw_notice_text[char_index]
+            char_index += 1
+    if entities[0]['text'] == " ":
+        entities = entities[1:]
+    else:
+        entities[0]['text'] = entities[0]['text'][1:]
+    return entities
