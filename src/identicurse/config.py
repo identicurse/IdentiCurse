@@ -17,25 +17,41 @@
 
 import json
 
+auth_fields = ["username", "password", "api_path", "consumer_key", "consumer_secret", "oauth_token", "oauth_token_secret", "use_oauth"]
+
 class Config(dict):
     def __init__(self):
         pass
         
-    def save(self, filename=None):
+    def save(self, filename=None, auth_filename=None):
         if filename is None:
             filename = self.filename
+        if auth_filename is None:
+            auth_filename = self.auth_filename
         try:
-            open(filename, "w").write(json.dumps(self.copy(), indent=4))
+            unclean_config = self.copy()
+            clean_config = {}
+            auth_config = {}
+            for key, value in unclean_config.items():
+                if key in auth_fields:
+                    auth_config[key] = value
+                else:
+                    clean_config[key] = value
+            open(filename, "w").write(json.dumps(clean_config, indent=4))
+            open(auth_filename, "w").write(json.dumps(auth_config, indent=4))
         except IOError:
             return False
         return True
 
-    def load(self, filename=None):
+    def load(self, filename=None, auth_filename=None):
         if filename is None:
             filename = self.filename
+        if auth_filename is None:
+            auth_filename = self.auth_filename
         try:
             self.clear()
             self.update(json.loads(open(filename, "r").read()))
+            self.update(json.loads(open(auth_filename, "r").read()))
         except IOError:
             return False
         return True

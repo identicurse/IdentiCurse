@@ -127,6 +127,7 @@ class IdentiCurse(object):
             config.config.filename = os.path.expanduser(additional_config['config_filename'])
         else:
             config.config.filename = os.path.join(config.config.basedir, "config.json")
+        config.config.auth_filename = os.path.join(config.config.basedir, "auth.json")
 
         if os.path.exists(config.config.basedir) and not os.path.isdir(config.config.basedir):  # (if a .identicurse file, as used by <= 0.7.x, exists)
             config_temp = open(config.config.basedir, "r").read()
@@ -136,6 +137,18 @@ class IdentiCurse(object):
 
         if not os.path.exists(config.config.basedir):
             os.mkdir(config.config.basedir)
+
+        if os.path.exists(config.config.filename) and not os.path.exists(config.config.auth_filename):
+            unclean_config = json.loads(open(config.config.filename, "r").read())
+            clean_config = {}
+            auth_config = {}
+            for key, value in unclean_config.items():
+                if key in config.auth_fields:
+                    auth_config[key] = value
+                else:
+                    clean_config[key] = value
+            open(config.config.filename, "w").write(json.dumps(clean_config, indent=4))
+            open(config.config.auth_filename, "w").write(json.dumps(auth_config, indent=4))
 
         try:
             if os.path.exists(config.config.filename) or os.path.exists(os.path.join("/etc", "identicurse.conf")):
