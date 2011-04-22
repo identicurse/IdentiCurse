@@ -530,7 +530,8 @@ class Timeline(Tab):
                         if entity['type'] in ['user', 'group', 'tag']:
                             entity_text_no_symbol = entity['text'][1:]
                             cache = getattr(config.session_store, '%s_cache' % (entity['type']))
-                            cache[entity_text_no_symbol] = random.choice(identicurse.base_colours.items())[1]
+                            if not entity_text_no_symbol in cache:
+                                cache[entity_text_no_symbol] = random.choice(identicurse.base_colours.items())[1]
                             if config.config['%s_rainbow' % (entity['type'])]:
                                 line.append((entity['text'], cache[entity_text_no_symbol]))
                             else:
