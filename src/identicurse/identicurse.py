@@ -1322,11 +1322,13 @@ class IdentiCurse(object):
     @repeat_passthrough
     def cmd_quote(self, notice):
         self.quote_mode = True
-        new_status_base = "RD @%s %s" % (notice['user']['screen_name'], notice['text'])
-        for match in helpers.entity_regex.findall(new_status_base):
-            if match[0] == "!":
-                new_status_base = new_status_base.replace(match, "#" + match[1:])
-        status = self.text_entry.edit(new_status_base)
+        new_status_base_unclean = "RD @%s %s" % (notice['user']['screen_name'], notice['text'])
+        new_status_base_clean = ""
+        for entity in helpers.split_entities(new_status_base_unclean):
+            if entity['type'] == "group":
+                entity['text'] = "#" + entity['text'][1:]
+            new_status_base_clean += entity['text']
+        status = self.text_entry.edit(new_status_base_clean)
         self.quote_mode = False
 
         if status is None:

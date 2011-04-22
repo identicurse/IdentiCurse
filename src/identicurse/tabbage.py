@@ -524,35 +524,22 @@ class Timeline(Tab):
                 line.append((" | ", identicurse.colour_fields["none"]))
 
             try:
-                notice_parts = helpers.entity_regex.split(n['text'])
-                for part in notice_parts:
-                    part_list = list(part)
-                    if len(part_list) > 0:
-                        if part_list[0] in ['@', '!', '#']:
-                            highlight_part = "".join(part_list[1:])
-                            if part_list[0] == '@':
-                                if not highlight_part in config.session_store.user_cache:
-                                    config.session_store.user_cache[highlight_part] = random.choice(identicurse.base_colours.items())[1]
-                                if config.config['user_rainbow']:
-                                    line.append((part, config.session_store.user_cache[highlight_part]))
+                notice_entities = helpers.split_entities(n['text'])
+                for entity in notice_entities:
+                    if len(entity['text']) > 0:
+                        if entity['type'] in ['user', 'group', 'tag']:
+                            entity_text_no_symbol = entity['text'][1:]
+                            cache = getattr(config.session_store, '%s_cache' % (entity['type']))
+                            cache[entity_text_no_symbol] = random.choice(identicurse.base_colours.items())[1]
+                            if config.config['%s_rainbow' % (entity['type'])]:
+                                line.append((entity['text'], cache[entity_text_no_symbol]))
+                            else:
+                                if entity['type'] == "user":
+                                    line.append((entity['text'], identicurse.colour_fields["username"]))
                                 else:
-                                    line.append((part, identicurse.colour_fields['username']))
-                            elif part_list[0] == '!':
-                                if not highlight_part in config.session_store.group_cache:
-                                    config.session_store.group_cache[highlight_part] = random.choice(identicurse.base_colours.items())[1]
-                                if config.config['group_rainbow']:
-                                    line.append((part, config.session_store.group_cache[highlight_part]))
-                                else:
-                                    line.append((part, identicurse.colour_fields['group']))
-                            elif part_list[0] == '#':
-                                if not highlight_part in config.session_store.tag_cache:
-                                    config.session_store.tag_cache[highlight_part] = random.choice(identicurse.base_colours.items())[1]
-                                if config.config['tag_rainbow']:
-                                    line.append((part, config.session_store.tag_cache[highlight_part]))
-                                else:
-                                    line.append((part, identicurse.colour_fields['tag']))
+                                    line.append((entity['text'], identicurse.colour_fields[entity['type']]))
                         else:
-                            line.append((part, identicurse.colour_fields["notice"]))
+                            line.append((entity['text'], identicurse.colour_fields["notice"]))
 
                 self.buffer.append(line)
 
