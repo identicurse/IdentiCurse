@@ -46,6 +46,7 @@
     },
     "update_interval": 60,
     "notice_limit": 25,
+    "notify": "flash",
     "long_dent": "split",
     "browser": "xdg-open '%s'",
     "keys": {
