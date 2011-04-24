@@ -299,6 +299,8 @@ class IdentiCurse(object):
 
         if not "search_case_sensitive" in config.config:
             config.config['search_case_sensitive'] = "sensitive"
+        if not "notify" in config.config:
+            config.config['notify'] = "flash"
         if not "long_dent" in config.config:
             config.config['long_dent'] = "split"
         if not "filters" in config.config:

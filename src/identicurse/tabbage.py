@@ -365,7 +365,10 @@ class Timeline(Tab):
 
         if self.timeline_type in ["direct", "mentions"]:  # alert on changes to these. maybe config option later?
             if (len(self.timeline) > 0) and (len(temp_timeline) > 0):  # only fire when there's new stuff _and_ we've already got something in the timeline
-                curses.flash()
+                if config.config['notify'] == 'flash':
+                    curses.flash()
+                elif config.config['notify'] == 'beep':
+                    curses.beep()
 
         if len(self.timeline) == 0:
             self.timeline = temp_timeline[:]
