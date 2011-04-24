@@ -59,7 +59,7 @@ class Config(dict):
                 try:
                     self.colourscheme_filename = os.path.join(self.basedir, "colours", "%s.json" % (self['colourscheme']))
                     colourscheme = json.loads(open(self.colourscheme_filename, "r").read())
-                    colours = {"colours":colourscheme}
+                    colours = {"colours":colourscheme["colours"], "custom_colours":colourscheme["custom_colours"]}
                 except IOError:  # couldn't load colourscheme
                     print "Couldn't load your colourscheme (%s) successfully." % (self['colourscheme'])
                     self.colourscheme_filename = None

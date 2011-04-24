@@ -217,8 +217,8 @@ class IdentiCurse(object):
                     sys.exit("Couldn't establish connection: %s" % (errmsg))
                 print "Okay! Everything seems good! Your new config will now be saved, then IdentiCurse will start properly."
                 config.config.save()
-        except ValueError:
-            sys.exit("ERROR: Your config file could not be succesfully loaded due to JSON syntax error(s). Please fix it.")
+        except ValueError, e:
+            sys.exit("ERROR: Your config file could not be succesfully loaded due to JSON syntax error(s). Please fix it.\nOriginal error: %s" % (str(e)))
 
         self.last_page_search = {'query':"", 'occurs':[], 'viewing':0, 'tab':-1}
 
@@ -489,7 +489,6 @@ class IdentiCurse(object):
                         current_y += y - (entry_lines + 1 + config.config['ui_order'].count("divider"))
                     else:
                         return self.redraw()
-                self.notice_window.bkgd(" ", curses.color_pair(colour_fields["timelines"]))
 
                 # I don't like this, but it looks like it has to be done
                 if hasattr(self, 'tabs'):
@@ -530,8 +529,12 @@ class IdentiCurse(object):
         if hasattr(self, 'tab_bar'):
             self.tab_bar.window = self.tab_bar_window
 
+        self.screen.bkgd(" ", curses.color_pair(colour_fields["none"]))
+        self.main_window.bkgd(" ", curses.color_pair(colour_fields["none"]))
+        self.notice_window.bkgd(" ", curses.color_pair(colour_fields["timelines"]))
         self.status_window.bkgd(" ", curses.color_pair(colour_fields["statusbar"]))
         self.tab_bar_window.bkgd(" ", curses.color_pair(colour_fields["tabbar"]))
+        self.screen.refresh()
 
     def initialise(self, screen):
         self.screen = screen
@@ -547,6 +550,28 @@ class IdentiCurse(object):
 
         if curses.has_colors() and config.config['enable_colours'] == True:
             curses.start_color()
+
+            if "custom_colours" in config.config:
+                temp_colours = colours.copy()
+                temp_colours.update(config.config['custom_colours'])
+                if not curses.can_change_color():
+                    raise Exception("Cannot set custom colours, since your terminal does not support changing colour values. Using \"export TERM=xterm-256color\" may resolve this, since some terminals only enable that function when 256 colours are available.")
+                elif len(temp_colours) >= curses.COLORS:
+                    raise Exception("Cannot set custom colours, since your terminal supports only %d colour slots. Adding all the custom colours defined in your config would need %d slots. For many terminals, using \"export TERM=xterm-256color\" will allow use of 256 slots." % (curses.COLORS, len(temp_colours)))
+                else:
+                    colour_num = len(colours)
+                    for colour_name, colour_value in config.config['custom_colours'].items():
+                        if colour_value[0] == "#":
+                            colour_value = colour_value[1:]
+                        r = int((ord(colour_value[0:2].decode("hex")) * 1000.0) / 255.0)
+                        g = int((ord(colour_value[2:4].decode("hex")) * 1000.0) / 255.0)
+                        b = int((ord(colour_value[4:6].decode("hex")) * 1000.0) / 255.0)
+                        if colour_name in colours:  # if we're redefining an already existing colour
+                            curses.init_color(colours[colour_name], r, g, b)
+                        else:
+                            curses.init_color(colour_num, r, g, b)
+                            colours[colour_name] = colour_num
+                            colour_num += 1
 
             for field, (fg, bg) in config.config['colours'].items():
                 try:
