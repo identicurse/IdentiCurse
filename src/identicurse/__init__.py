@@ -56,6 +56,7 @@ PRESET_SLOGANS = [
     "like a compact disc to the head!",
     "along with his mechanical ass-kicking leg.",
     "TIME FOR GROUP HUG.",
+    "GLORIOUS VICTORY"
     ]
 
 def main():
