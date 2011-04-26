@@ -48,10 +48,10 @@ class Textbox(textpad.Textbox):
                 self.do_command(263)
             elif ch == curses.KEY_ENTER or ch == 10:
                 break
-            elif ch == 27:
+            elif ch == curses.ascii.ESC:
                 abort = True
                 break
-            elif ch == 9:
+            elif ch == curses.ascii.TAB:
                 cursor_position = self.win.getyx()
                 x = cursor_position[1]
                 last_word = ""
