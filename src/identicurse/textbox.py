@@ -118,7 +118,7 @@ class Textbox(textpad.Textbox):
                     if self._end_of_line(y+1) == 0:
                         self.win.move(y, self._end_of_line(y))
                         break
-            elif ch == curses.KEY_BACKSPACE:
+            elif ch == curses.KEY_BACKSPACE or ch == curses.ascii.ctrl(ord("h")):
                 cursor_y, cursor_x = self.win.getyx()
                 if cursor_x == 0:
                     if cursor_y == 0:
@@ -128,7 +128,7 @@ class Textbox(textpad.Textbox):
                 else:
                     self.win.move(cursor_y, cursor_x - 1)
                 self.delch()
-            elif ch == curses.KEY_DC:
+            elif ch == curses.KEY_DC or ch == curses.ascii.ctrl(ord("d")):
                 self.delch()
             elif ch == curses.ascii.ctrl(ord("u")):  # delete entire line up to the cursor
                 cursor_y, cursor_x = self.win.getyx()
