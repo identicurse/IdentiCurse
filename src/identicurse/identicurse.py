@@ -975,13 +975,20 @@ class IdentiCurse(object):
             if tokens[0][0] == "i" and ((tokens[0][1:] in self.known_commands) or (tokens[0][1:] in config.config["aliases"])):
                 tokens[0] = tokens[0][1:]  # avoid doing the wrong thing when people accidentally submit stuff like "i/r 2 blabla"
 
-            # catch mistakes like "/r1" - the last condition is so that, for example, "/directs" is not mistakenly converted to "/direct s"
             for command in self.known_commands:
+                # catch mistakes like "/r1" - the last condition is so that, for example, "/directs" is not mistakenly converted to "/direct s"
                 if (tokens[0][:len(command)] == command) and (tokens[0] != command) and not (tokens[0] in self.known_commands) and not (tokens[0] in config.config['aliases']):
                     tokens[:1] = [command, tokens[0].replace(command, "")]
+                # catch mis-capitalizations
+                if tokens[0].lower() == command.lower() and not tokens[0].lower() in [cmd.lower() for cmd in self.known_commands if cmd != command]:
+                    tokens[0] = command
             for alias in config.config['aliases']:
+                # catch mistakes like "/r1" - the last condition is so that, for example, "/directs" is not mistakenly converted to "/direct s"
                 if (tokens[0][:len(alias)] == alias) and (tokens[0] != alias) and not (tokens[0] in self.known_commands) and not (tokens[0] in config.config['aliases']):
                     tokens[:1] = [alias, tokens[0].replace(alias, "")]
+                # catch mis-capitalizations
+                if tokens[0].lower() == alias.lower() and not tokens[0].lower() in [als.lower() for als in config.config['aliases'] if als != alias]:
+                    tokens[0] = alias
 
             if tokens[0] in config.config["aliases"]:
                 tokens = config.config["aliases"][tokens[0]].split(" ") + tokens[1:]
