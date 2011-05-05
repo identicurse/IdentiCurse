@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import time, datetime, htmlentitydefs, re, urllib, urllib2, locale, os, platform, sys
+import time, datetime, htmlentitydefs, re, urllib, urllib2, locale, os, platform, sys, string
 DATETIME_FORMAT = "%a %b %d %H:%M:%S +0000 %Y"
 offset_regex = re.compile("[+-][0-9]{4}")
 base_url_regex = re.compile("(http(s|)://.+?)/.*")
@@ -220,7 +220,7 @@ def split_entities(raw_notice_text):
     while char_index < len(raw_notice_text):
         if entities[-1]['type'] != "plaintext" and not raw_notice_text[char_index].isalnum() and not raw_notice_text[char_index] in [".", "_", "-"]:
             entities.append ({"text":"", "type":"plaintext"})
-        if raw_notice_text[char_index] in [" ", "\n", "\t"] and char_index < (len(raw_notice_text) - 2):
+        if (raw_notice_text[char_index] in string.whitespace or raw_notice_text[char_index] in string.punctuation) and char_index < (len(raw_notice_text) - 2):
             entities[-1]['text'] += raw_notice_text[char_index]
             char_index += 1
             if raw_notice_text[char_index] in ["@", "!", "#"] and (raw_notice_text[char_index+1].isalnum() or (raw_notice_text[char_index+1] in [".", "_", "-"])):
