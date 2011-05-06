@@ -1423,15 +1423,15 @@ class IdentiCurse(object):
     @shows_status("Deploying orbital nukes")
     @posts_notice
     def cmd_spamreport(self, username, reason=""):
-        user_id = self.conn.users_show(screen_name=username)["id"]
-        status = "@support !sr %s UID %d" % (username, user_id)
+        target_user_id = self.conn.users_show(screen_name=username)["id"]
+        status = "@support !sr %s UID %d" % (username, target_user_id)
         if len(reason) > 0:
             status += " %s" % (reason)
         user_id = self.conn.users_show()['id']
         group_id = self.conn.statusnet_groups_show(nickname="spamreport")['id']
         if not self.conn.statusnet_groups_is_member(user_id, group_id):
             self.status_bar.timed_update("You are not a member of the !spamreport group. Joining it is highly recommended if reporting spam.")
-        self.conn.blocks_create(user_id=user_id, screen_name=username)
+        self.conn.blocks_create(user_id=target_user_id, screen_name=username)
         return self.conn.statuses_update(status, "IdentiCurse")
 
     @shows_status("Blocking user")
