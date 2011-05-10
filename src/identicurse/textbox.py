@@ -44,8 +44,8 @@ class Textbox(textpad.Textbox):
             insert = False
             ch = self.win.getch()
 
-            if ch == 127:
-                self.do_command(263)
+            if ch == curses.ascii.DEL:
+                self.do_command(curses.ascii.BS)
             elif ch == curses.KEY_ENTER or ch == 10:
                 break
             elif ch == curses.ascii.ESC:
