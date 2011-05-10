@@ -15,7 +15,11 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import json, os.path
+import os.path
+try:
+    import json
+except ImportError:
+    import simplejson as json
 
 auth_fields = ["username", "password", "api_path", "consumer_key", "consumer_secret", "oauth_token", "oauth_token_secret", "use_oauth"]
 
