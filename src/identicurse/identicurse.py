@@ -122,11 +122,11 @@ class IdentiCurse(object):
         self.path = os.path.dirname(os.path.realpath(unicode(executable_path, sys.getfilesystemencoding())))
         self.qreply = False
         
-        config.config.basedir = os.path.join(os.path.expanduser("~") ,".identicurse")
-        if "config_filename" in additional_config:
-            config.config.filename = os.path.expanduser(additional_config['config_filename'])
+        if "config_dirname" in additional_config:
+            config.config.basedir = os.path.expanduser(additional_config['config_dirname'])
         else:
-            config.config.filename = os.path.join(config.config.basedir, "config.json")
+            config.config.basedir = os.path.join(os.path.expanduser("~") ,".identicurse")
+        config.config.filename = os.path.join(config.config.basedir, "config.json")
         config.config.auth_filename = os.path.join(config.config.basedir, "auth.json")
 
         if os.path.exists(config.config.basedir) and not os.path.isdir(config.config.basedir):  # (if a .identicurse file, as used by <= 0.7.x, exists)

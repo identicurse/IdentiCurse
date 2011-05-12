@@ -67,8 +67,8 @@ def main():
     """
     parser = OptionParser()
     parser.add_option("-c", "--config",
-        help="specify an alternative config file to use", action="store",
-        type="string", dest="config_filename", metavar="FILE")
+        help="specify an alternative config dir to use", action="store",
+        type="string", dest="config_dirname", metavar="FILE")
     parser.add_option("-s", "--slogans",
         help="specify an alternative slogans file to use", action="store",
         type="string", dest="slogans_filename", metavar="FILE")
@@ -89,8 +89,8 @@ def main():
         user_slogans_file = os.path.join(os.path.expanduser("~"),
                                              ".identicurse_slogans")
     
-    if options.config_filename is not None:
-        additional_config['config_filename'] = options.config_filename
+    if options.config_dirname is not None:
+        additional_config['config_dirname'] = options.config_dirname
 
     try:
         user_slogans_raw = open(user_slogans_file).read()
