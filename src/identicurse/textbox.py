@@ -100,13 +100,14 @@ class Textbox(textpad.Textbox):
                             self.poll_function(possible_guesses)
                     else:
                         possible_guesses = helpers.find_fuzzy_matches(last_word, guess_source)
-                        if len(possible_guesses) == 1:
+                        common_guess = helpers.find_longest_common_start(possible_guesses)
+                        if len(common_guess) != 0:
                             self.win.move(self.win.getyx()[0], self.win.getyx()[1]-len(last_word))
                             for i in xrange(len(last_word)):
                                 self.delch()
-                            for char in possible_guesses[0]:
+                            for char in common_guess:
                                 self.do_command(ord(char))
-                        elif len(possible_guesses) >= 2:
+                        if len(possible_guesses) >= 2:
                             self.poll_function(possible_guesses)
             elif ch == curses.KEY_HOME:
                 self.win.move(0, 0)
