@@ -3,6 +3,13 @@
  - Pausing (p to toggle pause on the current tab, P for all tabs), with a pause line to indicate which notices are before/after a pause.
  - Config is now stored in ~/.identicurse/config.json. Any existing setups will be automatically converted upon start.
 
+0.7.3:
+ - Tab completion is now more reliable across different systems.
+ - When deleting characters from multiline input boxes, the remaining lines are correctly moved over the line boundary.
+ - "/link [notice number]" no longer causes a crash
+ - Odd edge case fixed, where username/tag/group identification within a dent misidentified an entire dent as a single username/tag/group.
+ - An import bug that prevented running successfully on python 2.5 is now fixed.
+
 0.7.2:
  - The favourites tab no longer crashes on load.
 
