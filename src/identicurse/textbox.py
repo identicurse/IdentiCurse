@@ -101,7 +101,7 @@ class Textbox(textpad.Textbox):
                     else:
                         possible_guesses = helpers.find_fuzzy_matches(last_word, guess_source)
                         common_guess = helpers.find_longest_common_start(possible_guesses)
-                        if len(common_guess) != 0:
+                        if len(common_guess) != 0 and len(helpers.find_fuzzy_matches(last_word, [common_guess,])) > 0:
                             self.win.move(self.win.getyx()[0], self.win.getyx()[1]-len(last_word))
                             for i in xrange(len(last_word)):
                                 self.delch()
