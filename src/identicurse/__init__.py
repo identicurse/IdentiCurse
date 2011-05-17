@@ -58,7 +58,8 @@ PRESET_SLOGANS = [
     "TIME FOR GROUP HUG.",
     "GLORIOUS VICTORY",
     "the sock ruse was a... DISTACTION",
-    "wigeons have my car keys",
+    "wigeons have my car keys.",
+    "life is like a zombie in my head.",
     ]
 
 def main():
