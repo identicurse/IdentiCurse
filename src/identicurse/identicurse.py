@@ -865,13 +865,20 @@ class IdentiCurse(object):
                 if input == ord("d") or input in [ord(key) for key in config.config['keys']['creply']]:
                     self.update_timer.cancel()
                     self.insert_mode = True
-                    self.parse_input(self.text_entry.edit("/r " + str(self.tabs[self.current_tab].chosen_one + 1) + " "))
+                    if "direct" in self.tabs[self.current_tab].timeline_type:
+                        self.parse_input(self.text_entry.edit("/dm " + str(self.tabs[self.current_tab].chosen_one + 1) + " "))
+                    else:
+                        self.parse_input(self.text_entry.edit("/r " + str(self.tabs[self.current_tab].chosen_one + 1) + " "))
                 elif input == ord("D") or input in [ord(key) for key in config.config['keys']['creplymode']]:
                     self.update_timer.cancel()
-                    try:
-                        self.cmd_reply(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
-                    except Exception, (errmsg):
-                        self.status_bar.timed_update("ERROR: Couldn't post status: %s" % (errmsg))
+                    if "direct" in self.tabs[self.current_tab].timeline_type:
+                        self.insert_mode = True
+                        self.parse_input(self.text_entry.edit("/dm " + str(self.tabs[self.current_tab].chosen_one + 1) + " "))
+                    else:
+                        try:
+                            self.cmd_reply(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
+                        except Exception, (errmsg):
+                            self.status_bar.timed_update("ERROR: Couldn't post status: %s" % (errmsg))
                 elif input == ord("s") or input in [ord(key) for key in config.config['keys']['cnext']]:
                     if self.tabs[self.current_tab].chosen_one != (len(self.tabs[self.current_tab].timeline) - 1):
                         self.tabs[self.current_tab].chosen_one += 1
