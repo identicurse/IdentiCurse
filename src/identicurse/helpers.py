@@ -215,11 +215,18 @@ def set_terminal_title(title_text):
 
 def split_entities(raw_notice_text):
     entities = [{"text":"", "type":"plaintext"}]
-    raw_notice_text = " " + raw_notice_text
+    raw_notice_text = " " + raw_notice_text + " "
     char_index = 0
     while char_index < len(raw_notice_text):
         if entities[-1]['type'] != "plaintext" and not raw_notice_text[char_index].isalnum() and not raw_notice_text[char_index] in [".", "_", "-"]:
-            entities.append ({"text":"", "type":"plaintext"})
+            next_entity_text = ""
+            for i in xrange(len(entities[-1]['text'])):
+                if len(entities[-1]['text']) > 1 and entities[-1]['text'][-1] in [".", "_", "-"]:
+                    next_entity_text += entities[-1]['text'][-1]
+                    entities[-1]['text'] = entities[-1]['text'][:-1]
+                else:
+                    break
+            entities.append ({"text":next_entity_text, "type":"plaintext"})
         if (raw_notice_text[char_index] in string.whitespace or raw_notice_text[char_index] in string.punctuation) and char_index < (len(raw_notice_text) - 2):
             entities[-1]['text'] += raw_notice_text[char_index]
             char_index += 1
@@ -234,8 +241,14 @@ def split_entities(raw_notice_text):
         else:
             entities[-1]['text'] += raw_notice_text[char_index]
             char_index += 1
+    # strip the extra space that was prepended
     if entities[0]['text'] == " ":
         entities = entities[1:]
     else:
         entities[0]['text'] = entities[0]['text'][1:]
+    # and the one that was appended
+    if entities[-1]['text'] == " ":
+        entities = entities[:-1]
+    else:
+        entities[-1]['text'] = entities[-1]['text'][:-1]
     return entities
