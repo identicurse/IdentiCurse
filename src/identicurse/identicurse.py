@@ -861,7 +861,11 @@ class IdentiCurse(object):
                 self.tab_bar.current_tab = self.current_tab
                 self.tab_bar.update()
             # and now the c* actions, and anything else that shouldn't run on non-timeline tabs
-            if isinstance(self.tabs[self.current_tab], Timeline):  # don't try to do the c* actions unless on a timeline
+            if isinstance(self.tabs[self.current_tab], Timeline) and len(self.tabs[self.current_tab].timeline) > 0:  # don't try to do the c* actions unless on a populated timeline
+                if (self.tabs[self.current_tab].chosen_one + 1) > len(self.tabs[self.current_tab].timeline):  # reduce chosen_one if it's beyond the end
+                    self.tabs[self.current_tab].chosen_one = len(self.tabs[self.current_tab].timeline) - 1
+                    self.tabs[self.current_tab].update_buffer()
+
                 if input == ord("d") or input in [ord(key) for key in config.config['keys']['creply']]:
                     self.update_timer.cancel()
                     self.insert_mode = True
