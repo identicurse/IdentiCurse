@@ -221,7 +221,7 @@ def split_entities(raw_notice_text):
         if entities[-1]['type'] != "plaintext" and not raw_notice_text[char_index].isalnum() and not raw_notice_text[char_index] in [".", "_", "-"]:
             next_entity_text = ""
             for i in xrange(len(entities[-1]['text'])):
-                if len(entities[-1]['text']) > 1 and entities[-1]['text'][-1] in [".", "_", "-"]:
+                if len(entities[-1]['text']) > 1 and entities[-1]['text'][-1] in [".", "-"]:
                     next_entity_text += entities[-1]['text'][-1]
                     entities[-1]['text'] = entities[-1]['text'][:-1]
                 else:
