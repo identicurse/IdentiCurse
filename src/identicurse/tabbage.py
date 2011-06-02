@@ -374,7 +374,7 @@ class Timeline(Tab):
             self.timeline = temp_timeline[:]
         else:
             self.timeline = temp_timeline + self.timeline
-            if len(self.timeline) > get_count:  # truncate long timelines
+            if self.timeline_type != "context" and len(self.timeline) > get_count:  # truncate long timelines
                 self.timeline = self.timeline[:get_count]
 
         self.timeline.sort(key=itemgetter('id'), reverse=True)
