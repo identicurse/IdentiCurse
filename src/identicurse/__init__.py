@@ -60,6 +60,7 @@ PRESET_SLOGANS = [
     "the sock ruse was a... DISTACTION",
     "wigeons have my car keys.",
     "life is like a zombie in my head.",
+    "head to the nearest ENTRANCE and immediately call YOUR MUTANT FIRE DANCING MOON POSSE",
     ]
 
 def main():
