@@ -39,6 +39,8 @@ class StatusNet(object):
         self.use_auth = use_auth
         self.auth_type = auth_type
         self.auth_string = None
+        if not self.__checkconn():
+            raise Exception("Couldn't access %s, it may well be down." % (api_path))
         if self.use_auth:
             if auth_type == "basic":
                 self.auth_string = base64.encodestring('%s:%s' % (username, password))[:-1]
@@ -198,6 +200,13 @@ class StatusNet(object):
             return json.loads(content)
         except ValueError:  # it wasn't JSON data, return it raw
             return content
+
+    def __checkconn(self):
+        try:
+            urllib.urlopen(self.api_path+"/help/test.json")
+            return True
+        except:
+            return False
 
 
 ##############################
@@ -567,7 +576,10 @@ class StatusNet(object):
 ######## Help resources ########
 
     def help_test(self):
-        return self.__makerequest("help/test")
+        try:
+            return self.__makerequest("help/test")
+        except:
+            return None
 
 
 ######## OAuth resources ########
