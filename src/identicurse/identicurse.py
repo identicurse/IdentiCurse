@@ -410,7 +410,7 @@ class IdentiCurse(object):
             self.keybindings[action] = []
             if action in config.config['keys']:
                 for key in config.config['keys'][action]:
-                    if isinstance(key, str):
+                    if isinstance(key, basestring):
                         key = ord(key)
                     self.keybindings[action].append(key)
                     assigned_keys.append(key)
@@ -418,7 +418,7 @@ class IdentiCurse(object):
         for action in keybind_actions:
             if action in default_keys:
                 for key in default_keys[action]:
-                    if isinstance(key, str):
+                    if isinstance(key, basestring):
                         key, orig_key = ord(key), key
                     if not key in assigned_keys:
                         self.keybindings[action].append(key)
