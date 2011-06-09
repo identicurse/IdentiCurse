@@ -371,7 +371,7 @@ class IdentiCurse(object):
 
         empty_default_keys = ("firstpage", "newerpage", "olderpage", "refresh",
             "input", "commandinput", "search", "quit", "closetab", "help", "nexttab", "prevtab",
-            "qreply", "creply", "cfav", "ccontext", "crepeat", "cnext", "cprev",
+            "qreply", "creply", "cfav", "cunfav", "ccontext", "crepeat", "cnext", "cprev",
             "cfirst", "nextmatch", "prevmatch", "creplymode", "cquote", "tabswapleft", "tabswapright",
             "cdelete", "pausetoggle", "pausetoggleall")
 
@@ -900,6 +900,8 @@ class IdentiCurse(object):
                         self.tabs[self.current_tab].scrolltodent(self.tabs[self.current_tab].chosen_one)
                 elif input == ord("f") or input in [ord(key) for key in config.config['keys']['cfav']]:
                     self.cmd_favourite(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
+                elif input == ord("F") or input in [ord(key) for key in config.config['keys']['cunfav']]:
+                    self.cmd_unfavourite(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
                 elif input == ord("e") or input in [ord(key) for key in config.config['keys']['crepeat']]:
                     can_repeat = True
                     try:
@@ -1032,6 +1034,9 @@ class IdentiCurse(object):
     
                     elif tokens[0] == "/favourite" and len(tokens) == 2:
                         self.cmd_favourite(self.tabs[self.current_tab].timeline[int(tokens[1]) - 1])
+    
+                    elif tokens[0] == "/unfavourite" and len(tokens) == 2:
+                        self.cmd_unfavourite(self.tabs[self.current_tab].timeline[int(tokens[1]) - 1])
     
                     elif tokens[0] == "/repeat" and len(tokens) == 2:
                         update = self.cmd_repeat(self.tabs[self.current_tab].timeline[int(tokens[1]) - 1])
@@ -1368,6 +1373,11 @@ class IdentiCurse(object):
     @repeat_passthrough
     def cmd_favourite(self, notice):
         self.conn.favorites_create(notice["id"]) 
+
+    @shows_status("Unfavouriting notice")
+    @repeat_passthrough
+    def cmd_unfavourite(self, notice):
+        self.conn.favorites_destroy(notice["id"]) 
 
     @shows_status("Repeating notice")
     @posts_notice
