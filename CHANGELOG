@@ -1,6 +1,7 @@
 0.8:
- - New slogan.
+ - New slogans.
  - Pausing (p to toggle pause on the current tab, P for all tabs), with a pause line to indicate which notices are before/after a pause.
+ - Unfavouriting notices (command /unfavourite, or hotkey F).
  - Config is now stored in ~/.identicurse/config.json. Any existing setups will be automatically converted upon start.
 
 0.7.3:
