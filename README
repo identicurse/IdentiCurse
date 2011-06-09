@@ -72,6 +72,7 @@ the following:
                      dent you are replying to is added before posting.
     D               Reply to currently selected dent, full reply editable.
     f               Favourite currently selected dent.
+    F               Unfavourite currently selected dent.
     e               Repeat currently selected dent.
     E               Quote currently selected dent.
     c               View context for currently selected dent.
@@ -131,6 +132,10 @@ Available commands are as follows:
 /favourite [notice number]            (aliases: /favorite, /fav, /f)
    This will add the notice with the notice number specified to your
    favourites.
+
+/unfavourite [notice number]        (aliases: /unfavorite, /unfav, /unf)
+   This will remove the notice with the notice number specified
+   from your favourites.
 
 /repeat [notice number]                         (aliases: /rt)
    This will create a repeat of the notice with the notice number
@@ -565,6 +570,7 @@ The full range of keys you can set custom bindings for is as follows:
     cprev          Move selected notice up.
     creply         Reply to selected notice.
     cfav           Favourite selected notice.
+    cunfav         Unfavourite selected notice.
     crepeat        Repeat selected notice.
     ccontext       View context for selected notice.
     creplymode     Go into Reply Mode, with selected notice as target.
