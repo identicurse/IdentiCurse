@@ -340,18 +340,6 @@ class IdentiCurse(object):
 
         if not "keys" in config.config:
             config.config['keys'] = {}
-        if not "scrollup" in config.config['keys']:
-            config.config['keys']['scrollup'] = ['k']
-        if not "scrolltop" in config.config['keys']:
-            config.config['keys']['scrolltop'] = ['g']
-        if not "pageup" in config.config['keys']:
-            config.config['keys']['pageup'] = ['b']
-        if not "scrolldown" in config.config['keys']:
-            config.config['keys']['scrolldown'] = ['j']
-        if not "scrollbottom" in config.config['keys']:
-            config.config['keys']['scrollbottom'] = ['G']
-        if not "pagedown" in config.config['keys']:
-            config.config['keys']['pagedown'] = [' ']
 
         if not "tab_complete_mode" in config.config:
             config.config["tab_complete_mode"] = "exact"
@@ -369,15 +357,74 @@ class IdentiCurse(object):
             while config.config['ui_order'].count(ui_item) > 1:  # if item listed more than once, remove all but the last occurence
                 config.config['ui_order'].remove(ui_item)
 
-        empty_default_keys = ("firstpage", "newerpage", "olderpage", "refresh",
+        keybind_actions = ("firstpage", "newerpage", "olderpage", "refresh",
             "input", "commandinput", "search", "quit", "closetab", "help", "nexttab", "prevtab",
             "qreply", "creply", "cfav", "cunfav", "ccontext", "crepeat", "cnext", "cprev",
             "cfirst", "nextmatch", "prevmatch", "creplymode", "cquote", "tabswapleft", "tabswapright",
-            "cdelete", "pausetoggle", "pausetoggleall")
+            "cdelete", "pausetoggle", "pausetoggleall", "scrollup", "scrolltop", "pageup", "pagedown",
+            "scrolldown", "scrollbottom")
 
-        for k in empty_default_keys:
-            config.config['keys'][k] = []
-        
+        default_keys = {
+            "nexttab": [">"],
+            "prevtab": ["<"],
+            "tabswapright": ["."],
+            "tabswapleft": [","],
+            "scrollup": [curses.KEY_UP, "k"],
+            "scrolltop": [curses.KEY_HOME, "g"],
+            "pageup": [curses.KEY_PPAGE, "b"],
+            "scrolldown": [curses.KEY_DOWN, "j"],
+            "scrollbottom": [curses.KEY_END, "G"],
+            "pagedown": [curses.KEY_NPAGE, " "],
+            "firstpage": ["="],
+            "newerpage": [curses.KEY_LEFT],
+            "olderpage": [curses.KEY_RIGHT],
+            "refresh": ["r"],
+            "input": ["i"],
+            "commandinput": [":"],
+            "search": ["/"],
+            "quit": ["q"],
+            "closetab": ["x"],
+            "help": ["h"],
+            "qreply": ["l"],
+            "nextmatch": ["n"],
+            "prevmatch": ["N"],
+            "cdelete": ["#"],
+            "pausetoggleall": ["P"],
+            "creply": ["d"],
+            "creplymode": ["D"],
+            "cnext": ["s"],
+            "cprev": ["a"],
+            "cfirst": ["z"],
+            "cfav": ["f"],
+            "cunfav": ["F"],
+            "crepeat": ["e"],
+            "cquote": ["E"],
+            "ccontext": ["c"],
+            "pausetoggle": ["p"],
+            }
+
+        self.keybindings = {}
+        assigned_keys = []
+
+        for action in keybind_actions:
+            self.keybindings[action] = []
+            if action in config.config['keys']:
+                for key in config.config['keys'][action]:
+                    if isinstance(key, str):
+                        key = ord(key)
+                    self.keybindings[action].append(key)
+                    assigned_keys.append(key)
+
+        for action in keybind_actions:
+            if action in default_keys:
+                for key in default_keys[action]:
+                    if isinstance(key, str):
+                        key, orig_key = ord(key), key
+                    if not key in assigned_keys:
+                        self.keybindings[action].append(key)
+                    elif len(self.keybindings) == 0:
+                        print "WARNING: Tried to assign action '%(action)s' to key '%(key)s', but a user-set keybinding already uses '%(key)s'. This will leave '%(action)s' with no keybindings, so make sure to add a custom binding for '%(action)s' if you still want to use it." % {'action': action, 'key': orig_key}
+
         try:
             if config.config["use_oauth"]:
                 instance = domain_regex.findall(config.config['api_path'])[0][2]
@@ -730,17 +777,17 @@ class IdentiCurse(object):
                         break
                     if input == ord(str(x+1)):
                         switch_to_tab = x
-                if input == ord(">") or input in [ord(key) for key in config.config['keys']['nexttab']]:
+                if input in self.keybindings['nexttab']:
                     if self.current_tab < (len(self.tabs) - 1):
                         switch_to_tab = self.current_tab + 1
-                elif input == ord("<") or input in [ord(key) for key in config.config['keys']['prevtab']]:
+                elif input in self.keybindings['prevtab']:
                     if self.current_tab >= 1:
                         switch_to_tab = self.current_tab - 1
-                elif input == ord(".") or input in [ord(key) for key in config.config['keys']['tabswapright']]:
+                elif input in self.keybindings['tabswapright']:
                     if self.current_tab < (len(self.tabs) - 1):
                         self.tabs[self.current_tab], self.tabs[self.current_tab+1] = self.tabs[self.current_tab+1], self.tabs[self.current_tab]
                         switch_to_tab = self.current_tab + 1
-                elif input == ord(",") or input in [ord(key) for key in config.config['keys']['tabswapleft']]:
+                elif input in self.keybindings['tabswapleft']:
                     if self.current_tab >= 1:
                         self.tabs[self.current_tab-1], self.tabs[self.current_tab] = self.tabs[self.current_tab], self.tabs[self.current_tab-1]
                         switch_to_tab = self.current_tab - 1
@@ -758,68 +805,68 @@ class IdentiCurse(object):
                         self.parse_input(self.text_entry.edit("/r " + str(x) + " "))
                 self.qreply = False
             
-            if input == curses.KEY_UP or input in [ord(key) for key in config.config['keys']['scrollup']]:
+            if input in self.keybindings['scrollup']:
                 self.tabs[self.current_tab].scrollup(1)
                 self.display_current_tab()
-            elif input == curses.KEY_HOME or input in [ord(key) for key in config.config['keys']['scrolltop']]:
+            elif input in self.keybindings['scrolltop']:
                 self.tabs[self.current_tab].scrollup(0)
                 self.display_current_tab()
-            elif input == curses.KEY_PPAGE or input in [ord(key) for key in config.config['keys']['pageup']]:
+            elif input in self.keybindings['pageup']:
                 self.tabs[self.current_tab].scrollup(self.main_window.getmaxyx()[0] - 11) # the 11 offset gives 2 lines of overlap between the pre-scroll view and post-scroll view
                 self.display_current_tab()
-            elif input == curses.KEY_DOWN or input in [ord(key) for key in config.config['keys']['scrolldown']]:
+            elif input in self.keybindings['scrolldown']:
                 self.tabs[self.current_tab].scrolldown(1)
                 self.display_current_tab()
-            elif input == curses.KEY_END or input in [ord(key) for key in config.config['keys']['scrollbottom']]:
+            elif input in self.keybindings['scrollbottom']:
                 self.tabs[self.current_tab].scrolldown(0)
                 self.display_current_tab()
-            elif input == curses.KEY_NPAGE or input in [ord(key) for key in config.config['keys']['pagedown']]:
+            elif input in self.keybindings['pagedown']:
                 self.tabs[self.current_tab].scrolldown(self.main_window.getmaxyx()[0] - 11) # as above
                 self.display_current_tab()
-            elif input == ord("=") or input in [ord(key) for key in config.config['keys']['firstpage']]:
+            elif input in self.keybindings['firstpage']:
                 if self.tabs[self.current_tab].prevpage(0):
                     self.status_bar.update("Moving to first page...")
                     self.tabs[self.current_tab].update()
                     self.status_bar.update("Doing nothing.")
-            elif input == curses.KEY_LEFT or input in [ord(key) for key in config.config['keys']['newerpage']]:
+            elif input in self.keybindings['newerpage']:
                 if self.tabs[self.current_tab].prevpage():
                     self.status_bar.update("Moving to newer page...")
                     self.tabs[self.current_tab].update()
                     self.status_bar.update("Doing nothing.")
-            elif input == curses.KEY_RIGHT or input in [ord(key) for key in config.config['keys']['olderpage']]:
+            elif input in self.keybindings['olderpage']:
                 if self.tabs[self.current_tab].nextpage():
                     self.status_bar.update("Moving to older page...")
                     self.tabs[self.current_tab].update()
                     self.status_bar.update("Doing nothing.")
-            elif input == ord("r") or input in [ord(key) for key in config.config['keys']['refresh']]:
+            elif input in self.keybindings['refresh']:
                 self.update_tabs()
-            elif input == ord("i") or input in [ord(key) for key in config.config['keys']['input']]:
+            elif input in self.keybindings['input']:
                 self.update_timer.cancel()
                 self.insert_mode = True
                 self.parse_input(self.text_entry.edit())
-            elif input == ord(":") or input in [ord(key) for key in config.config['keys']['commandinput']]:
+            elif input in self.keybindings['commandinput']:
                 self.update_timer.cancel()
                 self.insert_mode = True
                 self.parse_input(self.text_entry.edit("/"))
-            elif input == ord("/") or input in [ord(key) for key in config.config['keys']['search']]:
+            elif input in self.keybindings['search']:
                 self.update_timer.cancel()
                 self.insert_mode = True
                 self.search_mode = True
                 self.parse_search(self.text_entry.edit())
-            elif input == ord("q") or input in [ord(key) for key in config.config['keys']['quit']]:
+            elif input in self.keybindings['quit']:
                 self.running = False
-            elif input == ord("x") or input in [ord(key) for key in config.config['keys']['closetab']]:
+            elif input in self.keybindings['closetab']:
                 self.close_current_tab()
-            elif input == ord("h") or input in [ord(key) for key in config.config['keys']['help']]:
+            elif input in self.keybindings['help']:
                 self.tabs.append(Help(self.notice_window, self.path))
                 self.tabs[self.current_tab].active = False
                 self.current_tab = len(self.tabs) - 1
                 self.tabs[self.current_tab].active = True
                 self.tab_order.insert(0, self.current_tab)
                 self.tabs[self.current_tab].update()
-            elif input == ord("l") or input in [ord(key) for key in config.config['keys']['qreply']]:
+            elif input in self.keybindings['qreply']:
                 self.qreply = True
-            elif input == ord("n") or input in [ord(key) for key in config.config['keys']['nextmatch']]:
+            elif input in self.keybindings['nextmatch']:
                 if (self.last_page_search['query'] != "") and (self.last_page_search['tab'] == self.current_tab):
                     if self.last_page_search['viewing'] < (len(self.last_page_search['occurs']) - 1):
                         self.last_page_search['viewing'] += 1
@@ -832,7 +879,7 @@ class IdentiCurse(object):
                     else:
                         self.status_bar.update("Viewing result #%d for '%s'" % (self.last_page_search['viewing'] + 1, self.last_page_search['query']))
                     self.display_current_tab()
-            elif input == ord("N") or input in [ord(key) for key in config.config['keys']['prevmatch']]:
+            elif input in self.keybindings['prevmatch']:
                 if (self.last_page_search['query'] != "") and (self.last_page_search['tab'] == self.current_tab):
                     if self.last_page_search['viewing'] > 0:
                         self.last_page_search['viewing'] -= 1
@@ -845,11 +892,11 @@ class IdentiCurse(object):
                     else:
                         self.status_bar.update("Viewing result #%d for '%s'" % (self.last_page_search['viewing'] + 1, self.last_page_search['query']))
                     self.display_current_tab()
-            elif input == ord("#") or input in [ord(key) for key in config.config['keys']['cdelete']]:
+            elif input in self.keybindings['cdelete']:
                 self.cmd_delete(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
             elif input == curses.ascii.ctrl(ord("l")):
                 self.redraw()
-            elif input == ord("P") or input in [ord(key) for key in config.config['keys']['pausetoggleall']]:
+            elif input in self.keybindings['pausetoggleall']:
                 for tab in self.tabs:
                     if hasattr(tab, "timeline"):
                         tab.paused = not tab.paused
@@ -866,14 +913,14 @@ class IdentiCurse(object):
                     self.tabs[self.current_tab].chosen_one = len(self.tabs[self.current_tab].timeline) - 1
                     self.tabs[self.current_tab].update_buffer()
 
-                if input == ord("d") or input in [ord(key) for key in config.config['keys']['creply']]:
+                if input in self.keybindings['creply']:
                     self.update_timer.cancel()
                     self.insert_mode = True
                     if "direct" in self.tabs[self.current_tab].timeline_type:
                         self.parse_input(self.text_entry.edit("/dm " + str(self.tabs[self.current_tab].chosen_one + 1) + " "))
                     else:
                         self.parse_input(self.text_entry.edit("/r " + str(self.tabs[self.current_tab].chosen_one + 1) + " "))
-                elif input == ord("D") or input in [ord(key) for key in config.config['keys']['creplymode']]:
+                elif input in self.keybindings['creplymode']:
                     self.update_timer.cancel()
                     if "direct" in self.tabs[self.current_tab].timeline_type:
                         self.insert_mode = True
@@ -883,26 +930,26 @@ class IdentiCurse(object):
                             self.cmd_reply(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
                         except Exception, (errmsg):
                             self.status_bar.timed_update("ERROR: Couldn't post status: %s" % (errmsg))
-                elif input == ord("s") or input in [ord(key) for key in config.config['keys']['cnext']]:
+                elif input in self.keybindings['cnext']:
                     if self.tabs[self.current_tab].chosen_one != (len(self.tabs[self.current_tab].timeline) - 1):
                         self.tabs[self.current_tab].chosen_one += 1
                         self.tabs[self.current_tab].update_buffer()
                         self.tabs[self.current_tab].scrolltodent(self.tabs[self.current_tab].chosen_one, smooth_scroll=config.config["smooth_cscroll"])
-                elif input == ord("a") or input in [ord(key) for key in config.config['keys']['cprev']]:
+                elif input in self.keybindings['cprev']:
                     if self.tabs[self.current_tab].chosen_one != 0:
                         self.tabs[self.current_tab].chosen_one -= 1
                         self.tabs[self.current_tab].update_buffer()
                         self.tabs[self.current_tab].scrolltodent(self.tabs[self.current_tab].chosen_one, smooth_scroll=config.config["smooth_cscroll"])
-                elif input == ord("z") or input in [ord(key) for key in config.config['keys']['cfirst']]:
+                elif input in self.keybindings['cfirst']:
                     if self.tabs[self.current_tab].chosen_one != 0:
                         self.tabs[self.current_tab].chosen_one = 0
                         self.tabs[self.current_tab].update_buffer()
                         self.tabs[self.current_tab].scrolltodent(self.tabs[self.current_tab].chosen_one)
-                elif input == ord("f") or input in [ord(key) for key in config.config['keys']['cfav']]:
+                elif input in self.keybindings['cfav']:
                     self.cmd_favourite(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
-                elif input == ord("F") or input in [ord(key) for key in config.config['keys']['cunfav']]:
+                elif input in self.keybindings['cunfav']:
                     self.cmd_unfavourite(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
-                elif input == ord("e") or input in [ord(key) for key in config.config['keys']['crepeat']]:
+                elif input in self.keybindings['crepeat']:
                     can_repeat = True
                     try:
                         if self.tabs[self.current_tab].timeline_type in ["direct", "sentdirect"]:
@@ -911,7 +958,7 @@ class IdentiCurse(object):
                         pass  # we must be in a Context tab, so repeating is fine.
                     if can_repeat:
                         self.cmd_repeat(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
-                elif input == ord("E") or input in [ord(key) for key in config.config['keys']['cquote']]:
+                elif input in self.keybindings['cquote']:
                     can_repeat = True
                     try:
                         if self.tabs[self.current_tab].timeline_type in ["direct", "sentdirect"]:
@@ -921,9 +968,9 @@ class IdentiCurse(object):
                     if can_repeat:
                         self.update_timer.cancel()
                         self.cmd_quote(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
-                elif input == ord("c") or input in [ord(key) for key in config.config['keys']['ccontext']]:
+                elif input in self.keybindings['ccontext']:
                     self.cmd_context(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
-                elif input == ord("p") or input in [ord(key) for key in config.config['keys']['pausetoggle']]:
+                elif input in self.keybindings['pausetoggle']:
                     self.tabs[self.current_tab].paused = not self.tabs[self.current_tab].paused
                     if self.tabs[self.current_tab].paused and (len(self.tabs[self.current_tab].timeline) > 0):
                         self.tabs[self.current_tab].timeline[0]["ic__paused_on"] = True
