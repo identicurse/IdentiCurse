@@ -31,11 +31,16 @@ class StatusNetError(Exception):
             Exception.__init__(self, "Error %d: %s" % (self.errcode, self.details))
 
 class StatusNet(object):
-    def __init__(self, api_path, username="", password="", use_auth=True, auth_type="basic", consumer_key=None, consumer_secret=None):
+    def __init__(self, api_path, username="", password="", use_auth=True, auth_type="basic", consumer_key=None, consumer_secret=None, validate_ssl=True):
         import base64
         self.api_path = api_path
         if self.api_path[-1] == "/":  # We don't want a surplus / when creating request URLs. Sure, most servers will handle it well, but why take the chance?
             self.api_path == self.api_path[:-1]
+        if validate_ssl:
+            #TODO: Implement SSL-validating handler and add it to opener here
+            self.opener = urllib2.build_opener()
+        else:
+            self.opener = urllib2.build_opener()
         self.use_auth = use_auth
         self.auth_type = auth_type
         self.auth_string = None
@@ -180,7 +185,7 @@ class StatusNet(object):
             if attempt_count >= 10:  # after 10 failed attempts
                 raise Exception("Could not successfully read any response. Please check that your connection is working.")
             try:
-                response = urllib2.urlopen(request)
+                response = self.opener.open(request)
             except urllib2.HTTPError, e:
                 raw_details = e.read()
                 try:
@@ -203,7 +208,7 @@ class StatusNet(object):
 
     def __checkconn(self):
         try:
-            urllib.urlopen(self.api_path+"/help/test.json")
+            self.opener.open(self.api_path+"/help/test.json")
             return True
         except:
             return False
