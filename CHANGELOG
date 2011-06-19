@@ -2,6 +2,7 @@
  - New slogans.
  - Pausing (p to toggle pause on the current tab, P for all tabs), with a pause line to indicate which notices are before/after a pause.
  - Unfavouriting notices (command /unfavourite, or hotkey F).
+ - Z (shift+z) keybinding to move to last dent in timeline.
  - Config is now stored in ~/.identicurse/config.json. Any existing setups will be automatically converted upon start.
 
 0.7.3:

@@ -80,6 +80,7 @@ the following:
     s               Move dent selection down (indicated by * character).
     a               Move dent selection up (indicated by * character).
     z               Move dent selection to the 1st in the tab (indicated by *).
+    Z               Move dent selection to the last in the tab (indicated by *).
     p               Toggle the current tab's pause state.
     P               Toggle all tabs' pause states.
     UP or k         Scroll up one line (in the current tab).
@@ -566,6 +567,7 @@ The full range of keys you can set custom bindings for is as follows:
     qreply         Start a reply to the notice with notice number
                    entered immediately after this key.
     cfirst         Move selected notice to first on current page.
+    clast          Move selected notice to last on current page.
     cnext          Move selected notice down.
     cprev          Move selected notice up.
     creply         Reply to selected notice.

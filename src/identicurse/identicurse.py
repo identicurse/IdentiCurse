@@ -359,8 +359,8 @@ class IdentiCurse(object):
 
         keybind_actions = ("firstpage", "newerpage", "olderpage", "refresh",
             "input", "commandinput", "search", "quit", "closetab", "help", "nexttab", "prevtab",
-            "qreply", "creply", "cfav", "cunfav", "ccontext", "crepeat", "cnext", "cprev",
-            "cfirst", "nextmatch", "prevmatch", "creplymode", "cquote", "tabswapleft", "tabswapright",
+            "qreply", "creply", "cfav", "cunfav", "ccontext", "crepeat", "cnext", "cprev", "cfirst",
+            "clast", "nextmatch", "prevmatch", "creplymode", "cquote", "tabswapleft", "tabswapright",
             "cdelete", "pausetoggle", "pausetoggleall", "scrollup", "scrolltop", "pageup", "pagedown",
             "scrolldown", "scrollbottom")
 
@@ -395,6 +395,7 @@ class IdentiCurse(object):
             "cnext": ["s"],
             "cprev": ["a"],
             "cfirst": ["z"],
+            "clast": ["Z"],
             "cfav": ["f"],
             "cunfav": ["F"],
             "crepeat": ["e"],
@@ -943,6 +944,12 @@ class IdentiCurse(object):
                 elif input in self.keybindings['cfirst']:
                     if self.tabs[self.current_tab].chosen_one != 0:
                         self.tabs[self.current_tab].chosen_one = 0
+                        self.tabs[self.current_tab].update_buffer()
+                        self.tabs[self.current_tab].scrolltodent(self.tabs[self.current_tab].chosen_one)
+                elif input in self.keybindings['clast']:
+                    last_index = len(self.tabs[self.current_tab].timeline) - 1
+                    if self.tabs[self.current_tab].chosen_one != last_index:
+                        self.tabs[self.current_tab].chosen_one = last_index
                         self.tabs[self.current_tab].update_buffer()
                         self.tabs[self.current_tab].scrolltodent(self.tabs[self.current_tab].chosen_one)
                 elif input in self.keybindings['cfav']:
