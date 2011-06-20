@@ -61,6 +61,7 @@ PRESET_SLOGANS = [
     "wigeons have my car keys.",
     "life is like a zombie in my head.",
     "head to the nearest ENTRANCE and immediately call YOUR MUTANT FIRE DANCING MOON POSSE",
+    "it's got what dents crave.",
     ]
 
 def main():
