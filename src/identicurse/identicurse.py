@@ -990,7 +990,7 @@ class IdentiCurse(object):
                 elif input in self.keybindings['ccontext']:
                     try:
                         self.cmd_context(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
-                    except Exception, (errmsg)
+                    except Exception, (errmsg):
                         self.status_bar.timed_update("ERROR: Couldn't get context: %s" % (errmsg))
                 elif input in self.keybindings['pausetoggle']:
                     self.tabs[self.current_tab].paused = not self.tabs[self.current_tab].paused
