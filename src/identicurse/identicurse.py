@@ -893,8 +893,6 @@ class IdentiCurse(object):
                     else:
                         self.status_bar.update("Viewing result #%d for '%s'" % (self.last_page_search['viewing'] + 1, self.last_page_search['query']))
                     self.display_current_tab()
-            elif input in self.keybindings['cdelete']:
-                self.cmd_delete(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
             elif input == curses.ascii.ctrl(ord("l")):
                 self.redraw()
             elif input in self.keybindings['pausetoggleall']:
@@ -931,6 +929,11 @@ class IdentiCurse(object):
                             self.cmd_reply(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
                         except Exception, (errmsg):
                             self.status_bar.timed_update("ERROR: Couldn't post status: %s" % (errmsg))
+                elif input in self.keybindings['cdelete']:
+                    try:
+                        self.cmd_delete(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
+                    except Exception, (errmsg):
+                        self.status_bar.timed_update("ERROR: Couldn't delete notice: %s" % (errmsg))
                 elif input in self.keybindings['cnext']:
                     if self.tabs[self.current_tab].chosen_one != (len(self.tabs[self.current_tab].timeline) - 1):
                         self.tabs[self.current_tab].chosen_one += 1
@@ -953,9 +956,15 @@ class IdentiCurse(object):
                         self.tabs[self.current_tab].update_buffer()
                         self.tabs[self.current_tab].scrolltodent(self.tabs[self.current_tab].chosen_one)
                 elif input in self.keybindings['cfav']:
-                    self.cmd_favourite(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
+                    try:
+                        self.cmd_favourite(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
+                    except Exception, (errmsg):
+                        self.status_bar.timed_update("ERROR: Couldn't favourite notice: %s" % (errmsg))
                 elif input in self.keybindings['cunfav']:
-                    self.cmd_unfavourite(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
+                    try:
+                        self.cmd_unfavourite(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
+                    except Exception, (errmsg):
+                        self.status_bar.timed_update("ERROR: Couldn't unfavourite notice: %s" % (errmsg))
                 elif input in self.keybindings['crepeat']:
                     can_repeat = True
                     try:
@@ -964,7 +973,10 @@ class IdentiCurse(object):
                     except AttributeError:
                         pass  # we must be in a Context tab, so repeating is fine.
                     if can_repeat:
-                        self.cmd_repeat(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
+                        try:
+                            self.cmd_repeat(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
+                        except Exception, (errmsg):
+                            self.status_bar.timed_update("ERROR: Couldn't repeat notice: %s" % (errmsg))
                 elif input in self.keybindings['cquote']:
                     can_repeat = True
                     try:
@@ -976,7 +988,10 @@ class IdentiCurse(object):
                         self.update_timer.cancel()
                         self.cmd_quote(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
                 elif input in self.keybindings['ccontext']:
-                    self.cmd_context(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
+                    try:
+                        self.cmd_context(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
+                    except Exception, (errmsg)
+                        self.status_bar.timed_update("ERROR: Couldn't get context: %s" % (errmsg))
                 elif input in self.keybindings['pausetoggle']:
                     self.tabs[self.current_tab].paused = not self.tabs[self.current_tab].paused
                     if self.tabs[self.current_tab].paused and (len(self.tabs[self.current_tab].timeline) > 0):
