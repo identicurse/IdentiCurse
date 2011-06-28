@@ -362,7 +362,7 @@ class IdentiCurse(object):
             "qreply", "creply", "cfav", "cunfav", "ccontext", "crepeat", "cnext", "cprev", "cfirst",
             "clast", "nextmatch", "prevmatch", "creplymode", "cquote", "tabswapleft", "tabswapright",
             "cdelete", "pausetoggle", "pausetoggleall", "scrollup", "scrolltop", "pageup", "pagedown",
-            "scrolldown", "scrollbottom")
+            "scrolldown", "scrollbottom", "togglenoticelinks")
 
         default_keys = {
             "nexttab": [">"],
@@ -402,6 +402,7 @@ class IdentiCurse(object):
             "cquote": ["E"],
             "ccontext": ["c"],
             "pausetoggle": ["p"],
+            "togglenoticelinks": ["L"],
             }
 
         self.keybindings = {}
@@ -906,6 +907,9 @@ class IdentiCurse(object):
                 self.tab_bar.tabs = [tab.name for tab in self.tabs]
                 self.tab_bar.current_tab = self.current_tab
                 self.tab_bar.update()
+            elif input in self.keybindings['togglenoticelinks']:
+                config.config["show_notice_links"] = not config.config["show_notice_links"]
+                self.update_tab_buffers()
             # and now the c* actions, and anything else that shouldn't run on non-timeline tabs
             if isinstance(self.tabs[self.current_tab], Timeline) and len(self.tabs[self.current_tab].timeline) > 0:  # don't try to do the c* actions unless on a populated timeline
                 if (self.tabs[self.current_tab].chosen_one + 1) > len(self.tabs[self.current_tab].timeline):  # reduce chosen_one if it's beyond the end
