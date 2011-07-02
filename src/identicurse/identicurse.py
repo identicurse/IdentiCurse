@@ -1444,7 +1444,7 @@ class IdentiCurse(object):
         if message is None:
             message = ""
         if len(message) > 0:
-            message = plugins.hook_point("send_status", message)[0]
+            message, = plugins.hook_point("send_status", message)
             return self.conn.statuses_update(message, "IdentiCurse", long_dent=config.config["long_dent"], dup_first_word=False)
 
     @shows_status("Favouriting notice")
