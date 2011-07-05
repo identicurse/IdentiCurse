@@ -71,6 +71,9 @@ def hook_point(hook_name, *args):
 def load_plugin(plugin_filename):
     plugin_filename = os.path.abspath(plugin_filename)
     plugin_modulename = os.path.basename(plugin_filename)[:-3]  # all plugins must end with ".py", so [:-3] removes that to get a valid module name
+    if plugin_modulename in config.config["plugin_blacklist"]:
+        print "Plugin '%s' is blacklisted, skipped loading it." % (plugin_modulename)
+        return  # stop without doing anything
     plugin_file = None
     try:
         plugin_file = open(plugin_filename, "r")
@@ -87,13 +90,13 @@ def load_plugin(plugin_filename):
                             register(hook, handler)
                     else:
                         register(hook, handlers)
-            print "Successfully loaded plugin '%s'." % (plugin.plugin_name)
+            print "Successfully loaded plugin '%s' (%s)." % (plugin_modulename, plugin.plugin_name)
         elif type(init_val) == type(1):
-            print "Plugin '%s' requires plugin API v%d or greater (this version of IdentiCurse has plugin API v%d), so was not loaded." % (plugin.plugin_name, init_val, PLUGIN_API_VERSION)
+            print "Plugin '%s' (%s) requires plugin API v%d or greater (this version of IdentiCurse has plugin API v%d), so was not loaded." % (plugin_modulename, plugin.plugin_name, init_val, PLUGIN_API_VERSION)
         else:
             if init_val is None:
                 init_val = "Unknown reason."
-            print "Plugin '%s' failed to load: %s" % (plugin.plugin_name, str(init_val))
+            print "Plugin '%s' (%s) failed to load: %s" % (plugin_modulename, plugin.plugin_name, str(init_val))
     except ImportError, e:
         print "Failed to load plugin '%s': %s" % (plugin_filename, str(e))
     finally:

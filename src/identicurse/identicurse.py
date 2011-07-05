@@ -221,7 +221,9 @@ class IdentiCurse(object):
         except ValueError, e:
             sys.exit("ERROR: Your config file could not be succesfully loaded due to JSON syntax error(s). Please fix it.\nOriginal error: %s" % (str(e)))
 
-        # config was loaded successfully, so now we load plugins
+        # config was loaded successfully, so now we prepare the plugin blacklist and start loading plugins
+        if not "plugin_blacklist" in config.config:
+            config.config["plugin_blacklist"] = []
         plugins.load_all()
 
         self.last_page_search = {'query':"", 'occurs':[], 'viewing':0, 'tab':-1}
