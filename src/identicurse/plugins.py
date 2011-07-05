@@ -17,61 +17,56 @@
 import config, os.path, imp, glob
 PLUGIN_API_VERSION = 1
 
-def register(hook_name, plugin_start_function=None, plugin_end_function=None):
-    """Registers a start and end function (both are optional) for hook-point hook_name."""
+def register(hook_name, handler):
+    """Registers a handler for hook-point hook_name."""
     if not hook_name in config.session_store.plugin_hooks:
-        config.session_store.plugin_hooks[hook_name] = {"start": [], "end": []}
+        config.session_store.plugin_hooks[hook_name] = [handler]
+    else:
+        config.session_store.plugin_hooks[hook_name].append(handler)
 
-    if plugin_start_function is not None:
-        config.session_store.plugin_hooks[hook_name]["start"].append(plugin_start_function)
-    if plugin_end_function is not None:
-        config.session_store.plugin_hooks[hook_name]["end"].append(plugin_end_function)
-
-def normalise_args(args):
-    """Helper function to ensure args is always in correct list form."""
+def normalise_chain_args(args):
+    """Helper function to ensure args for chained hooks are always in correct list form."""
     if type(args) == type(()):  # if args is a tuple
         args = list(args)  # turn it into a list
     elif type(args) != type([]):  # if it's not, and also not a list
         args = [args]  # encase it in one
     return args
 
-def hook_point(hook_name, *args):
-    """Runs all start functions for hook-point hook_name in a chain, passing the return from
-    each into the next one (all handlers, by definition, have the same argument pattern as
-    return pattern). Takes an arbitrary number of additional arguments which are passed down
-    into the start functions. Returns input unchanged on finding no plugins to run, otherwise
-    returns the last start function in the chain's return. Additionally, some hook points may
-    have no end-point. These are single-point hooks, and all use only start functions."""
+def chained_hook_point(hook_name, *args):
+    """Runs all handlers for chained hook-point hook_name in a chain, passing the return from
+    each into the next one (all chained handlers, by definition, have the same argument pattern
+    as return pattern). Takes an arbitrary number of additional arguments which are passed down
+    into the handlers. Returns input unchanged on finding no plugins to run, otherwise returns
+    whatever the last handler in the chain returned."""
     try:
-        start_functions = config.session_store.plugin_hooks[hook_name]["start"]
-    except KeyError:  # getting hook_name's start_function list failed, no entry for that hook
+        handlers = config.session_store.plugin_hooks[hook_name]
+    except KeyError:  # getting hook_name's handler list failed, no entry for that hook
         return args
-    for start_function in start_functions:
+    for handler in handlers:
         try:
-            args = normalise_args(args)
-            args = start_function(*args)
+            args = normalise_chain_args(args)
+            args = handler(*args)
         except TypeError:
             pass  # this function failed, just move on to the next
-    return normalise_args(args)
+    return normalise_chain_args(args)
 
-def hook_point_end(hook_name, *args):
-    """Runs all end functions for hook-point hook_name in a chain, passing the return from
-    each into the next one (all handlers, by definition, have the same argument pattern as
-    return pattern). Takes an arbitrary number of additional arguments which are passed down
-    into the end functions. Returns input unchanged on finding no plugins to run, otherwise
-    returns the last end function in the chain's return."""
+def hook_point(hook_name, *args):
+    """Runs all handlers for hook-point hook_name in sequence, returning a list comprising all
+    non-None returned objects/values. Unlike chained hook-points, the handlers' return may be
+    completely different in layout to the arguments, or even non-existent."""
+    responses = []
     try:
-        end_functions = config.session_store.plugin_hooks[hook_name]["end"]
-    except KeyError:  # getting hook_name's end_function list failed, no entry for that hook
-        return list(args)
-    for end_function in end_functions:
+        handlers = config.session_store.plugin_hooks[hook_name]
+    except KeyError:  # getting hook_name's handler list failed, no entry for that hook
+        return responses
+    for handler in handlers:
         try:
-            args = normalise_args(args)
-            args = end_function(*args)
+            response = handler(*args)
+            if response is not None:
+                responses.append(response)
         except TypeError:
             pass  # this function failed, just move on to the next
-    return normalise_args(args)
-
+    return responses
 
 def load_plugin(plugin_filename):
     plugin_filename = os.path.abspath(plugin_filename)
@@ -81,20 +76,24 @@ def load_plugin(plugin_filename):
         plugin_file = open(plugin_filename, "r")
         plugin = imp.load_source(plugin_modulename, plugin_filename, plugin_file)
         # if we get here, we loaded successfully, so load the plugin fully
-        if plugin.init(PLUGIN_API_VERSION):
+        init_val = plugin.init(PLUGIN_API_VERSION)
+        if init_val == True:
             hooks = plugin.handles_hooks
             for hook in hooks:
-                start_handlers = plugin.get_handlers(hook, "start")
-                if start_handlers is not None:
-                    for handler in start_handlers:
-                        register(hook, plugin_start_function=handler)
-                end_handlers = plugin.get_handlers(hook, "end")
-                if end_handlers is not None:
-                    for handler in end_handlers:
-                        register(hook, plugin_end_function=handler)
+                handlers = plugin.get_handlers(hook)
+                if handlers is not None:
+                    if type(handlers) in (type([]), type(())):
+                        for handler in handlers:
+                            register(hook, handler)
+                    else:
+                        register(hook, handlers)
             print "Successfully loaded plugin '%s'." % (plugin.plugin_name)
+        elif type(init_val) == type(1):
+            print "Plugin '%s' requires plugin API v%d or greater (this version of IdentiCurse has plugin API v%d), so was not loaded." % (plugin.plugin_name, init_val, PLUGIN_API_VERSION)
         else:
-            print "Plugin '%s' requires a later plugin API (this version of IdentiCurse has plugin API v%d), so was not loaded." % (plugin.plugin_name, PLUGIN_API_VERSION)
+            if init_val is None:
+                init_val = "Unknown reason."
+            print "Plugin '%s' failed to load: %s" % (plugin.plugin_name, str(init_val))
     except ImportError, e:
         print "Failed to load plugin '%s': %s" % (plugin_filename, str(e))
     finally:

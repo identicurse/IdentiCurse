@@ -1435,7 +1435,7 @@ class IdentiCurse(object):
     @shows_status("Posting mention")
     @posts_notice
     def cmd_mention(self, username, message):
-        username, message = plugins.hook_point("send_mention", username, message)
+        username, message = plugins.chained_hook_point("send_mention", username, message)
         status = "@%s %s" % (username, message)
         return self.conn.statuses_update(status, "IdentiCurse", long_dent=config.config["long_dent"], dup_first_word=True)
 
@@ -1445,7 +1445,7 @@ class IdentiCurse(object):
         if message is None:
             message = ""
         if len(message) > 0:
-            message, = plugins.hook_point("send_status", message)
+            message, = plugins.chained_hook_point("send_status", message)
             return self.conn.statuses_update(message, "IdentiCurse", long_dent=config.config["long_dent"], dup_first_word=False)
 
     @shows_status("Favouriting notice")
