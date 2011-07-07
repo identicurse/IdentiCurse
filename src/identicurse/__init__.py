@@ -62,6 +62,7 @@ PRESET_SLOGANS = [
     "life is like a zombie in my head.",
     "head to the nearest ENTRANCE and immediately call YOUR MUTANT FIRE DANCING MOON POSSE",
     "it's got what dents crave.",
+    "it has lightsabers.",
     ]
 
 def main():
