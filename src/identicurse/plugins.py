@@ -17,6 +17,32 @@
 import config, os.path, imp, glob
 PLUGIN_API_VERSION = 1
 
+class APIWrapper(object):
+    """Wraps various parts of IdentiCurse for use by plugins. Also makes for a consistent
+    interface for plugins to use."""
+    def get_version(self):
+        """Returns the plugin API version."""
+        return PLUGIN_API_VERSION
+
+    def show_notification(self, notification_text):
+        """Shows a short notification."""
+        pass  # TODO: implement
+
+    def session_put(self, key, value):
+        """Store 'value' into the plugin per-session store under key 'key'."""
+        config.session_store.plugin_store[key] = value
+
+    def session_get(self, key):
+        """Fetch the value in key 'key' from the plugin per-session store."""
+        try:
+            return config.session_store.plugin_store[key]
+        except KeyError:
+            raise KeyError("No such key in the plugin per-session store.")
+
+    def new_timeline_tab(self, timeline_type, type_params):
+        """Open a new tab of type 'timeline_type' with parameters 'type_params'."""
+        pass  # TODO: implement
+
 def register(hook_name, handler):
     """Registers a handler for hook-point hook_name."""
     if not hook_name in config.session_store.plugin_hooks:
