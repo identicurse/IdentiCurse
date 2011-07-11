@@ -296,6 +296,16 @@ class StatusNet(object):
             params['include_rts'] = "true"
         return self.__makerequest("statuses/user_timeline", params, force_get=True)
 
+    def statuses_conversation(self, id, since_id=0, max_id=0, count=0):
+        params = {'id': id}
+        if not (since_id == 0):
+            params['since_id'] = since_id
+        if not (max_id == 0):
+            params['max_id'] = max_id
+        if not (count == 0):
+            params['count'] = count
+        return self.__makerequest("statuses/conversation/%s" % str(id), params, force_get=True)
+
 ### StatusNet does not implement this method yet
 #    def statuses_retweeted_by_me(self, since_id=0, max_id=0, count=0, page=0):
 #        params = {}
