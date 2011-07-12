@@ -323,16 +323,19 @@ class Timeline(Tab):
             elif self.timeline_type == "search":
                 raw_timeline = self.conn.search(self.type_params['query'], page=self.page, standardise=True, since_id=last_id)
             elif self.timeline_type == "context":
-                raw_timeline = []
-                if last_id == 0:  # don't run this if we've already filled the timeline
-                    next_id = self.type_params['notice_id']
-                    while next_id is not None:
-                        notice = self.conn.statuses_show(id=next_id)
-                        raw_timeline.append(notice)
-                        if "retweeted_status" in notice:
-                            next_id = notice['retweeted_status']['id']
-                        else:
-                            next_id = notice['in_reply_to_status_id']
+                try:  # try to do it the proposed 1.0 way
+                    raw_timeline = self.conn.statuses_conversation(self.type_params['notice_id'], count=get_count, since_id=last_id)
+                except StatusNetError:  # otherwise fall back to the established 0.9.7 way
+                    raw_timeline = []
+                    if last_id == 0:  # don't run this if we've already filled the timeline
+                        next_id = self.type_params['notice_id']
+                        while next_id is not None:
+                            notice = self.conn.statuses_show(id=next_id)
+                            raw_timeline.append(notice)
+                            if "retweeted_status" in notice:
+                                next_id = notice['retweeted_status']['id']
+                            else:
+                                next_id = notice['in_reply_to_status_id']
 
         self.prev_page = self.page
 
