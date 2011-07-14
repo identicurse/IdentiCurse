@@ -324,7 +324,15 @@ class Timeline(Tab):
                 raw_timeline = self.conn.search(self.type_params['query'], page=self.page, standardise=True, since_id=last_id)
             elif self.timeline_type == "context":
                 try:  # try to do it the proposed 1.0 way
-                    raw_timeline = self.conn.statuses_conversation(self.type_params['notice_id'], count=get_count, since_id=last_id)
+                    raw_timeline = []
+                    new_timeline = self.conn.statuses_conversation(self.type_params['notice_id'], count=get_count, since_id=last_id)
+                    while len(new_timeline) > 0:
+                        raw_timeline.extend(new_timeline)
+                        new_timeline = self.conn.statuses_conversation(self.type_params['notice_id'], count=get_count, max_id=raw_timeline[-1]['id'])
+                        for notice in raw_timeline:
+                            for new_notice in new_timeline:
+                                if str(notice['id']) == str(new_notice['id']):
+                                    new_timeline.remove(new_notice)
                 except StatusNetError:  # otherwise fall back to the established 0.9.7 way
                     raw_timeline = []
                     if last_id == 0:  # don't run this if we've already filled the timeline
