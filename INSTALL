@@ -23,7 +23,7 @@ distributions is known to be:
 
         python-setuptools   in  Fedora, Ubuntu, Debian, openSUSE
         python2-distribute  in  Arch
-        setuptools          in  Slackware
+        pysetuptools        in  Slackware
         devel/py-setuptools in  OpenBSD
         
         (if your distribution of choice is not in this list yet,
