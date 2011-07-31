@@ -131,7 +131,7 @@ class StatusNet(object):
 
         signature_key = "%s&" % urllib.quote(oauth_tokens["consumer_secret"], safe='~')
         if "token_secret" in oauth_tokens:
-                signature_key = "%s%s" % (signature_key, urllib.quote(oauth_tokens["token_secret"], safe='~'))
+            signature_key = "%s%s" % (signature_key, urllib.quote(oauth_tokens["token_secret"], safe='~'))
         signature_data = "&".join(raw_signature_data)
 
         import hmac, binascii
@@ -139,7 +139,7 @@ class StatusNet(object):
             import hashlib.sha1 as sha
         except ImportError:
             import sha  # 2.4 and earlier
-        signature_raw = hmac.new(signature_key, signature_data, sha)
+        signature_raw = hmac.new(str(signature_key), str(signature_data), sha)
         signature = binascii.b2a_base64(signature_raw.digest())[:-1]
 
         oauth_params["oauth_signature"] = signature

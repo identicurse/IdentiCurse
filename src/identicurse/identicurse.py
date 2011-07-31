@@ -174,9 +174,9 @@ class IdentiCurse(object):
                     config.config['password'] = getpass.getpass("Password: ")
                 api_path = raw_input("API path [%s]: " % (config.config['api_path']))
                 if api_path != "":
-                    if api_path[:7] != "http://" and api_path[:8] != "https://":
+                    if len(api_path) < 7 or api_path[:7] != "http://" and api_path[:8] != "https://":
                         api_path = "http://" + api_path
-                    if api_path[:5] != "https":
+                    if len(api_path) >= 7 and api_path[:5] != "https":
                         https_api_path = "https" + api_path[4:]
                         response = raw_input("You have not used an https URL. This means everything you do with IdentiCurse will travel over your connection _unencrypted_. Would you rather use '%s' as your API path [Y/n]? " % (https_api_path)).upper()
                         if response == "":
@@ -196,26 +196,26 @@ class IdentiCurse(object):
                         config.config['notice_limit'] = int(notice_limit)
                     except ValueError:
                         print "Sorry, you entered an invalid number of notices. The default of %d will be used instead." % (config.config['notice_limit'])
-                try:
-                    if config.config['use_oauth']:
-                        instance = domain_regex.findall(config.config['api_path'])[0][2]
-                        if not instance in oauth_consumer_keys:
-                            print "No suitable consumer keys stored locally, fetching latest list..."
-                            req = urllib2.Request("http://identicurse.net/api_keys.json")
-                            resp = urllib2.urlopen(req)
-                            api_keys = json.loads(resp.read())
-                            if not instance in api_keys['keys']:
-                                sys.exit("Sorry, IdentiCurse currently lacks the API keys needed to support OAuth with your instance (%(instance)s). If %(instance)s is a public instance, let us know which one it is, and we'll add support as soon as possible." % (locals()))
-                            else:
-                                temp_conn = StatusNet(config.config['api_path'], auth_type="oauth", consumer_key=api_keys['keys'][instance], consumer_secret=api_keys['secrets'][instance])
-                                config.config["consumer_key"] = api_keys['keys'][instance]
-                                config.config["consumer_secret"] = api_keys['secrets'][instance]
+                # try:
+                if config.config['use_oauth']:
+                    instance = domain_regex.findall(config.config['api_path'])[0][2]
+                    if not instance in oauth_consumer_keys:
+                        print "No suitable consumer keys stored locally, fetching latest list..."
+                        req = urllib2.Request("http://identicurse.net/api_keys.json")
+                        resp = urllib2.urlopen(req)
+                        api_keys = json.loads(resp.read())
+                        if not instance in api_keys['keys']:
+                            sys.exit("Sorry, IdentiCurse currently lacks the API keys needed to support OAuth with your instance (%(instance)s). If %(instance)s is a public instance, let us know which one it is, and we'll add support as soon as possible." % (locals()))
                         else:
-                            temp_conn = StatusNet(config.config['api_path'], auth_type="oauth", consumer_key=oauth_consumer_keys[instance], consumer_secret=oauth_consumer_secrets[instance])
+                            temp_conn = StatusNet(config.config['api_path'], auth_type="oauth", consumer_key=api_keys['keys'][instance], consumer_secret=api_keys['secrets'][instance])
+                            config.config["consumer_key"] = api_keys['keys'][instance]
+                            config.config["consumer_secret"] = api_keys['secrets'][instance]
                     else:
-                        temp_conn = StatusNet(config.config['api_path'], config.config['username'], config.config['password'])
-                except Exception, (errmsg):
-                    sys.exit("Couldn't establish connection: %s" % (errmsg))
+                        temp_conn = StatusNet(config.config['api_path'], auth_type="oauth", consumer_key=oauth_consumer_keys[instance], consumer_secret=oauth_consumer_secrets[instance])
+                else:
+                    temp_conn = StatusNet(config.config['api_path'], config.config['username'], config.config['password'])
+                # except Exception, (errmsg):
+                    # sys.exit("Couldn't establish connection: %s" % (errmsg))
                 print "Okay! Everything seems good! Your new config will now be saved, then IdentiCurse will start properly."
                 config.config.save()
         except ValueError, e:
