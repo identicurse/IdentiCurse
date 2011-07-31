@@ -1,0 +1,3 @@
+[submodule "src/oauth"]
+	path = src/oauth
+	url = git://github.com/leah/python-oauth.git
