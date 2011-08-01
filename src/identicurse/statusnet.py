@@ -58,7 +58,7 @@ class StatusNet(object):
                     raise Exception("Invalid credentials")
             elif auth_type == "oauth":
                 if has_oauth:
-                    self.consumer = oauth.OAuthConsumer(consumer_key, consumer_secret)
+                    self.consumer = oauth.OAuthConsumer(str(consumer_key), str(consumer_secret))
                     self.oauth_initialize()
                     if not self.account_verify_credentials():
                         raise Exception("OAuth authentication failed")
@@ -88,7 +88,7 @@ class StatusNet(object):
             config.config['oauth_token_secret'] = access_tokens['oauth_token_secret']
             config.config.save()
 
-        self.token = oauth.OAuthToken(config.config['oauth_token'], config.config['oauth_token_secret'])
+        self.token = oauth.OAuthToken(str(config.config['oauth_token']), str(config.config['oauth_token_secret']))
 
     def __makerequest(self, resource_path, raw_params={}, force_get=False):
         params = urllib.urlencode(raw_params)
@@ -533,19 +533,19 @@ class StatusNet(object):
 # will not be implemented unless this module moves to using OAuth instead of basic
 
     def oauth_request_token(self):
-        oauth_request = oauth.OAuthRequest.from_consumer_and_token(self.consumer, callback="oob", http_url="%s/%s" % (self.api_path, "oauth/request_token"))
-        oauth_request.sign_request(oauth.OAuthSignatureMethod_PLAINTEXT(), self.consumer, None)
-        request = urllib2.Request("%s/%s" % (self.api_path, "oauth/request_token"), headers=oauth_request.to_header())
+        oauth_request = oauth.OAuthRequest.from_consumer_and_token(self.consumer, callback="oob", http_method="POST", http_url="%s/%s" % (self.api_path, "oauth/request_token"))
+        oauth_request.sign_request(oauth.OAuthSignatureMethod_HMAC_SHA1(), self.consumer, None)
+        request = urllib2.Request("%s/%s" % (self.api_path, "oauth/request_token"), data=oauth_request.to_postdata(), headers=oauth_request.to_header())
         return self.opener.open(request).read()
     
     def oauth_authorize(self, request_token):
         return raw_input("To authorize IdentiCurse to access your account, you must go to %s/oauth/authorize?oauth_token=%s in your web browser.\nPlease enter the verification code you receive there: " % (self.api_path, request_token))
 
     def oauth_access_token(self, request_token, request_token_secret, verifier):
-        req_token = oauth.OAuthToken(request_token, request_token_secret)
-        oauth_request = oauth.OAuthRequest.from_consumer_and_token(self.consumer, token=req_token, verifier=verifier, http_url="%s/%s" % (self.api_path, "oauth/access_token"))
-        oauth_request.sign_request(oauth.OAuthSignatureMethod_PLAINTEXT(), self.consumer, None)
-        request = urllib2.Request("%s/%s" % (self.api_path, "oauth/access_token"), headers=oauth_request.to_header())
+        req_token = oauth.OAuthToken(str(request_token), str(request_token_secret))
+        oauth_request = oauth.OAuthRequest.from_consumer_and_token(self.consumer, token=req_token, verifier=verifier, callback="oob", http_method="POST", http_url="%s/%s" % (self.api_path, "oauth/access_token"))
+        oauth_request.sign_request(oauth.OAuthSignatureMethod_HMAC_SHA1(), self.consumer, req_token)
+        request = urllib2.Request("%s/%s" % (self.api_path, "oauth/access_token"), data=oauth_request.to_postdata(), headers=oauth_request.to_header())
         return self.opener.open(request).read()
 
 ######## Search ########
