@@ -534,7 +534,7 @@ class StatusNet(object):
 
     def oauth_request_token(self):
         oauth_request = oauth.OAuthRequest.from_consumer_and_token(self.consumer, callback="oob", http_url="%s/%s" % (self.api_path, "oauth/request_token"))
-        oauth_request.sign_request(OAuth.OAuthSignatureMethod_PLAINTEXT(), self.consumer, None)
+        oauth_request.sign_request(oauth.OAuthSignatureMethod_PLAINTEXT(), self.consumer, None)
         request = urllib2.Request("%s/%s" % (self.api_path, "oauth/request_token"), headers=oauth_request.to_headers)
         return self.opener.open(request).read()
     
@@ -544,7 +544,7 @@ class StatusNet(object):
     def oauth_access_token(self, request_token, request_token_secret, verifier):
         req_token = oauth.OAuthToken(request_token, request_token_secret)
         oauth_request = oauth.OAuthRequest.from_consumer_and_token(self.consumer, token=req_token, verifier=verifier, http_url="%s/%s" % (self.api_path, "oauth/access_token"))
-        oauth_request.sign_request(OAuth.OAuthSignatureMethod_PLAINTEXT(), self.consumer, None)
+        oauth_request.sign_request(oauth.OAuthSignatureMethod_PLAINTEXT(), self.consumer, None)
         request = urllib2.Request("%s/%s" % (self.api_path, "oauth/access_token"), headers=oauth_request.to_headers)
         return self.opener.open(request).read()
 
