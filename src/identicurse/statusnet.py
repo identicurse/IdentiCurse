@@ -54,12 +54,16 @@ class StatusNet(object):
         if self.use_auth:
             if auth_type == "basic":
                 self.auth_string = base64.encodestring('%s:%s' % (username, password))[:-1]
+                if "api.twitter.com" in self.api_path:
+                    self.api_path += "/1"
                 if not self.account_verify_credentials():
                     raise Exception("Invalid credentials")
             elif auth_type == "oauth":
                 if has_oauth:
                     self.consumer = oauth.OAuthConsumer(str(consumer_key), str(consumer_secret))
                     self.oauth_initialize()
+                    if "api.twitter.com" in self.api_path:
+                        self.api_path += "/1"
                     if not self.account_verify_credentials():
                         raise Exception("OAuth authentication failed")
                 else:
