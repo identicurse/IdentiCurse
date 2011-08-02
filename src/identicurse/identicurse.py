@@ -509,6 +509,9 @@ class IdentiCurse(object):
                 notice_length = self.conn.length_limit
             entry_lines = (notice_length / x) + 1
 
+        if entry_lines > (y / 4):  # if entry box would take more than 1/4 of the screen height
+            entry_lines = y / 4
+
         for part in config.config['ui_order']:
             if part == "divider":
                 current_y += 1
