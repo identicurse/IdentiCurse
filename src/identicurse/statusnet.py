@@ -101,8 +101,6 @@ class StatusNet(object):
             resource_path = "%s.json" % (resource_path)
 
         if self.auth_type == "basic":
-            if self.auth_string is not None:
-                request.add_header("Authorization", "Basic %s" % (self.auth_string))
             if len(raw_params) > 0:
                 if force_get:
                     request = urllib2.Request("%s/%s?%s" % (self.api_path, resource_path, params))
@@ -110,6 +108,10 @@ class StatusNet(object):
                     request = urllib2.Request("%s/%s" % (self.api_path, resource_path), params)
             else:
                 request = urllib2.Request("%s/%s" % (self.api_path, resource_path))
+
+            if self.auth_string is not None:
+                request.add_header("Authorization", "Basic %s" % (self.auth_string))
+
         elif self.auth_type == "oauth":
             resource_url = "%s/%s" % (self.api_path, resource_path)
 
