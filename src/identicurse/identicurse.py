@@ -102,7 +102,7 @@ else:
 
 base_colours = {}
 
-domain_regex = re.compile("http(s|)://(www\.|)(.+?)/.*")
+domain_regex = re.compile("http(s|)://(www\.|)(.+?)(/.*|)$")
 
 oauth_consumer_keys = {
     "identi.ca": "d4f54e34af11ff8d35b79b7557ad771c",
