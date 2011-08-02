@@ -16,6 +16,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import urllib, urllib2, httplib, helpers, config, time
+from identicurse import domain_regex
 try:
     from oauth import oauth
     has_oauth = True
@@ -41,6 +42,10 @@ class StatusNet(object):
         self.api_path = api_path
         if self.api_path[-1] == "/":  # We don't want a surplus / when creating request URLs. Sure, most servers will handle it well, but why take the chance?
             self.api_path == self.api_path[:-1]
+        if domain_regex.findall(self.api_path)[0][2] == "api.twitter.com":
+            self.is_twitter = True
+        else:
+            self.is_twitter = False
         if validate_ssl:
             #TODO: Implement SSL-validating handler and add it to opener here
             self.opener = urllib2.build_opener()
@@ -54,15 +59,15 @@ class StatusNet(object):
         if self.use_auth:
             if auth_type == "basic":
                 self.auth_string = base64.encodestring('%s:%s' % (username, password))[:-1]
-                if "api.twitter.com" in self.api_path:
-                    self.api_path += "/1"
+                if self.is_twitter:
+                    raise Exception("Twitter does not support basic auth; bailing out.")
                 if not self.account_verify_credentials():
                     raise Exception("Invalid credentials")
             elif auth_type == "oauth":
                 if has_oauth:
                     self.consumer = oauth.OAuthConsumer(str(consumer_key), str(consumer_secret))
                     self.oauth_initialize()
-                    if "api.twitter.com" in self.api_path:
+                    if self.is_twitter:
                         self.api_path += "/1"
                     if not self.account_verify_credentials():
                         raise Exception("OAuth authentication failed")
