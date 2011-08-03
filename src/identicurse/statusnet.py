@@ -16,7 +16,6 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import urllib, urllib2, httplib, helpers, config, time
-from identicurse import domain_regex
 try:
     from oauth import oauth
     has_oauth = True
@@ -42,7 +41,7 @@ class StatusNet(object):
         self.api_path = api_path
         if self.api_path[-1] == "/":  # We don't want a surplus / when creating request URLs. Sure, most servers will handle it well, but why take the chance?
             self.api_path == self.api_path[:-1]
-        if domain_regex.findall(self.api_path)[0][2] == "api.twitter.com":
+        if helpers.domain_regex.findall(self.api_path)[0][2] == "api.twitter.com":
             self.is_twitter = True
         else:
             self.is_twitter = False

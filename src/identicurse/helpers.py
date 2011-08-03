@@ -22,6 +22,8 @@ base_url_regex = re.compile("(http(s|)://.+?)/.*")
 title_regex = re.compile("\<title\>(.*)\<\/title\>")
 ur1_regex = re.compile("Your ur1 is: <a.+?>(http://ur1\.ca/[0-9A-Za-z]+)")
 url_regex = re.compile("http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+")
+domain_regex = re.compile("http(s|)://(www\.|)(.+?)(/.*|)$")
+
 
 def notice_datetime(notice):
     locale.setlocale(locale.LC_TIME, 'C')  # hacky fix because statusnet uses english timestrings regardless of locale

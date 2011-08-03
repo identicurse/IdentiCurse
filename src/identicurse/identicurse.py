@@ -102,8 +102,6 @@ else:
 
 base_colours = {}
 
-domain_regex = re.compile("http(s|)://(www\.|)(.+?)(/.*|)$")
-
 oauth_consumer_keys = {
     "identi.ca": "d4f54e34af11ff8d35b79b7557ad771c",
     }
@@ -197,7 +195,7 @@ class IdentiCurse(object):
                         print "Sorry, you entered an invalid number of notices. The default of %d will be used instead." % (config.config['notice_limit'])
                 # try:
                 if config.config['use_oauth']:
-                    instance = domain_regex.findall(config.config['api_path'])[0][2]
+                    instance = helpers.domain_regex.findall(config.config['api_path'])[0][2]
                     if not instance in oauth_consumer_keys:
                         print "No suitable consumer keys stored locally, fetching latest list..."
                         req = urllib2.Request("http://identicurse.net/api_keys.json")
@@ -434,7 +432,7 @@ class IdentiCurse(object):
 
         try:
             if config.config["use_oauth"]:
-                instance = domain_regex.findall(config.config['api_path'])[0][2]
+                instance = helpers.domain_regex.findall(config.config['api_path'])[0][2]
                 if "consumer_key" in config.config:
                     self.conn = StatusNet(config.config['api_path'], auth_type="oauth", consumer_key=config.config["consumer_key"], consumer_secret=config.config["consumer_secret"])
                 elif not instance in oauth_consumer_keys:
