@@ -365,11 +365,13 @@ class IdentiCurse(object):
             "qreply", "creply", "cfav", "cunfav", "ccontext", "crepeat", "cnext", "cprev", "cfirst",
             "clast", "nextmatch", "prevmatch", "creplymode", "cquote", "tabswapleft", "tabswapright",
             "cdelete", "pausetoggle", "pausetoggleall", "scrollup", "scrolltop", "pageup", "pagedown",
-            "scrolldown", "scrollbottom", "togglenoticelinks")
+            "scrolldown", "scrollbottom", "togglenoticelinks", "nexttabcycle", "prevtabcycle")
 
         default_keys = {
             "nexttab": [">"],
+            "nexttabcycle": ["\t", "+"],
             "prevtab": ["<"],
+            "prevtabcycle": [curses.KEY_BTAB, "-"],
             "tabswapright": ["."],
             "tabswapleft": [","],
             "scrollup": [curses.KEY_UP, "k"],
@@ -788,9 +790,19 @@ class IdentiCurse(object):
                 if input in self.keybindings['nexttab']:
                     if self.current_tab < (len(self.tabs) - 1):
                         switch_to_tab = self.current_tab + 1
+                elif input in self.keybindings['nexttabcycle']:
+                    if self.current_tab < (len(self.tabs) - 1):
+                        switch_to_tab = self.current_tab + 1
+                    else:
+                        switch_to_tab = 0
                 elif input in self.keybindings['prevtab']:
                     if self.current_tab >= 1:
                         switch_to_tab = self.current_tab - 1
+                elif input in self.keybindings['prevtabcycle']:
+                    if self.current_tab >= 1:
+                        switch_to_tab = self.current_tab - 1
+                    else:
+                        switch_to_tab = len(self.tabs) - 1
                 elif input in self.keybindings['tabswapright']:
                     if self.current_tab < (len(self.tabs) - 1):
                         self.tabs[self.current_tab], self.tabs[self.current_tab+1] = self.tabs[self.current_tab+1], self.tabs[self.current_tab]
