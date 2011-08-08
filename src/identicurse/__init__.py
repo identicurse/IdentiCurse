@@ -63,7 +63,8 @@ PRESET_SLOGANS = [
     "head to the nearest ENTRANCE and immediately call YOUR MUTANT FIRE DANCING MOON POSSE",
     "it's got what dents crave.",
     "it has lightsabers.",
-    "enemy of #scannability"
+    "enemy of #scannability.",
+    "T-rex rules the school.",
     ]
 
 def main():
