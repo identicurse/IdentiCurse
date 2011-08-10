@@ -308,6 +308,8 @@ class IdentiCurse(object):
             config.config['long_dent'] = "split"
         if not "filters" in config.config:
             config.config['filters'] = []
+        if (not "filter_mode" in config.config) or (not config.config["filter_mode"] in ["plain", "regex"]):
+            config.config['filter_mode'] = "plain"
         if not "notice_limit" in config.config:
             config.config['notice_limit'] = 25
         if not "browser" in config.config:
@@ -340,16 +342,11 @@ class IdentiCurse(object):
             config.config["prefill_user_cache"] = False
         if not "show_source" in config.config:
             config.config["show_source"] = True
+        if (not "tab_complete_mode" in config.config) or (not config.config["tab_complete_mode"] in ["exact", "fuzzy"]):
+            config.config["tab_complete_mode"] = "exact"
 
         if not "keys" in config.config:
             config.config['keys'] = {}
-
-        if not "tab_complete_mode" in config.config:
-            config.config["tab_complete_mode"] = "exact"
-        else:
-            config.config["tab_complete_mode"] = config.config["tab_complete_mode"].lower()
-            if not config.config["tab_complete_mode"] in ["exact", "fuzzy"]:
-                config.config["tab_complete_mode"] = "exact"
 
         if not "ui_order" in config.config:
             config.config['ui_order'] = ["divider", "entry", "divider", "notices", "statusbar", "tabbar"]  # this will recreate the same layout as the old UI
@@ -359,6 +356,12 @@ class IdentiCurse(object):
                 config.config['ui_order'].append(ui_item)
             while config.config['ui_order'].count(ui_item) > 1:  # if item listed more than once, remove all but the last occurence
                 config.config['ui_order'].remove(ui_item)
+
+        if config.config["filter_mode"] == "regex":
+            raw_filters = config.config["filters"]
+            config.config["filters"] = []
+            for raw_filter in raw_filters:
+                config.config["filters"].append(re.compile(raw_filter))
 
         keybind_actions = ("firstpage", "newerpage", "olderpage", "refresh",
             "input", "commandinput", "search", "quit", "closetab", "help", "nexttab", "prevtab",

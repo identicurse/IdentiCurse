@@ -357,10 +357,16 @@ class Timeline(Tab):
             if notice['id'] in old_ids:
                 passes_filters = False
                 continue
-            for filter_item in config.config['filters']:
-                if filter_item.lower() in notice['text'].lower():
-                    passes_filters = False
-                    break
+            if config.config["filter_mode"] == "regex":
+                for filter_item in config.config['filters']:
+                    if filter_item.search(notice['text']) is not None:
+                        passes_filters = False
+                        break
+            else:
+                for filter_item in config.config['filters']:
+                    if filter_item.lower() in notice['text'].lower():
+                        passes_filters = False
+                        break
             if passes_filters:
                 if (not self.timeline_type in ["direct", "sentdirect"]) and notice["source"] == "ostatus" and config.config['expand_remote'] and "attachments" in notice:
                     import urllib2
