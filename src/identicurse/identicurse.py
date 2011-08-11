@@ -259,6 +259,8 @@ class IdentiCurse(object):
             "/featurerequest",
             "/quote",
             "/quit",
+            "/mute",
+            "/unmute",
         ]
 
         # load all known commands and aliases into the command list
@@ -1029,6 +1031,16 @@ class IdentiCurse(object):
                     self.tab_bar.tabs = [tab.name for tab in self.tabs]
                     self.tab_bar.current_tab = self.current_tab
                     self.tab_bar.update()
+                elif input in self.keybindings['mute']:
+                    try:
+                        self.cmd_mute(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
+                    except Exception, (errmsg):
+                        self.status_bar.timed_update("ERROR: Couldn't mute: %s" % (errmsg))
+                elif input in self.keybindings['unmute']:
+                    try:
+                        self.cmd_unmute(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
+                    except Exception, (errmsg):
+                        self.status_bar.timed_update("ERROR: Couldn't unmute: %s" % (errmsg))
 
 
             y, x = self.screen.getmaxyx()
@@ -1347,6 +1359,12 @@ class IdentiCurse(object):
 
                     elif tokens[0] == "/quote" and len(tokens) == 2:
                         update = self.cmd_quote(self.tabs[self.current_tab].timeline[int(tokens[1]) - 1])
+
+                    elif tokens[0] == "/mute" and len(tokens) == 2:
+                        update = self.cmd_mute(self.tabs[self.current_tab].timeline[int(tokens[1]) - 1])
+
+                    elif tokens[0] == "/unmute" and len(tokens) == 2:
+                        update = self.cmd_unmute(self.tabs[self.current_tab].timeline[int(tokens[1]) - 1])
 
                     elif tokens[0] == "/quit" and len(tokens) == 1:
                         self.running = False
