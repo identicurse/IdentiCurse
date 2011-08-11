@@ -1520,7 +1520,7 @@ class IdentiCurse(object):
                     self.conn.statuses_destroy(notice["retweeted_status"]["id"])
                     delete_succeeded = True
                 else:  # user is trying to delete something they don't own. the API doesn't like this
-        yy            self.status_bar.timed_update("You cannot delete others' notices.", 3)
+                    self.status_bar.timed_update("You cannot delete others' notices.", 3)
             else:  # it wasn't a 403, so re-raise
                 raise(e)
         try:
