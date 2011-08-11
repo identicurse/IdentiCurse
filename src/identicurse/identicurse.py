@@ -368,7 +368,8 @@ class IdentiCurse(object):
             "qreply", "creply", "cfav", "cunfav", "ccontext", "crepeat", "cnext", "cprev", "cfirst",
             "clast", "nextmatch", "prevmatch", "creplymode", "cquote", "tabswapleft", "tabswapright",
             "cdelete", "pausetoggle", "pausetoggleall", "scrollup", "scrolltop", "pageup", "pagedown",
-            "scrolldown", "scrollbottom", "togglenoticelinks", "nexttabcycle", "prevtabcycle")
+            "scrolldown", "scrollbottom", "togglenoticelinks", "nexttabcycle", "prevtabcycle",
+            "mute", "unmute")
 
         default_keys = {
             "nexttab": [">"],
@@ -411,6 +412,8 @@ class IdentiCurse(object):
             "ccontext": ["c"],
             "pausetoggle": ["p"],
             "togglenoticelinks": ["L"],
+            "mute": ["m"],
+            "unmute": ["M"],
             }
 
         self.keybindings = {}
@@ -1517,7 +1520,7 @@ class IdentiCurse(object):
                     self.conn.statuses_destroy(notice["retweeted_status"]["id"])
                     delete_succeeded = True
                 else:  # user is trying to delete something they don't own. the API doesn't like this
-                    self.status_bar.timed_update("You cannot delete others' notices.", 3)
+        yy            self.status_bar.timed_update("You cannot delete others' notices.", 3)
             else:  # it wasn't a 403, so re-raise
                 raise(e)
         try:
@@ -1693,6 +1696,32 @@ class IdentiCurse(object):
     def cmd_featurerequest(self, request):
         status = "#icurserequest " + request
         return self.conn.statuses_update(status, "IdentiCurse", long_dent=config.config['long_dent'], dup_first_word=True)
+
+    @shows_status("Muting conversation")
+    @repeat_passthrough
+    def cmd_mute(self, notice):
+        if (not "conversation_id" in notice) or (notice["conversation_id"] is None):
+            self.status_bar.timed_update("This instance does not provide conversation IDs, so muting will not be possible.")
+            return
+        if not hasattr(config.session_store, "muted_conversations"):
+            config.session_store.muted_conversations = []
+        if notice["conversation_id"] in config.session_store.muted_conversations:
+            self.status_bar.timed_update("This conversation is already muted.")
+        else:
+            config.session_store.muted_conversations.append(notice["conversation_id"])
+    #TODO: correct these methods if necessary when the final conversation ID key name is known
+    @shows_status("Unmuting conversation")
+    @repeat_passthrough
+    def cmd_unmute(self, notice):
+        if (not "conversation_id" in notice) or (notice["conversation_id"] is None):
+            self.status_bar.timed_update("This instance does not provide conversation IDs, so unmuting will not be possible.")
+            return
+        if not hasattr(config.session_store, "muted_conversations"):
+            config.session_store.muted_conversations = []
+        if notice["conversation_id"] in config.session_store.muted_conversations:
+            config.session_store.muted_conversations.remove(notice["conversation_id"])
+        else:
+            self.status_bar.timed_update("This conversation wasn't muted.")
 
     @shows_status("Quitting")
     def cmd_quit(self):

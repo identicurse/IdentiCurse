@@ -357,6 +357,10 @@ class Timeline(Tab):
             if notice['id'] in old_ids:
                 passes_filters = False
                 continue
+            #TODO: correct conversation ID key name if needed once it's added
+            if hasattr(config.session_store, "muted_conversations") and notice['conversation_id'] in config.session_store.muted_conversations:
+                passes_filters = False
+                continue
             if config.config["filter_mode"] == "regex":
                 for filter_item in config.config['filters']:
                     if filter_item.search(notice['text']) is not None:
