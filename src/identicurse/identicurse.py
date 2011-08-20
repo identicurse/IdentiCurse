@@ -1702,7 +1702,7 @@ class IdentiCurse(object):
         else:
             link_index = int(link_num) - 1
             try:
-                target_url = helpers.url_regex.findall(notice["text"])[link_index]
+                target_url = target_urls[link_index]
                 if not target_url in links_to_open:
                     links_to_open.append(target_url)
             except IndexError:
