@@ -1691,15 +1691,22 @@ class IdentiCurse(object):
     @repeat_passthrough
     def cmd_link(self, notice, link_num):
         links_to_open = []
+        target_urls = helpers.url_regex.findall(notice["text"])
         if link_num == "*":
-            for target_url in helpers.url_regex.findall(notice["text"]):
+            if not target_urls:
+                self.status_bar.timed_update("No matching link(s) found.")
+                return
+            for target_url in target_urls:
                 if not target_url in links_to_open:
                     links_to_open.append(target_url)
         else:
             link_index = int(link_num) - 1
-            target_url = helpers.url_regex.findall(notice["text"])[link_index]
-            if not target_url in links_to_open:
-                links_to_open.append(target_url)
+            try:
+                target_url = helpers.url_regex.findall(notice["text"])[link_index]
+                if not target_url in links_to_open:
+                    links_to_open.append(target_url)
+            except IndexError:
+                self.status_bar.timed_update("No matching link(s) found.")
         for link in links_to_open:
             subprocess.Popen(config.config['browser'] % (link), shell=True, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
 
