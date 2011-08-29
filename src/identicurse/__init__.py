@@ -65,6 +65,7 @@ PRESET_SLOGANS = [
     "it has lightsabers.",
     "enemy of #scannability.",
     "T-rex rules the school.",
+    "GET BLUE SPHERES",
     ]
 
 def main():
