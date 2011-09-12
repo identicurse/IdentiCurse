@@ -232,7 +232,7 @@ def split_entities(raw_notice_text):
         if (raw_notice_text[char_index] in string.whitespace or raw_notice_text[char_index] in string.punctuation) and char_index < (len(raw_notice_text) - 2):
             entities[-1]['text'] += raw_notice_text[char_index]
             char_index += 1
-            if raw_notice_text[char_index] in ["@", "!", "#"] and (raw_notice_text[char_index+1].isalnum() or (raw_notice_text[char_index+1] in [".", "_", "-"])):
+            if raw_notice_text[char_index] in ["@", "!", "#"] and (raw_notice_text[char_index+1].isalnum() or (raw_notice_text[char_index+1] in [".", "_", "-"])) and (not raw_notice_text[char_index-1] in ["@", "!", "#", ".", "_", "-"]) and (not raw_notice_text[char_index-1].isalnum()):
                 if raw_notice_text[char_index] == "@":
                     entities.append({"text":"@", "type":"user"})
                 elif raw_notice_text[char_index] == "!":
