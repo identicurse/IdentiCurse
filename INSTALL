@@ -24,7 +24,7 @@ distributions is known to be:
         python-setuptools   in  Fedora, Ubuntu, Debian, openSUSE
         python2-distribute  in  Arch
         pysetuptools        in  Slackware
-        devel/py-setuptools in  OpenBSD
+        devel/py-setuptools in  OpenBSD, FreeBSD
         
         (if your distribution of choice is not in this list yet,
         feel free to inform us of the correct package name)
