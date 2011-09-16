@@ -705,18 +705,21 @@ class IdentiCurse(object):
                     nickname = nickname[1:]
                 group_id = int(self.conn.statusnet_groups_show(nickname=nickname)['id'])
                 self.tabs.append(Timeline(self.conn, self.notice_window, "group", {'nickname':nickname, 'group_id':group_id}))
-            if tab[0] == "tag":
+            elif tab[0] == "tag":
                 tag = tab[1]
                 if tag[0] == "#":
                     tag = tag[1:]
                 self.tabs.append(Timeline(self.conn, self.notice_window, "tag", {'tag':tag}))
-            if tab[0] == "search":
+            elif tab[0] == "search":
                 self.tabs.append(Timeline(self.conn, self.notice_window, "search", {'query':tab[1]}))
             #not too sure why anyone would need to auto-open these last two, but it couldn't hurt to add them
-            if tab[0] == "context":
+            elif tab[0] == "context":
                 notice_id = int(tab[1])
                 self.tabs.append(Timeline(self.conn, self.notice_window, "context", {'notice_id':notice_id}))
-            if tab[0] == "help":
+            elif tab[0] == "conversation":
+                conv_id = int(tab[1])
+                self.tabs.append(Timeline(self.conn, self.notice_window, "context", {'conversation_id':conv_id}))
+            elif tab[0] == "help":
                 self.tabs.append(Help(self.notice_window, self.path))
 
         self.update_timer = Timer(config.config['update_interval'], self.update_tabs)
@@ -1603,7 +1606,10 @@ class IdentiCurse(object):
     @opens_tab()
     @repeat_passthrough
     def cmd_context(self, notice):
-        return Timeline(self.conn, self.notice_window, "context", {'notice_id':notice['id']})
+        if "statusnet:conversation_id" in notice:
+            return Timeline(self.conn, self.notice_window, "context", {'conversation_id':notice['statusnet:conversation_id']})
+        else:
+            return Timeline(self.conn, self.notice_window, "context", {'notice_id':notice['id']})
 
     @shows_status("Subscribing to user")
     def cmd_subscribe(self, username):

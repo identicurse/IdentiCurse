@@ -323,27 +323,26 @@ class Timeline(Tab):
             elif self.timeline_type == "search":
                 raw_timeline = self.conn.search(self.type_params['query'], page=self.page, standardise=True, since_id=last_id)
             elif self.timeline_type == "context":
-#                try:  # try to do it the proposed 1.0 way
-#                    raw_timeline = []
-#                    new_timeline = self.conn.statuses_conversation(self.type_params['notice_id'], count=get_count, since_id=last_id)
-#                    while len(new_timeline) > 0:
-#                        raw_timeline.extend(new_timeline)
-#                        new_timeline = self.conn.statuses_conversation(self.type_params['notice_id'], count=get_count, max_id=raw_timeline[-1]['id'])
-#                        for notice in raw_timeline:
-#                            for new_notice in new_timeline:
-#                                if str(notice['id']) == str(new_notice['id']):
-#                                    new_timeline.remove(new_notice)
-#                except StatusNetError:  # otherwise fall back to the established 0.9.7 way
                 raw_timeline = []
-                if last_id == 0:  # don't run this if we've already filled the timeline
-                    next_id = self.type_params['notice_id']
-                    while next_id is not None:
-                        notice = self.conn.statuses_show(id=next_id)
-                        raw_timeline.append(notice)
-                        if "retweeted_status" in notice:
-                            next_id = notice['retweeted_status']['id']
-                        else:
-                            next_id = notice['in_reply_to_status_id']
+                if "conversation_id" in self.type_params:  # try to do it the new way
+                    new_timeline = self.conn.statusnet_conversation(self.type_params['conversation_id'], count=get_count, since_id=last_id)
+                    while len(new_timeline) > 0:
+                        raw_timeline.extend(new_timeline)
+                        new_timeline = self.conn.statusnet_conversation(self.type_params['conversation_id'], count=get_count, max_id=raw_timeline[-1]['id'])
+                        for notice in raw_timeline:
+                            for new_notice in new_timeline:
+                                if str(notice['id']) == str(new_notice['id']):
+                                    new_timeline.remove(new_notice)
+                else:
+                    if last_id == 0:  # don't run this if we've already filled the timeline
+                        next_id = self.type_params['notice_id']
+                        while next_id is not None:
+                            notice = self.conn.statuses_show(id=next_id)
+                            raw_timeline.append(notice)
+                            if "retweeted_status" in notice:
+                                next_id = notice['retweeted_status']['id']
+                            else:
+                                next_id = notice['in_reply_to_status_id']
 
         self.prev_page = self.page
 
