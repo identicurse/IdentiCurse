@@ -1606,8 +1606,8 @@ class IdentiCurse(object):
     @opens_tab()
     @repeat_passthrough
     def cmd_context(self, notice):
-        if "statusnet:conversation_id" in notice:
-            return Timeline(self.conn, self.notice_window, "context", {'conversation_id':notice['statusnet:conversation_id']})
+        if "statusnet_conversation_id" in notice:
+            return Timeline(self.conn, self.notice_window, "context", {'conversation_id':notice['statusnet_conversation_id']})
         else:
             return Timeline(self.conn, self.notice_window, "context", {'notice_id':notice['id']})
 
