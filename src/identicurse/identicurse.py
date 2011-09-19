@@ -346,6 +346,8 @@ class IdentiCurse(object):
             config.config["show_source"] = True
         if (not "tab_complete_mode" in config.config) or (not config.config["tab_complete_mode"] in ["exact", "fuzzy"]):
             config.config["tab_complete_mode"] = "exact"
+        if not "hide_activities" in config.config:
+            config.config["hide_activities"] = False
 
         if not "keys" in config.config:
             config.config['keys'] = {}
@@ -1731,26 +1733,26 @@ class IdentiCurse(object):
     @shows_status("Muting conversation")
     @repeat_passthrough
     def cmd_mute(self, notice):
-        if (not "conversation_id" in notice) or (notice["conversation_id"] is None):
+        if (not "statusnet_conversation_id" in notice) or (notice["statusnet_conversation_id"] is None):
             self.status_bar.timed_update("This instance does not provide conversation IDs, so muting will not be possible.")
             return
         if not hasattr(config.session_store, "muted_conversations"):
             config.session_store.muted_conversations = []
-        if notice["conversation_id"] in config.session_store.muted_conversations:
+        if notice["statusnet_conversation_id"] in config.session_store.muted_conversations:
             self.status_bar.timed_update("This conversation is already muted.")
         else:
-            config.session_store.muted_conversations.append(notice["conversation_id"])
-    #TODO: correct these methods if necessary when the final conversation ID key name is known
+            config.session_store.muted_conversations.append(notice["statusnet_conversation_id"])
+
     @shows_status("Unmuting conversation")
     @repeat_passthrough
     def cmd_unmute(self, notice):
-        if (not "conversation_id" in notice) or (notice["conversation_id"] is None):
+        if (not "statusnet_conversation_id" in notice) or (notice["statusnet_conversation_id"] is None):
             self.status_bar.timed_update("This instance does not provide conversation IDs, so unmuting will not be possible.")
             return
         if not hasattr(config.session_store, "muted_conversations"):
             config.session_store.muted_conversations = []
-        if notice["conversation_id"] in config.session_store.muted_conversations:
-            config.session_store.muted_conversations.remove(notice["conversation_id"])
+        if notice["statusnet_conversation_id"] in config.session_store.muted_conversations:
+            config.session_store.muted_conversations.remove(notice["statusnet_conversation_id"])
         else:
             self.status_bar.timed_update("This conversation wasn't muted.")
 

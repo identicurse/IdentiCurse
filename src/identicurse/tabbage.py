@@ -356,8 +356,10 @@ class Timeline(Tab):
             if notice['id'] in old_ids:
                 passes_filters = False
                 continue
-            #TODO: correct conversation ID key name if needed once it's added
-            if hasattr(config.session_store, "muted_conversations") and notice['conversation_id'] in config.session_store.muted_conversations:
+            if hasattr(config.session_store, "muted_conversations") and notice['statusnet_conversation_id'] in config.session_store.muted_conversations:
+                passes_filters = False
+                continue
+            if config.config["hide_activities"] and ("source" in notice) and (notice["source"] == "activity"):
                 passes_filters = False
                 continue
             if config.config["filter_mode"] == "regex":
@@ -424,7 +426,17 @@ class Timeline(Tab):
                 user_string = "%s -> %s" % (n["sender"]["screen_name"], n["recipient"]["screen_name"])
                 source_msg = ""
             else:
-                user_string = "%s" % (n["user"]["screen_name"])
+                atless_reply = False
+                if "in_reply_to_screen_name" in n and n["in_reply_to_screen_name"] is not None:
+                    atless_reply = True
+                    for entity in helpers.split_entities(n["text"]):
+                        if entity["type"] == "user" and entity["text"][1:].lower() == n["in_reply_to_screen_name"].lower():
+                            atless_reply = False
+                            break
+                if atless_reply:
+                    user_string = "%s -> %s" % (n["user"]["screen_name"], n["in_reply_to_screen_name"])
+                else:
+                    user_string = "%s" % (n["user"]["screen_name"])
                 raw_source_msg = "from %s" % (n["source"])
                 source_msg = self.html_regex.sub("", raw_source_msg)
             if "in_reply_to_status_id" in n and n["in_reply_to_status_id"] is not None:
@@ -460,6 +472,15 @@ class Timeline(Tab):
                     repeating_user = n["user"]["screen_name"]
                     n = n["retweeted_status"]
                 from_user = n["user"]["screen_name"]
+                atless_reply = False
+                if "in_reply_to_screen_name" in n and n["in_reply_to_screen_name"] is not None:
+                    atless_reply = True
+                    for entity in helpers.split_entities(n["text"]):
+                        if entity["type"] == "user" and entity["text"][1:].lower() == n["in_reply_to_screen_name"].lower():
+                            atless_reply = False
+                            break
+                if atless_reply:
+                    to_user = n["in_reply_to_screen_name"]
                 raw_source_msg = "from %s" % (n["source"])
                 source_msg = self.html_regex.sub("", raw_source_msg)
                 repeat_msg = ""
