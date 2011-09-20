@@ -322,7 +322,9 @@ class StatusNet(object):
                     status_next = ".. " + status_next
                 params['status'] = status
                 dents = [self.__makerequest("statuses/update", params)] # post the first piece as normal
-                next_dent = self.statuses_update(status_next, source=source, in_reply_to_status_id=dents[-1]["id"], latitude=latitude, longitude=longitude, place_id=place_id, display_coordinates=display_coordinates, long_dent=long_dent) # then hand the rest off for potential further splitting
+                if in_reply_to_status_id == 0:
+                    in_reply_to_status_id = dents[-1]["id"]  # if this is not a reply, string everything onto the first dent
+                next_dent = self.statuses_update(status_next, source=source, in_reply_to_status_id=in_reply_to_status_id, latitude=latitude, longitude=longitude, place_id=place_id, display_coordinates=display_coordinates, long_dent=long_dent) # then hand the rest off for potential further splitting
                 if isinstance(next_dent, list):
                     for dent in next_dent:
                         dents.append(dent)

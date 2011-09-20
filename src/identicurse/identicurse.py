@@ -1473,7 +1473,7 @@ class IdentiCurse(object):
         if status is None:
             status = ""
         if len(status) > 0:
-            return self.conn.statuses_update(status, "IdentiCurse", int(notice["id"]), long_dent=config.config["long_dent"], dup_first_word=True)
+            return self.conn.statuses_update(status, "IdentiCurse", int(notice["id"]), long_dent=config.config["long_dent"])
 
     @shows_status("Posting mention")
     @posts_notice
