@@ -83,3 +83,8 @@ class SessionStore(object):
 
 config = Config()
 session_store = SessionStore()
+
+def store_oauth_keys(oauth_token, oauth_token_secret):
+    config["oauth_token"] = oauth_token
+    config["oauth_token_secret"] = oauth_token_secret
+    config.save()

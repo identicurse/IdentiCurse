@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import urllib, urllib2, httplib, helpers, config, time
+import urllib, urllib2, httplib, time, re
 try:
     from oauth import oauth
     has_oauth = True
@@ -25,6 +25,26 @@ try:
     import json
 except ImportError:
     import simplejson as json
+
+
+domain_regex = re.compile("http(s|)://(www\.|)(.+?)(/.*|)$")
+
+
+def find_split_point(text, width):
+    split_point = width - 1
+    while True:
+        if split_point == 0:  # no smart split point was found, split unsmartly
+            split_point = width - 1
+            break
+        elif split_point < 0:
+            split_point = 0
+            break
+        if text[split_point-1] == " ":
+            break
+        else:
+            split_point -= 1
+    return split_point
+
 
 class StatusNetError(Exception):
     def __init__(self, errcode, details):
@@ -36,12 +56,12 @@ class StatusNetError(Exception):
             Exception.__init__(self, "Error %d: %s" % (self.errcode, self.details))
 
 class StatusNet(object):
-    def __init__(self, api_path, username="", password="", use_auth=True, auth_type="basic", consumer_key=None, consumer_secret=None, validate_ssl=True):
+    def __init__(self, api_path, username="", password="", use_auth=True, auth_type="basic", consumer_key=None, consumer_secret=None, oauth_token=None, oauth_token_secret=None, validate_ssl=True, save_oauth_credentials=None):
         import base64
         self.api_path = api_path
         if self.api_path[-1] == "/":  # We don't want a surplus / when creating request URLs. Sure, most servers will handle it well, but why take the chance?
             self.api_path == self.api_path[:-1]
-        if helpers.domain_regex.findall(self.api_path)[0][2] == "api.twitter.com":
+        if domain_regex.findall(self.api_path)[0][2] == "api.twitter.com":
             self.is_twitter = True
         else:
             self.is_twitter = False
@@ -52,6 +72,8 @@ class StatusNet(object):
             self.opener = urllib2.build_opener()
         self.use_auth = use_auth
         self.auth_type = auth_type
+        self.oauth_token = oauth_token
+        self.oauth_token_secret = oauth_token_secret
         self.auth_string = None
         if not self.__checkconn():
             raise Exception("Couldn't access %s, it may well be down." % (api_path))
@@ -80,7 +102,7 @@ class StatusNet(object):
         self.tz = self.server_config["site"]["timezone"]
 
     def oauth_initialize(self):
-        if not ("oauth_token" in config.config and "oauth_token_secret" in config.config):  # we've never run with oauth before, or we failed, so we'll need to authenticate
+        if (self.oauth_token is None) or (self.oauth_token_secret is None):  # we've never run with oauth before, or we failed, so we'll need to authenticate
             request_tokens_raw = self.oauth_request_token()
             request_tokens = {}
             for item in request_tokens_raw.split("&"):
@@ -95,11 +117,12 @@ class StatusNet(object):
                 key, value = item.split("=")
                 access_tokens[key] = value
 
-            config.config['oauth_token'] = access_tokens['oauth_token']
-            config.config['oauth_token_secret'] = access_tokens['oauth_token_secret']
-            config.config.save()
+            self.oauth_token = access_tokens['oauth_token']
+            self.oauth_token_secret = access_tokens['oauth_token_secret']
+            if self.save_oauth_credentials is not None:
+                self.save_oauth_credentials(oauth_token, oauth_token_secret)
 
-        self.token = oauth.OAuthToken(str(config.config['oauth_token']), str(config.config['oauth_token_secret']))
+        self.token = oauth.OAuthToken(str(self.oauth_token), str(self.oauth_token_secret))
 
     def __makerequest(self, resource_path, raw_params={}, force_get=False):
         params = urllib.urlencode(raw_params)
@@ -314,8 +337,8 @@ class StatusNet(object):
             if long_dent=="truncate":
                 params['status'] = status[:self.length_limit]
             elif long_dent=="split":
-                status_next = status[helpers.find_split_point(status, self.length_limit - 3):]
-                status = status.encode('utf-8')[:helpers.find_split_point(status, self.length_limit - 3)] + u".."
+                status_next = status[find_split_point(status, self.length_limit - 3):]
+                status = status.encode('utf-8')[:find_split_point(status, self.length_limit - 3)] + u".."
                 if dup_first_word:
                     status_next = status.split(" ")[0].encode('utf-8') + " .. " + status_next
                 else:

@@ -204,11 +204,11 @@ class IdentiCurse(object):
                         if not instance in api_keys['keys']:
                             sys.exit("Sorry, IdentiCurse currently lacks the API keys needed to support OAuth with your instance (%(instance)s). If %(instance)s is a public instance, let us know which one it is, and we'll add support as soon as possible." % (locals()))
                         else:
-                            temp_conn = StatusNet(config.config['api_path'], auth_type="oauth", consumer_key=api_keys['keys'][instance], consumer_secret=api_keys['secrets'][instance])
+                            temp_conn = StatusNet(config.config['api_path'], auth_type="oauth", consumer_key=api_keys['keys'][instance], consumer_secret=api_keys['secrets'][instance], save_oauth_credentials=config.store_oauth_keys)
                             config.config["consumer_key"] = api_keys['keys'][instance]
                             config.config["consumer_secret"] = api_keys['secrets'][instance]
                     else:
-                        temp_conn = StatusNet(config.config['api_path'], auth_type="oauth", consumer_key=oauth_consumer_keys[instance], consumer_secret=oauth_consumer_secrets[instance])
+                        temp_conn = StatusNet(config.config['api_path'], auth_type="oauth", consumer_key=oauth_consumer_keys[instance], consumer_secret=oauth_consumer_secrets[instance], save_oauth_credentials=config.store_oauth_keys)
                 else:
                     temp_conn = StatusNet(config.config['api_path'], config.config['username'], config.config['password'])
                 # except Exception, (errmsg):
@@ -448,7 +448,7 @@ class IdentiCurse(object):
             if config.config["use_oauth"]:
                 instance = helpers.domain_regex.findall(config.config['api_path'])[0][2]
                 if "consumer_key" in config.config:
-                    self.conn = StatusNet(config.config['api_path'], auth_type="oauth", consumer_key=config.config["consumer_key"], consumer_secret=config.config["consumer_secret"])
+                    self.conn = StatusNet(config.config['api_path'], auth_type="oauth", consumer_key=config.config["consumer_key"], consumer_secret=config.config["consumer_secret"], oauth_token=config.config["oauth_token"], oauth_token_secret=config.config["oauth_token_secret"], save_oauth_credentials=config.store_oauth_keys)
                 elif not instance in oauth_consumer_keys:
                     print "No suitable consumer keys stored locally, fetching latest list..."
                     req = urllib2.Request("http://identicurse.net/api_keys.json")
@@ -457,12 +457,12 @@ class IdentiCurse(object):
                     if not instance in api_keys['keys']:
                         sys.exit("Sorry, IdentiCurse currently lacks the API keys needed to support OAuth with your instance (%(instance)s). If %(instance)s is a public instance, let us know which one it is (filing a bug at http://bugzilla.identicurse.net/ is the preferred way of doing so), and we'll add support as soon as possible." % (locals()))
                     else:
-                        self.conn = StatusNet(config.config['api_path'], auth_type="oauth", consumer_key=api_keys['keys'][instance], consumer_secret=api_keys['secrets'][instance])
+                        self.conn = StatusNet(config.config['api_path'], auth_type="oauth", consumer_key=api_keys['keys'][instance], consumer_secret=api_keys['secrets'][instance], oauth_token=config.config["oauth_token"], oauth_token_secret=config.config["oauth_token_secret"], save_oauth_credentials=config.store_oauth_keys)
                         config.config["consumer_key"] = api_keys['keys'][instance]
                         config.config["consumer_secret"] = api_keys['secrets'][instance]
                         config.config.save()
                 else:
-                    self.conn = StatusNet(config.config['api_path'], auth_type="oauth", consumer_key=oauth_consumer_keys[instance], consumer_secret=oauth_consumer_secrets[instance])
+                    self.conn = StatusNet(config.config['api_path'], auth_type="oauth", consumer_key=oauth_consumer_keys[instance], consumer_secret=oauth_consumer_secrets[instance], oauth_token=config.config["oauth_token"], oauth_token_secret=config.config["oauth_token_secret"], save_oauth_credentials=config.store_oauth_keys)
             else:
                 self.conn = StatusNet(config.config['api_path'], config.config['username'], config.config['password'])
         except Exception, (errmsg):
