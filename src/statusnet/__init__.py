@@ -365,7 +365,7 @@ class StatusNet(object):
         params = {'id':id}
         if not (source == ""):
             params['source'] = source
-        return self.__makerequest("statuses/retweet", params)
+        return self.__makerequest("statuses/retweet/%s" % str(id), params)
 
 
 ######## User resources ########
