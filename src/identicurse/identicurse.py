@@ -348,6 +348,8 @@ class IdentiCurse(object):
             config.config["tab_complete_mode"] = "exact"
         if not "hide_activities" in config.config:
             config.config["hide_activities"] = False
+        if not "new_reply_mode" in config.config:
+            config.config["new_reply_mode"] = False
 
         if not "keys" in config.config:
             config.config['keys'] = {}
@@ -1466,7 +1468,10 @@ class IdentiCurse(object):
         user = notice["user"]["screen_name"]
         if message == "":
             self.reply_mode = True
-            status = self.text_entry.edit("@%s " % (user))
+            if config.config["new_reply_mode"]:
+                status = self.text_entry.edit("")
+            else:
+                status = self.text_entry.edit("@%s " % (user))
             self.reply_mode = False
         else:
             status = "@%s %s" % (notice["user"]["screen_name"], message)
