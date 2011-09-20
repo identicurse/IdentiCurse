@@ -350,7 +350,7 @@ class Timeline(Tab):
         old_ids = [n['id'] for n in self.timeline]
 
         for notice in raw_timeline:
-            notice["ic__raw_datetime"] = helpers.notice_datetime(notice)
+            notice["ic__raw_datetime"] = helpers.normalise_datetime(notice['created_at'])
             notice["ic__from_web"] = True
             passes_filters = True
             if notice['id'] in old_ids:
@@ -451,7 +451,7 @@ class Timeline(Tab):
                         user_string += " +"
                     else:
                         source_msg += " [+]"
-            datetime_notice = helpers.notice_datetime(n)
+            datetime_notice = helpers.normalise_datetime(n["created_at"])
             time_msg = helpers.format_time(helpers.time_since(datetime_notice), short_form=True)
             metadata_string = time_msg + " " + user_string
             if config.config["show_source"]:
@@ -486,7 +486,7 @@ class Timeline(Tab):
                 repeat_msg = ""
                 if n["in_reply_to_status_id"] is not None:
                     source_msg += " [+]"
-            datetime_notice = helpers.notice_datetime(n)
+            datetime_notice = helpers.normalise_datetime(n["created_at"])
 
             time_msg = helpers.format_time(helpers.time_since(datetime_notice), short_form=True)
 
@@ -655,9 +655,7 @@ class Profile(Tab):
                 self.profile['following'] = "No"
 
             # create this field specially
-            locale.setlocale(locale.LC_TIME, 'C')  # hacky fix because statusnet uses english timestrings regardless of locale
-            datetime_joined = datetime.datetime.strptime(self.profile['created_at'], DATETIME_FORMAT)
-            locale.setlocale(locale.LC_TIME, '') # other half of the hacky fix
+            datetime_joined = helpers.normalise_datetime(self.profile['created_at'])
             days_since_join = helpers.single_unit(helpers.time_since(datetime_joined), "days")['days']
             self.profile['notices_per_day'] = "%0.2f" % (float(self.profile['statuses_count']) / days_since_join)
 

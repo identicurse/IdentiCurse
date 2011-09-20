@@ -1434,7 +1434,7 @@ class IdentiCurse(object):
             self = largs[0]
             update = cmd(*largs, **kargs)
             if update is not None:
-                update["ic__raw_datetime"] = helpers.notice_datetime(update)
+                update["ic__raw_datetime"] = helpers.normalise_datetime(update["created_at"])
                 update["ic__from_web"] = False
                 if self.tabs[self.current_tab].name == "Context":  # if we're in a context tab, add notice to there too
                     self.tabs[self.current_tab].timeline.insert(0, update)
