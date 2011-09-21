@@ -67,6 +67,7 @@ PRESET_SLOGANS = [
     "T-rex rules the school.",
     "GET BLUE SPHERES",
     "not affiliated with @sandersch's nipple.",
+    "we're sitti. D next to toy fish",
     ]
 
 def main():
