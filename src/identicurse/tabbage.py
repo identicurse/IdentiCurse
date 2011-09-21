@@ -325,14 +325,7 @@ class Timeline(Tab):
             elif self.timeline_type == "context":
                 raw_timeline = []
                 if "conversation_id" in self.type_params:  # try to do it the new way
-                    new_timeline = self.conn.statusnet_conversation(self.type_params['conversation_id'], count=get_count, since_id=last_id)
-                    while len(new_timeline) > 0:
-                        raw_timeline.extend(new_timeline)
-                        new_timeline = self.conn.statusnet_conversation(self.type_params['conversation_id'], count=get_count, max_id=raw_timeline[-1]['id'])
-                        for notice in raw_timeline:
-                            for new_notice in new_timeline:
-                                if str(notice['id']) == str(new_notice['id']):
-                                    new_timeline.remove(new_notice)
+                    raw_timeline = self.conn.statusnet_conversation(self.type_params['conversation_id'], count=get_count, since_id=last_id, page=self.page)
                 else:
                     if last_id == 0:  # don't run this if we've already filled the timeline
                         next_id = self.type_params['notice_id']
