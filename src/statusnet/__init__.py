@@ -74,6 +74,7 @@ class StatusNet(object):
         self.auth_type = auth_type
         self.oauth_token = oauth_token
         self.oauth_token_secret = oauth_token_secret
+        self.save_oauth_credentials = save_oauth_credentials
         self.auth_string = None
         if not self.__checkconn():
             raise Exception("Couldn't access %s, it may well be down." % (api_path))
