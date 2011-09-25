@@ -9,6 +9,7 @@
  - d/D default bindings are now reply mode/reply respectively, the opposite way round to in 0.7, since reply mode is generally more useful.
  - L (shift+l) keybinding to display notice links, for use in (for example) linking others to a specific dent.
  - Support for Status.net 1.0's conversation API, allowing full conversations to be viewed at last. (only on 1.0+ instances)
+ - Support for displaying "user -> user"-style addressee information on 1.0+ instances.
  - Moved to using Leah Culver's python-oauth module (MIT licensed), resolves some weird OAuth edgecase bugs.
  - <TAB>/+ and <shift+TAB>/- bindings for cycling through tabs (second pair cycles backwards).
  - New regex-based filtering mode. More complex, but more flexible.
