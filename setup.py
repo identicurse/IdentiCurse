@@ -22,11 +22,14 @@ Standard build script.
 
 __docformat__ = 'restructuredtext'
 
+import distutils
 from setuptools import setup, find_packages
+
+distutils.dir_util.remove_tree("build", "dist")
 
 setup(
     name="identicurse",
-    version='0.8-dev',
+    version='0.9-dev',
     description="A simple Identi.ca client with a curses-based UI.",
     long_description=("A simple Identi.ca client with a curses-based UI."),
     author="Psychedelic Squid and Reality",

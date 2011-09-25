@@ -24,12 +24,15 @@ until such time as Python finally includes Windows curses support as standard.
 
 __docformat__ = 'restructuredtext'
 
+import distutils
 from setuptools import setup, find_packages
 import py2exe
 
+distutils.dir_util.remove_tree("build", "dist")
+
 setup(
     name="identicurse",
-    version='0.8',  # 0.8-dev, but py2exe doesn't like the -dev bit.
+    version='0.9',  # 0.9-dev, but py2exe doesn't like that
     description="A simple Identi.ca client with a curses-based UI.",
     long_description=("A simple Identi.ca client with a curses-based UI."),
     author="Psychedelic Squid and Reality",
