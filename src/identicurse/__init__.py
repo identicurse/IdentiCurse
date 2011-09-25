@@ -108,7 +108,7 @@ def main():
         slogans = user_slogans
     except IOError:
         slogans = PRESET_SLOGANS
-    print "Welcome to IdentiCurse 0.8 (Holyhead) - %s" % (random.choice(slogans))
+    print "Welcome to IdentiCurse 0.8.1 (Holyhead) - %s" % (random.choice(slogans))
     IdentiCurse(additional_config)
 
 def colour_check():
