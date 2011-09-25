@@ -295,6 +295,15 @@ Available commands are as follows:
 /link [notice number]
    As above, but the first link in the notice is selected.
 
+/mute [notice number]
+   Mutes the entire conversation to which the chosen notice belongs.
+   This means that any notice in the same conversation will never be
+   shown to you until/unless you unmute the conversation.
+
+/unmute [notice number]
+   Removes muting from the entire conversation to which the chosen
+   notice belongs. The exact reverse of the above command.
+
 /alias [alias] [command]
    This will create the alias given as an alias for the command
    given. For example:
@@ -392,6 +401,17 @@ This is the default if the setting is not given.
 the same order. For example, "wgo" would match "windigo", even though other
 letters do appear. It would also match "mightywargod", since that still has
 all the letters, even though it doesn't start with w.
+
+Filtering modes:
+The "filter_mode" config setting is used to switch between two filtering
+modes. These are:
+
+"plain", which will match occurences of exactly the strings present in
+the "filters" config key.
+
+"regex", which will match any notice whose text is matched by the strings
+present in filters, interpreted as regular expressions.
+
 
 Colours:
 To use colours, the config setting "enable_colours" must be set to
