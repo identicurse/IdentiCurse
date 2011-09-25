@@ -121,7 +121,7 @@ class StatusNet(object):
             self.oauth_token = access_tokens['oauth_token']
             self.oauth_token_secret = access_tokens['oauth_token_secret']
             if self.save_oauth_credentials is not None:
-                self.save_oauth_credentials(oauth_token, oauth_token_secret)
+                self.save_oauth_credentials(self.oauth_token, self.oauth_token_secret)
 
         self.token = oauth.OAuthToken(str(self.oauth_token), str(self.oauth_token_secret))
 
