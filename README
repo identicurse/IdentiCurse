@@ -4,7 +4,7 @@ Before using IdentiCurse, you can manually configure it with your
 account login credentials. Alternatively, since 0.6, you can simply
 start IdentiCurse, and let it walk you through a few questions to set
 up a basic config for you.  This will be saved in your home directory
-as .identicurse.
+as .identicurse/config.json.
 
 If you would still rather do it manually (for example, if you would
 like to configure some of the more advanced settings that the
@@ -21,7 +21,7 @@ looks for config.json in .identicurse (a directory which is in your
 home directory), and then it checks config.json in its installed
 location. It is highly recommended, if you intend to manually edit
 it, that you copy the supplied config.json (found in conf/ in the
-tarball) to $HOME/.identicurse (create the directory first if it
+tarball) to $HOME/.identicurse/ (create the directory first if it
 doesn't exist yet) before modifying this copy, as that way future
 updates (which *will* overwrite the original config.json with the
 newest version) will not erase any customisation you have made.
@@ -32,7 +32,8 @@ in the home directory. This is no longer the case. However, you do not
 have to do anything about this, as IdentiCurse will move the config
 to the correct place automatically the first time you run it after
 updating. This note is just so that you're aware that there has been
-a change.
+a change. If you have not used any versions prior to 0.8, you don't
+need to worry about this section, it doesn't affect you.
 
 
 USING IDENTICURSE
@@ -68,9 +69,9 @@ the following:
     N               Move to the previous match for latest in-page search.
     l               Followed by a number between 1 and 9,
                      quickly reply to that notice on the timeline.
-    d               Reply to currently selected dent, name of the user whose
+    d               Reply to currently selected dent, full reply editable.
+    D               Reply to currently selected dent, name of the user whose
                      dent you are replying to is added before posting.
-    D               Reply to currently selected dent, full reply editable.
     f               Favourite currently selected dent.
     F               Unfavourite currently selected dent.
     e               Repeat currently selected dent.
@@ -83,6 +84,13 @@ the following:
     Z               Move dent selection to the last in the tab (indicated by *).
     p               Toggle the current tab's pause state.
     P               Toggle all tabs' pause states.
+    m               Mute the entire conversation which the currently selected
+                     dent is a part of.
+    M               Unmute the entire conversation which the currently selected
+                     dent is a part of.
+    L               Toggle display of notice links (the URLs to the notices).
+    TAB or +        Move to the next tab, or to the first if on the last.
+    Shift-TAB or -  Move to the previous tab, or to the last if on the first.
     UP or k         Scroll up one line (in the current tab).
     DOWN or j       Scroll down one line (in the current tab).
     PgUp or b       Scroll up one screen (in the current tab).
