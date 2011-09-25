@@ -31,7 +31,6 @@ from tabbar import TabBar
 
 import config
 import helpers
-import plugins
 
 locale.setlocale(locale.LC_ALL, '')
 code = locale.getpreferredencoding()
@@ -217,11 +216,6 @@ class IdentiCurse(object):
                 config.config.save()
         except ValueError, e:
             sys.exit("ERROR: Your config file could not be succesfully loaded due to JSON syntax error(s). Please fix it.\nOriginal error: %s" % (str(e)))
-
-        # config was loaded successfully, so now we prepare the plugin blacklist and start loading plugins
-        if not "plugin_blacklist" in config.config:
-            config.config["plugin_blacklist"] = []
-        plugins.load_all()
 
         self.last_page_search = {'query':"", 'occurs':[], 'viewing':0, 'tab':-1}
 
@@ -1483,7 +1477,6 @@ class IdentiCurse(object):
     @shows_status("Posting mention")
     @posts_notice
     def cmd_mention(self, username, message):
-        username, message = plugins.chained_hook_point("send_mention", username, message)
         status = "@%s %s" % (username, message)
         return self.conn.statuses_update(status, "IdentiCurse", long_dent=config.config["long_dent"], dup_first_word=True)
 
@@ -1493,7 +1486,6 @@ class IdentiCurse(object):
         if message is None:
             message = ""
         if len(message) > 0:
-            message, = plugins.chained_hook_point("send_status", message)
             return self.conn.statuses_update(message, "IdentiCurse", long_dent=config.config["long_dent"], dup_first_word=False)
 
     @shows_status("Favouriting notice")

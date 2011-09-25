@@ -17,7 +17,7 @@
 
 from helpers import DATETIME_FORMAT
 import os.path, re, sys, threading, datetime, locale, curses, random, httplib
-import identicurse, config, helpers, plugins
+import identicurse, config, helpers
 from operator import itemgetter
 from statusnet import StatusNetError
 
@@ -298,44 +298,40 @@ class Timeline(Tab):
                     last_id = notice['id']
                     break
 
-        _timeline_type, _timeline, _page, _count, _since_id, _type_params, _changed = plugins.chained_hook_point("populate_timeline", self.timeline_type, self.timeline, self.page, get_count, last_id, self.type_params, False)
-        if _changed:  # plugin did something, use its timeline rather than a built-in one
-            raw_timeline = _timeline
-        else:
-            if self.timeline_type == "home":
-                raw_timeline = self.conn.statuses_home_timeline(count=get_count, page=self.page, since_id=last_id)
-            elif self.timeline_type == "mentions":
-                raw_timeline = self.conn.statuses_mentions(count=get_count, page=self.page, since_id=last_id)
-            elif self.timeline_type == "direct":
-                raw_timeline = self.conn.direct_messages(count=get_count, page=self.page, since_id=last_id)
-            elif self.timeline_type == "user":
-                raw_timeline = self.conn.statuses_user_timeline(user_id=self.type_params['user_id'], screen_name=self.type_params['screen_name'], count=get_count, page=self.page, since_id=last_id)
-            elif self.timeline_type == "group":
-                raw_timeline = self.conn.statusnet_groups_timeline(group_id=self.type_params['group_id'], nickname=self.type_params['nickname'], count=get_count, page=self.page, since_id=last_id)
-            elif self.timeline_type == "tag":
-                raw_timeline = self.conn.statusnet_tags_timeline(tag=self.type_params['tag'], count=get_count, page=self.page, since_id=last_id)
-            elif self.timeline_type == "sentdirect":
-                raw_timeline = self.conn.direct_messages_sent(count=get_count, page=self.page, since_id=last_id)
-            elif self.timeline_type == "public":
-                raw_timeline = self.conn.statuses_public_timeline()
-            elif self.timeline_type == "favourites":
-                raw_timeline = self.conn.favorites(page=self.page, since_id=last_id)
-            elif self.timeline_type == "search":
-                raw_timeline = self.conn.search(self.type_params['query'], page=self.page, standardise=True, since_id=last_id)
-            elif self.timeline_type == "context":
-                raw_timeline = []
-                if "conversation_id" in self.type_params:  # try to do it the new way
-                    raw_timeline = self.conn.statusnet_conversation(self.type_params['conversation_id'], count=get_count, since_id=last_id, page=self.page)
-                else:
-                    if last_id == 0:  # don't run this if we've already filled the timeline
-                        next_id = self.type_params['notice_id']
-                        while next_id is not None:
-                            notice = self.conn.statuses_show(id=next_id)
-                            raw_timeline.append(notice)
-                            if "retweeted_status" in notice:
-                                next_id = notice['retweeted_status']['id']
-                            else:
-                                next_id = notice['in_reply_to_status_id']
+        if self.timeline_type == "home":
+            raw_timeline = self.conn.statuses_home_timeline(count=get_count, page=self.page, since_id=last_id)
+        elif self.timeline_type == "mentions":
+            raw_timeline = self.conn.statuses_mentions(count=get_count, page=self.page, since_id=last_id)
+        elif self.timeline_type == "direct":
+            raw_timeline = self.conn.direct_messages(count=get_count, page=self.page, since_id=last_id)
+        elif self.timeline_type == "user":
+            raw_timeline = self.conn.statuses_user_timeline(user_id=self.type_params['user_id'], screen_name=self.type_params['screen_name'], count=get_count, page=self.page, since_id=last_id)
+        elif self.timeline_type == "group":
+            raw_timeline = self.conn.statusnet_groups_timeline(group_id=self.type_params['group_id'], nickname=self.type_params['nickname'], count=get_count, page=self.page, since_id=last_id)
+        elif self.timeline_type == "tag":
+            raw_timeline = self.conn.statusnet_tags_timeline(tag=self.type_params['tag'], count=get_count, page=self.page, since_id=last_id)
+        elif self.timeline_type == "sentdirect":
+            raw_timeline = self.conn.direct_messages_sent(count=get_count, page=self.page, since_id=last_id)
+        elif self.timeline_type == "public":
+            raw_timeline = self.conn.statuses_public_timeline()
+        elif self.timeline_type == "favourites":
+            raw_timeline = self.conn.favorites(page=self.page, since_id=last_id)
+        elif self.timeline_type == "search":
+            raw_timeline = self.conn.search(self.type_params['query'], page=self.page, standardise=True, since_id=last_id)
+        elif self.timeline_type == "context":
+            raw_timeline = []
+            if "conversation_id" in self.type_params:  # try to do it the new way
+                raw_timeline = self.conn.statusnet_conversation(self.type_params['conversation_id'], count=get_count, since_id=last_id, page=self.page)
+            else:
+                if last_id == 0:  # don't run this if we've already filled the timeline
+                    next_id = self.type_params['notice_id']
+                    while next_id is not None:
+                        notice = self.conn.statuses_show(id=next_id)
+                        raw_timeline.append(notice)
+                        if "retweeted_status" in notice:
+                            next_id = notice['retweeted_status']['id']
+                        else:
+                            next_id = notice['in_reply_to_status_id']
 
         self.prev_page = self.page
 
@@ -389,8 +385,6 @@ class Timeline(Tab):
                     curses.flash()
                 elif config.config['notify'] == 'beep':
                     curses.beep()
-                elif config.config['notify'] == 'plugin':
-                    plugins.hook_point("notify", self.timeline_type)
 
         if len(self.timeline) == 0:
             self.timeline = temp_timeline[:]
@@ -400,8 +394,6 @@ class Timeline(Tab):
                 self.timeline = self.timeline[:get_count]
 
         self.timeline.sort(key=itemgetter('id'), reverse=True)
-
-        plugins.hook_point("populated_timeline", self.timeline_type, self.timeline, self.type_params)
 
         self.search_highlight_line = -1
 

@@ -1,0 +1,84 @@
+{
+    "colours": {
+        "username": [
+            "cyan", 
+            "none"
+        ], 
+        "pause_line": [
+            "white", 
+            "red"
+        ], 
+        "notice": [
+            "none", 
+            "none"
+        ], 
+        "group": [
+            "black", 
+            "brown"
+        ], 
+        "profile_fields": [
+            "blue", 
+            "none"
+        ], 
+        "statusbar": [
+            "black", 
+            "white"
+        ], 
+        "warning": [
+            "black", 
+            "red"
+        ], 
+        "none": [
+            "none", 
+            "none"
+        ], 
+        "selector": [
+            "brown", 
+            "none"
+        ], 
+        "tabbar_active": [
+            "red", 
+            "white"
+        ], 
+        "source": [
+            "green", 
+            "none"
+        ], 
+        "profile_values": [
+            "none", 
+            "none"
+        ], 
+        "tag": [
+            "brown", 
+            "none"
+        ], 
+        "notice_link": [
+            "green", 
+            "none"
+        ], 
+        "profile_title": [
+            "cyan", 
+            "none"
+        ], 
+        "tabbar": [
+            "white", 
+            "red"
+        ], 
+        "time": [
+            "brown", 
+            "none"
+        ], 
+        "timelines": [
+            "none", 
+            "none"
+        ], 
+        "notice_count": [
+            "blue", 
+            "none"
+        ], 
+        "search_highlight": [
+            "white", 
+            "blue"
+        ]
+    }
+}
