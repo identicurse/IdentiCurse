@@ -25,7 +25,10 @@ __docformat__ = 'restructuredtext'
 import distutils
 from setuptools import setup, find_packages
 
-distutils.dir_util.remove_tree("build", "dist")
+try:
+    distutils.dir_util.remove_tree("build", "dist", "src/identicurse.egg-info")
+except:
+    pass
 
 setup(
     name="identicurse",
