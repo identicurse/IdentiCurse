@@ -4,6 +4,23 @@
  - Unfavouriting notices (command /unfavourite, or hotkey F).
  - Z (shift+z) keybinding to move to last dent in timeline.
  - Config is now stored in ~/.identicurse/config.json. Any existing setups will be automatically converted upon start.
+ - Colourschemes can now be stored as discrete files, and pulled in with the "colorscheme" config key. See README for more detail.
+ - Default keybindings can now be fully overriden.
+ - d/D default bindings are now reply mode/reply respectively, the opposite way round to in 0.7, since reply mode is generally more useful.
+ - L (shift+l) keybinding to display notice links, for use in (for example) linking others to a specific dent.
+ - Support for Status.net 1.0's conversation API, allowing full conversations to be viewed at last. (only on 1.0+ instances)
+ - Moved to using Leah Culver's python-oauth module (MIT licensed), resolves some weird OAuth edgecase bugs.
+ - <TAB>/+ and <shift+TAB>/- bindings for cycling through tabs (second pair cycles backwards).
+ - New regex-based filtering mode. More complex, but more flexible.
+ - m and M keybindings, and /mute and /unmute commands, for muting/unmuting entire conversations. Any notice in a muted conversation will simply not be displayed. (only on 1.0+ instances)
+ - Message-splitting behaviour adjusted to make more sense with 1.0 instances.
+ - "new_reply_mode" config key for not auto-prepending @usernames when starting reply mode.
+ - Bugfixes for:
+      - IdentiCurse gave a "bad credentials" error on trying to use valid credentials, if the Status.net instance was down.
+      - Some "currently-selected dent" commands crashed the whole program on exceptions.
+      - /link would not match ftp:// URLs.
+      - /link commands would crash IdentiCurse if no link was present in the target dent.
+      - Repeating wouldn't work on 1.0+ instances.
 
 0.7.3:
  - Tab completion is now more reliable across different systems.
