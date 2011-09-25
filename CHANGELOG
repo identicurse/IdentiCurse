@@ -4,7 +4,7 @@
  - Unfavouriting notices (command /unfavourite, or hotkey F).
  - Z (shift+z) keybinding to move to last dent in timeline.
  - Config is now stored in ~/.identicurse/config.json. Any existing setups will be automatically converted upon start.
- - Colourschemes can now be stored as discrete files, and pulled in with the "colorscheme" config key. See README for more detail.
+ - Colourschemes can now be stored as discrete files, and pulled in with the "colorscheme" config key. Sample colourscheme provided under misc/.
  - Default keybindings can now be fully overriden.
  - d/D default bindings are now reply mode/reply respectively, the opposite way round to in 0.7, since reply mode is generally more useful.
  - L (shift+l) keybinding to display notice links, for use in (for example) linking others to a specific dent.
