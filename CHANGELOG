@@ -1,3 +1,10 @@
+0.8.2:
+ - Fixed broken setup_py2exe.py.
+ - Fixed broken OAuth code.
+
+0.8.1:
+ - Fixed broken setup.py.
+
 0.8:
  - New slogans.
  - Pausing (p to toggle pause on the current tab, P for all tabs), with a pause line to indicate which notices are before/after a pause.
