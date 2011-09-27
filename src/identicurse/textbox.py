@@ -42,7 +42,7 @@ class Textbox(textpad.Textbox):
         abort = False
         while 1:
             insert = False
-            ch = self.win.getch()
+            ch = self.win.getch() #TODO: python doesn't have a get wide char function, make one
 
             if ch == curses.ascii.DEL:
                 self.do_command(curses.ascii.BS)
