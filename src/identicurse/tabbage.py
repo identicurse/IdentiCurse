@@ -31,8 +31,9 @@ class Buffer(list):
             clean_blocks = []
             try:
                 if "\n" in block[0]:
-                    for sub_block in block[0].split("\n"):
-                        clean_blocks.append((sub_block, block[1]))
+                    clean_blocks.append((block[0].split("\n")[0], block[1]))
+                    for sub_block in block[0].split("\n")[1:]:
+                        clean_blocks.append((" "+sub_block, block[1]))
                 else:
                     clean_blocks.append(block)
                 for block in clean_blocks: 
