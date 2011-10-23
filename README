@@ -623,7 +623,7 @@ the following sample configuration may prove useful.  Suppose for
 example that you want to open URLs/links using the Elinks text
 browser.  In this case the following configuration line should work:
 
-    "browser": "screen elinks '%s'"
+    "browser": "screen elinks %s"
 
 Notice links:
 The "show_notice_links" config setting, if set to true (default false),
