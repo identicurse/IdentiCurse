@@ -506,7 +506,10 @@ class Timeline(Tab):
                 line.append((from_user, config.session_store.user_cache[from_user]))
             else:
                 line.append((from_user, identicurse.colour_fields["username"]))
-            user_length = len(from_user)
+            if from_user is not None:
+                user_length = len(from_user)
+            else:
+                user_length = None
 
             if to_user is not None:
                 line.append((" -> ", identicurse.colour_fields["none"]))
