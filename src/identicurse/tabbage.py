@@ -420,9 +420,16 @@ class Timeline(Tab):
                             atless_reply = False
                             break
                 if atless_reply:
-                    user_string = "%s -> %s" % (n["user"]["screen_name"], n["in_reply_to_screen_name"])
+                    if "user" in n:
+                        user_string = "%s" % (n["user"]["screen_name"])
+                    else:
+                        user_string = "<no username>"
+                    user_string += " -> %s" % (n["in_reply_to_screen_name"])
                 else:
-                    user_string = "%s" % (n["user"]["screen_name"])
+                    if "user" in n:
+                        user_string = "%s" % (n["user"]["screen_name"])
+                    else:
+                        user_string = ""
                 raw_source_msg = "from %s" % (n["source"])
                 source_msg = self.html_regex.sub("", raw_source_msg)
             if "in_reply_to_status_id" in n and n["in_reply_to_status_id"] is not None:
@@ -457,7 +464,10 @@ class Timeline(Tab):
                 if "retweeted_status" in n:
                     repeating_user = n["user"]["screen_name"]
                     n = n["retweeted_status"]
-                from_user = n["user"]["screen_name"]
+                if "user" in n:
+                    from_user = n["user"]["screen_name"]
+                else:
+                    from_user = "<no username>"
                 atless_reply = False
                 if "in_reply_to_screen_name" in n and n["in_reply_to_screen_name"] is not None:
                     atless_reply = True
