@@ -687,8 +687,6 @@ class StatusNet(object):
         params = {}
         if not (count == 0):
             params['count'] = count
-        if not (count == 0):
-            params['count'] = count
         return self.__makerequest("statusnet/groups/list_all", params)
 
     def statusnet_groups_membership(self, group_id=0, nickname=""):
