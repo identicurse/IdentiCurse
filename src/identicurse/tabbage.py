@@ -430,7 +430,10 @@ class Timeline(Tab):
                         user_string = "%s" % (n["user"]["screen_name"])
                     else:
                         user_string = ""
-                raw_source_msg = "from %s" % (n["source"])
+                if (n["source"] == "ostatus") and ("user" in n) and "statusnet_profile_url" in n["user"]:
+                    raw_source_msg = "from %s" % (helpers.domain_regex.findall(n["user"]["statusnet_profile_url"])[0][2])
+                else:
+                    raw_source_msg = "from %s" % (n["source"])
                 source_msg = self.html_regex.sub("", raw_source_msg)
             if "in_reply_to_status_id" in n and n["in_reply_to_status_id"] is not None:
                 if not config.config["show_source"]:
@@ -477,7 +480,10 @@ class Timeline(Tab):
                             break
                 if atless_reply:
                     to_user = n["in_reply_to_screen_name"]
-                raw_source_msg = "from %s" % (n["source"])
+                if (n["source"] == "ostatus") and ("user" in n) and "statusnet_profile_url" in n["user"]:
+                    raw_source_msg = "from %s" % (helpers.domain_regex.findall(n["user"]["statusnet_profile_url"])[0][2])
+                else:
+                    raw_source_msg = "from %s" % (n["source"])
                 source_msg = self.html_regex.sub("", raw_source_msg)
                 repeat_msg = ""
                 if n["in_reply_to_status_id"] is not None:
