@@ -31,8 +31,9 @@ class Buffer(list):
             clean_blocks = []
             try:
                 if "\n" in block[0]:
-                    for sub_block in block[0].split("\n"):
-                        clean_blocks.append((sub_block, block[1]))
+                    clean_blocks.append((block[0].split("\n")[0].replace("\r", ""), block[1]))
+                    for sub_block in block[0].split("\n")[1:]:
+                        clean_blocks.append((" "+sub_block.replace("\r", ""), block[1]))
                 else:
                     clean_blocks.append(block)
                 for block in clean_blocks: 
@@ -419,10 +420,20 @@ class Timeline(Tab):
                             atless_reply = False
                             break
                 if atless_reply:
-                    user_string = "%s -> %s" % (n["user"]["screen_name"], n["in_reply_to_screen_name"])
+                    if "user" in n:
+                        user_string = "%s" % (n["user"]["screen_name"])
+                    else:
+                        user_string = "<no username>"
+                    user_string += " -> %s" % (n["in_reply_to_screen_name"])
                 else:
-                    user_string = "%s" % (n["user"]["screen_name"])
-                raw_source_msg = "from %s" % (n["source"])
+                    if "user" in n:
+                        user_string = "%s" % (n["user"]["screen_name"])
+                    else:
+                        user_string = ""
+                if (n["source"] == "ostatus") and ("user" in n) and "statusnet_profile_url" in n["user"]:
+                    raw_source_msg = "from %s" % (helpers.domain_regex.findall(n["user"]["statusnet_profile_url"])[0][2])
+                else:
+                    raw_source_msg = "from %s" % (n["source"])
                 source_msg = self.html_regex.sub("", raw_source_msg)
             if "in_reply_to_status_id" in n and n["in_reply_to_status_id"] is not None:
                 if not config.config["show_source"]:
@@ -456,7 +467,10 @@ class Timeline(Tab):
                 if "retweeted_status" in n:
                     repeating_user = n["user"]["screen_name"]
                     n = n["retweeted_status"]
-                from_user = n["user"]["screen_name"]
+                if "user" in n:
+                    from_user = n["user"]["screen_name"]
+                else:
+                    from_user = "<no username>"
                 atless_reply = False
                 if "in_reply_to_screen_name" in n and n["in_reply_to_screen_name"] is not None:
                     atless_reply = True
@@ -466,7 +480,10 @@ class Timeline(Tab):
                             break
                 if atless_reply:
                     to_user = n["in_reply_to_screen_name"]
-                raw_source_msg = "from %s" % (n["source"])
+                if (n["source"] == "ostatus") and ("user" in n) and "statusnet_profile_url" in n["user"]:
+                    raw_source_msg = "from %s" % (helpers.domain_regex.findall(n["user"]["statusnet_profile_url"])[0][2])
+                else:
+                    raw_source_msg = "from %s" % (n["source"])
                 source_msg = self.html_regex.sub("", raw_source_msg)
                 repeat_msg = ""
                 if n["in_reply_to_status_id"] is not None:
@@ -505,7 +522,10 @@ class Timeline(Tab):
                 line.append((from_user, config.session_store.user_cache[from_user]))
             else:
                 line.append((from_user, identicurse.colour_fields["username"]))
-            user_length = len(from_user)
+            if from_user is not None:
+                user_length = len(from_user)
+            else:
+                user_length = None
 
             if to_user is not None:
                 line.append((" -> ", identicurse.colour_fields["none"]))
