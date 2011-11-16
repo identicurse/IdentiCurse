@@ -18,6 +18,8 @@
 import curses, identicurse, config, helpers
 from curses import textpad
 from curses import ascii
+import sys
+
 
 class Textbox(textpad.Textbox):
     def __init__(self, win, poll, insert_mode=False):
@@ -42,7 +44,36 @@ class Textbox(textpad.Textbox):
         abort = False
         while 1:
             insert = False
-            ch = self.win.getch() #TODO: python doesn't have a get wide char function, make one
+            ch = self.win.getch()
+            if ch > 127:
+                #liberated from http://groups.google.com/group/comp.lang.python/browse_thread/thread/67dce30f0a2742a6?fwc=2&pli=1
+                #needs refactoring
+
+                def check_next_byte():
+                    ch = self.win.getch()
+                    if 128 <= ch <= 191:
+                        return ch
+                    else:
+                        raise UnicodeError
+
+                bytes = []
+                bytes.append(ch)
+                if 194 <= ch <= 223:
+                    #2 bytes
+                    bytes.append(check_next_byte())
+                elif 224 <= ch <= 239:
+                    #3 bytes
+                    bytes.append(check_next_byte())
+                    bytes.append(check_next_byte())
+                elif 240 <= ch <= 244:
+                    #4 bytes
+                    bytes.append(check_next_byte())
+                    bytes.append(check_next_byte())
+                    bytes.append(check_next_byte())
+
+                ch = "".join([chr(b) for b in bytes])
+                self.win.addstr(ch)
+                continue
 
             if ch == curses.ascii.DEL:
                 self.do_command(curses.ascii.BS)
