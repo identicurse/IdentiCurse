@@ -18,7 +18,6 @@
 import curses, identicurse, config, helpers
 from curses import textpad
 from curses import ascii
-import sys
 
 
 class Textbox(textpad.Textbox):
@@ -45,36 +44,7 @@ class Textbox(textpad.Textbox):
         while 1:
             insert = False
             ch = self.win.getch()
-            if ch > 127:
-                #liberated from http://groups.google.com/group/comp.lang.python/browse_thread/thread/67dce30f0a2742a6?fwc=2&pli=1
-                #needs refactoring
-
-                def check_next_byte():
-                    ch = self.win.getch()
-                    if 128 <= ch <= 191:
-                        return ch
-                    else:
-                        raise UnicodeError
-
-                bytes = []
-                bytes.append(ch)
-                if 194 <= ch <= 223:
-                    #2 bytes
-                    bytes.append(check_next_byte())
-                elif 224 <= ch <= 239:
-                    #3 bytes
-                    bytes.append(check_next_byte())
-                    bytes.append(check_next_byte())
-                elif 240 <= ch <= 244:
-                    #4 bytes
-                    bytes.append(check_next_byte())
-                    bytes.append(check_next_byte())
-                    bytes.append(check_next_byte())
-
-                ch = "".join([chr(b) for b in bytes])
-                self.win.addstr(ch)
-                continue
-
+            
             if ch == curses.ascii.DEL:
                 self.do_command(curses.ascii.BS)
             elif ch == curses.KEY_ENTER or ch == 10:
@@ -88,6 +58,7 @@ class Textbox(textpad.Textbox):
                 last_word = ""
                 while True:
                     x -= 1
+                    # Much as I enjoy TAB, this line will choke on non-ascii chars
                     c = chr(curses.ascii.ascii(self.win.inch(cursor_position[0], x)))
                     if c == " ":
                         if (len(last_word) == 0) and (x > 0):
@@ -194,6 +165,36 @@ class Textbox(textpad.Textbox):
                             else:
                                 self.win.move(y, x + 1)
                             break
+            elif ch > 127 and ch <= 256:
+                #liberated from http://groups.google.com/group/comp.lang.python/browse_thread/thread/67dce30f0a2742a6?fwc=2&pli=1
+
+                def check_next_byte():
+                    ch = self.win.getch()
+                    if 128 <= ch <= 191:
+                        return ch
+                    else:
+                        raise UnicodeError
+
+                bytes = []
+                bytes.append(ch)
+                if 194 <= ch <= 223:
+                    #2 bytes
+                    bytes.append(check_next_byte())
+                elif 224 <= ch <= 239:
+                    #3 bytes
+                    bytes.append(check_next_byte())
+                    bytes.append(check_next_byte())
+                elif 240 <= ch <= 244:
+                    #4 bytes
+                    bytes.append(check_next_byte())
+                    bytes.append(check_next_byte())
+                    bytes.append(check_next_byte())
+
+                ch = "".join([chr(b) for b in bytes])
+                self.win.addstr(ch)
+                continue
+                #wide_char = '&#' + str(ord(unicode(wide_char,'utf'))) + ';'
+
             elif not ch:
                 continue
             elif not self.do_command(ch):
@@ -218,6 +219,7 @@ class Textbox(textpad.Textbox):
         self.win.delch()
         if cursor_y < self.maxy:
             for line_offset in xrange(0, self.maxy - cursor_y):
+                # next line might choke on non-ascii
                 self.win.insch(cursor_y + line_offset, self.maxx, curses.ascii.ascii(self.win.inch(cursor_y + line_offset + 1, 0)))
                 self.win.delch(cursor_y + line_offset + 1, 0)
             self.win.move(cursor_y, cursor_x)
@@ -235,10 +237,12 @@ class Textbox(textpad.Textbox):
                 if self.stripspaces and x > stop:
                     result.append("")
                     break
+                # choke
                 char = chr(curses.ascii.ascii(self.win.inch(y, x)))
                 if char == " ":
                     result.append("")
                 else:
+                    # choke
                     result[-1] += chr(curses.ascii.ascii(self.win.inch(y, x)))
         result = [word for word in result if word != ""]
         self.win.move(*cursor_position)
