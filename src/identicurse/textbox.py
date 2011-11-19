@@ -19,7 +19,6 @@ import curses, identicurse, config, helpers
 from curses import textpad
 from curses import ascii
 
-
 class Textbox(textpad.Textbox):
     def __init__(self, win, poll, insert_mode=False):
         try:
@@ -58,7 +57,6 @@ class Textbox(textpad.Textbox):
                 last_word = ""
                 while True:
                     x -= 1
-                    # Much as I enjoy TAB, this line will choke on non-ascii chars
                     c = chr(curses.ascii.ascii(self.win.inch(cursor_position[0], x)))
                     if c == " ":
                         if (len(last_word) == 0) and (x > 0):
@@ -193,7 +191,6 @@ class Textbox(textpad.Textbox):
                 ch = "".join([chr(b) for b in bytes])
                 self.win.addstr(ch)
                 continue
-                #wide_char = '&#' + str(ord(unicode(wide_char,'utf'))) + ';'
 
             elif not ch:
                 continue
@@ -219,7 +216,6 @@ class Textbox(textpad.Textbox):
         self.win.delch()
         if cursor_y < self.maxy:
             for line_offset in xrange(0, self.maxy - cursor_y):
-                # next line might choke on non-ascii
                 self.win.insch(cursor_y + line_offset, self.maxx, curses.ascii.ascii(self.win.inch(cursor_y + line_offset + 1, 0)))
                 self.win.delch(cursor_y + line_offset + 1, 0)
             self.win.move(cursor_y, cursor_x)
@@ -237,13 +233,18 @@ class Textbox(textpad.Textbox):
                 if self.stripspaces and x > stop:
                     result.append("")
                     break
-                # choke
-                char = chr(curses.ascii.ascii(self.win.inch(y, x)))
+
+                # deal with non-ascii
+                char = self.win.inch(y, x)
+                if char == curses.ascii.ascii(char):
+                    char = chr(curses.ascii.ascii(char))
+                else:
+                    char = '&#%u;' % char
+
                 if char == " ":
                     result.append("")
                 else:
-                    # choke
-                    result[-1] += chr(curses.ascii.ascii(self.win.inch(y, x)))
+                    result[-1] += char
         result = [word for word in result if word != ""]
         self.win.move(*cursor_position)
         return " ".join(result)
