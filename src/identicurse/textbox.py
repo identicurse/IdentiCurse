@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import curses, identicurse, config, helpers
+import curses, identicurse, config, helpers, string
 from curses import textpad
 from curses import ascii
 
@@ -164,34 +164,40 @@ class Textbox(textpad.Textbox):
                                 self.win.move(y, x + 1)
                             break
             elif ch > 127 and ch <= 256:
-                #liberated from http://groups.google.com/group/comp.lang.python/browse_thread/thread/67dce30f0a2742a6?fwc=2&pli=1
+                cursor_y, cursor_x = self.win.getyx()
 
-                def check_next_byte():
-                    ch = self.win.getch()
-                    if 128 <= ch <= 191:
-                        return ch
-                    else:
-                        raise UnicodeError
+                if cursor_y < self.maxy:
+                    overhang_ch = self.win.inch(cursor_y, self.maxx)
+                    if overhang_ch <= 127:
+                        self.win.insch(cursor_y+1, 0, overhang_ch)
+                    elif overhang_ch <= 256:
+                        for c in self.unicode_demangle(overhang_ch):
+                            self.win.insch(cursor_y+1, 0, ord(c))
 
-                bytes = []
-                bytes.append(ch)
-                if 194 <= ch <= 223:
-                    #2 bytes
-                    bytes.append(check_next_byte())
-                elif 224 <= ch <= 239:
-                    #3 bytes
-                    bytes.append(check_next_byte())
-                    bytes.append(check_next_byte())
-                elif 240 <= ch <= 244:
-                    #4 bytes
-                    bytes.append(check_next_byte())
-                    bytes.append(check_next_byte())
-                    bytes.append(check_next_byte())
+                for c in self.unicode_demangle(ch):
+                    self.win.insch(cursor_y, cursor_x, ord(c))
 
-                ch = "".join([chr(b) for b in bytes])
-                self.win.addstr(ch)
-                continue
+                if cursor_x < self.maxx:
+                    self.win.move(cursor_y, cursor_x+1)
+                elif cursor_y < self.maxy:
+                    self.win.move(cursor_y+1, 0)
 
+            elif ch <= 127 and chr(ch) in string.printable:
+                cursor_y, cursor_x = self.win.getyx()
+                if cursor_y < self.maxy:
+                    overhang_ch = self.win.inch(cursor_y, self.maxx)
+                    if overhang_ch <= 127:
+                        self.win.insch(cursor_y+1, 0, overhang_ch)
+                    elif overhang_ch <= 256:
+                        for c in self.unicode_demangle(overhang_ch):
+                            self.win.insch(cursor_y+1, 0, ord(c))
+
+                self.win.insch(cursor_y, cursor_x, ch)
+
+                if cursor_x < self.maxx:
+                    self.win.move(cursor_y, cursor_x+1)
+                elif cursor_y < self.maxy:
+                    self.win.move(cursor_y+1, 0)
             elif not ch:
                 continue
             elif not self.do_command(ch):
@@ -210,6 +216,32 @@ class Textbox(textpad.Textbox):
             self.win.clear()
             self.win.refresh()
             return None
+
+    def unicode_demangle(self, unicode_ch):
+        #liberated from http://groups.google.com/group/comp.lang.python/browse_thread/thread/67dce30f0a2742a6?fwc=2&pli=1
+        def check_next_byte():
+            unicode_ch = self.win.getch()
+            if 128 <= unicode_ch <= 191:
+                return unicode_ch
+            else:
+                raise UnicodeError
+
+        bytes = []
+        bytes.append(unicode_ch)
+        if 194 <= unicode_ch <= 223:
+            #2 bytes
+            bytes.append(check_next_byte())
+        elif 224 <= unicode_ch <= 239:
+            #3 bytes
+            bytes.append(check_next_byte())
+            bytes.append(check_next_byte())
+        elif 240 <= unicode_ch <= 244:
+            #4 bytes
+            bytes.append(check_next_byte())
+            bytes.append(check_next_byte())
+            bytes.append(check_next_byte())
+
+        return "".join([chr(b) for b in bytes])
 
     def delch(self):  # delch, but with provisions for moving characters across lines
         cursor_y, cursor_x = self.win.getyx()
