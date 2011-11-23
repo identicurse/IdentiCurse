@@ -68,6 +68,7 @@ PRESET_SLOGANS = [
     "GET BLUE SPHERES",
     "not affiliated with @sandersch's nipple.",
     "we're sitti. D next to toy fish",
+    "do the federation!",
     ]
 
 def main():
