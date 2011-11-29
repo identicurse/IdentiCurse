@@ -69,6 +69,7 @@ PRESET_SLOGANS = [
     "not affiliated with @sandersch's nipple.",
     "we're sitti. D next to toy fish",
     "do the federation!",
+    "some BAD SOFTWARE with regrettable REALNESS ATTRIBUTE",
     ]
 
 def main():
