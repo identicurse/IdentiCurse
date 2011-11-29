@@ -18,11 +18,10 @@
 import threading, random, time, config, curses
 
 class StatusBar(object):
-    def __init__(self, window, slogans):
+    def __init__(self, window):
         self.window = window
         self.text = ""
         self.timed_update_restore_value = None
-        self.slogans = slogans
 
     def timed_update(self, text, delay=10):
         TimedUpdate(self, text, delay).start()
@@ -44,17 +43,10 @@ class StatusBar(object):
         self.window.refresh()
 
     def do_nothing(self):
-        try:
-            slogans_on = config.config['slogans']
-        except KeyError, e:
-            slogans_on = 1
-        if slogans_on:
-            text = random.choice(self.slogans)
-            text = text[0].capitalize() + text[1:]
-            text = "IdentiCurse: %s" % text
+        if config.config['status_slogans']:
+            self.update("IdentiCurse: %s" % random.choice(config.session_store.slogans).capitalize())
         else:
-            text = "Doing nothing."
-        self.update(text)
+            self.update("Doing nothing.")
 
 class TimedUpdate(threading.Thread):
     def __init__(self, statusbar, text, delay):

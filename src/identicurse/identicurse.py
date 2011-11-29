@@ -119,7 +119,7 @@ class IdentiCurse(object):
             executable_path = __file__
         self.path = os.path.dirname(os.path.realpath(unicode(executable_path, sys.getfilesystemencoding())))
         self.qreply = False
-        self.slogans = additional_config["slogans"]
+        config.session_store.slogans = additional_config["slogans"]
         
         if "config_dirname" in additional_config:
             config.config.basedir = os.path.expanduser(additional_config['config_dirname'])
@@ -345,6 +345,8 @@ class IdentiCurse(object):
             config.config["hide_activities"] = False
         if not "new_reply_mode" in config.config:
             config.config["new_reply_mode"] = False
+        if not "status_slogans" in config.config:
+            config.config["status_slogans"] = True
 
         if not "keys" in config.config:
             config.config['keys'] = {}
@@ -664,7 +666,7 @@ class IdentiCurse(object):
 
         self.redraw()
 
-        self.status_bar = StatusBar(self.status_window, self.slogans)
+        self.status_bar = StatusBar(self.status_window)
         self.status_bar.update("Welcome to IdentiCurse")
         
         self.tabs = []
