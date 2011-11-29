@@ -119,6 +119,7 @@ class IdentiCurse(object):
             executable_path = __file__
         self.path = os.path.dirname(os.path.realpath(unicode(executable_path, sys.getfilesystemencoding())))
         self.qreply = False
+        self.slogans = additional_config["slogans"]
         
         if "config_dirname" in additional_config:
             config.config.basedir = os.path.expanduser(additional_config['config_dirname'])
@@ -663,7 +664,7 @@ class IdentiCurse(object):
 
         self.redraw()
 
-        self.status_bar = StatusBar(self.status_window)
+        self.status_bar = StatusBar(self.status_window, self.slogans)
         self.status_bar.update("Welcome to IdentiCurse")
         
         self.tabs = []
@@ -752,7 +753,7 @@ class IdentiCurse(object):
         self.display_current_tab()
         if config.session_store.update_error is not None:
             self.status_bar.timed_update(config.session_store.update_error)
-        self.status_bar.update("Doing nothing.")
+        self.status_bar.do_nothing()
         self.tab_bar.tabs = [tab.name for tab in self.tabs]
         self.tab_bar.current_tab = self.current_tab
         self.tab_bar.update()
@@ -856,17 +857,17 @@ class IdentiCurse(object):
                 if self.tabs[self.current_tab].prevpage(0):
                     self.status_bar.update("Moving to first page...")
                     self.tabs[self.current_tab].update()
-                    self.status_bar.update("Doing nothing.")
+                    self.status_bar.do_nothing()
             elif input in self.keybindings['newerpage']:
                 if self.tabs[self.current_tab].prevpage():
                     self.status_bar.update("Moving to newer page...")
                     self.tabs[self.current_tab].update()
-                    self.status_bar.update("Doing nothing.")
+                    self.status_bar.do_nothing()
             elif input in self.keybindings['olderpage']:
                 if self.tabs[self.current_tab].nextpage():
                     self.status_bar.update("Moving to older page...")
                     self.tabs[self.current_tab].update()
-                    self.status_bar.update("Doing nothing.")
+                    self.status_bar.do_nothing()
             elif input in self.keybindings['refresh']:
                 self.update_tabs()
             elif input in self.keybindings['input']:
@@ -1380,13 +1381,13 @@ class IdentiCurse(object):
 
             if not update:
                 self.tabs[self.current_tab].update()
-                self.status_bar.update("Doing nothing.")
+                self.status_bar.do_nothing()
 
         self.text_entry = Textbox(self.entry_window, self.validate, insert_mode=True)
         self.text_entry.stripspaces = 1
         self.tabs[self.current_tab].search_highlight_line = -1
         self.display_current_tab()
-        self.status_bar.update("Doing nothing.")
+        self.status_bar.do_nothing()
         self.insert_mode = False
         self.update_timer = Timer(config.config['update_interval'], self.update_tabs)
         self.update_timer.start()
@@ -1418,7 +1419,7 @@ class IdentiCurse(object):
                 self = largs[0]
                 self.status_bar.update(status_msg + "...")
                 retval = cmd(*largs, **kargs)
-                self.status_bar.update("Doing nothing.")
+                self.status_bar.do_nothing()
                 return retval
             return outcmd
         return status_decorator
@@ -1443,7 +1444,7 @@ class IdentiCurse(object):
                         else:
                             tab.timeline.insert(0, update)
                         tab.update_buffer()
-            self.status_bar.update("Doing nothing.")
+            self.status_bar.do_nothing()
             return True
         return outcmd
 
@@ -1804,7 +1805,7 @@ class IdentiCurse(object):
                     self.status_bar.update("No results for '%s'" % (query))
                     self.last_page_search = {'query':"", 'occurs':[], 'viewing':0, 'tab':-1}  # reset to no search
         else:
-            self.status_bar.update("Doing nothing.")
+            self.status_bar.do_nothing()
 
         self.text_entry = Textbox(self.entry_window, self.validate, insert_mode=True)
         self.text_entry.stripspaces = 1

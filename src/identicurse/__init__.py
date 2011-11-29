@@ -109,6 +109,8 @@ def main():
         slogans = user_slogans
     except IOError:
         slogans = PRESET_SLOGANS
+    additional_config['slogans'] = slogans
+
     print "Welcome to IdentiCurse 0.9-dev (i r back) - %s" % (random.choice(slogans))
     IdentiCurse(additional_config)
 
