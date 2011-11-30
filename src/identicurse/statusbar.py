@@ -44,7 +44,7 @@ class StatusBar(object):
 
     def do_nothing(self):
         if config.config['status_slogans']:
-            self.update("IdentiCurse: %s" % random.choice(config.session_store.slogans).capitalize())
+            self.update("IdentiCurse: %s" % random.choice(config.session_store.slogans))
         else:
             self.update("Doing nothing.")
 
