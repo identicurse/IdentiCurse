@@ -408,6 +408,8 @@ class Timeline(Tab):
 
         longest_metadata_string_len = 0
         for n in self.timeline:
+            if n["text"] is None:
+                n["text"] = ""
             if "direct" in self.timeline_type:
                 user_string = "%s -> %s" % (n["sender"]["screen_name"], n["recipient"]["screen_name"])
                 source_msg = ""
@@ -456,6 +458,8 @@ class Timeline(Tab):
                 longest_metadata_string_len = len(metadata_string)
 
         for n in self.timeline:
+            if n["text"] is None:
+                n["text"] = ""
             from_user = None
             to_user = None
             repeating_user = None
