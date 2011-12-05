@@ -171,7 +171,8 @@ class StatusNet(object):
                     err_details = json.loads(raw_details)['error']
                 except ValueError:  # not JSON, use raw
                     err_details = raw_details
-                raise StatusNetError(e.code, err_details)
+                if (e.code % 400) < 100:  # only throw the error further up if it's not a server error
+                    raise StatusNetError(e.code, err_details)
             except urllib2.URLError, e:
                 raise StatusNetError(-1, e.reason)
             except httplib.BadStatusLine, e:
