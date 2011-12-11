@@ -70,6 +70,7 @@ PRESET_SLOGANS = [
     "we're sitti. D next to toy fish",
     "do the federation!",
     "some BAD SOFTWARE with regrettable REALNESS ATTRIBUTE",
+    "as seen on RealiTV!",
     ]
 
 def main():
