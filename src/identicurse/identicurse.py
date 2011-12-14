@@ -1471,7 +1471,10 @@ class IdentiCurse(object):
                 status = self.text_entry.edit("@%s " % (user))
             self.reply_mode = False
         else:
-            status = "@%s %s" % (notice["user"]["screen_name"], message)
+            if config.config["new_reply_mode"]:
+                status = message
+            else:
+                status = "@%s %s" % (notice["user"]["screen_name"], message)
         if status is None:
             status = ""
         if len(status) > 0:
