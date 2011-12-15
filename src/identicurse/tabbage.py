@@ -537,7 +537,7 @@ class Timeline(Tab):
                     line.append((to_user, config.session_store.user_cache[to_user]))
                 else:
                     line.append((to_user, identicurse.colour_fields["username"]))
-                user_length += (len(" -> ") + len(to_user))
+                user_length += len(" -> ") + len(to_user)
 
             if repeating_user is not None:
                 if config.config["compact_notices"]:
@@ -552,10 +552,10 @@ class Timeline(Tab):
 
                 if config.config["compact_notices"]:
                     line.append(("'s RD]", identicurse.colour_fields["none"]))
-                    user_length += (len(" [") + len(repeating_user) + len("'s RD]"))
+                    user_length += len(" [") + len(repeating_user) + len("'s RD]")
                 else:
                     line.append((" ]", identicurse.colour_fields["none"]))
-                    user_length += (len(" [ repeat by ") + len(repeating_user) + len(" ]"))
+                    user_length += len(" [ repeat by ") + len(repeating_user) + len(" ]")
 
             if not config.config['compact_notices']:
                 if config.config["show_source"]:
