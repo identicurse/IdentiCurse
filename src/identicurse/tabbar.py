@@ -45,7 +45,7 @@ class TabBar(object):
                 attr = identicurse.colour_fields['tabbar']
             tab_title = self.tabs[tab_num]
             if config.config["enumerate_tabs"]:
-                tab_title = "%d %s" % (tab_num, tab_title)
+                tab_title = "%d %s" % (tab_num+1, tab_title)
             if (not config.config["enable_colours"]) and (tab_num == self.current_tab):
                 tab_list.append((tab_title.upper(), attr))
             else:
