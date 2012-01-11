@@ -43,11 +43,14 @@ class TabBar(object):
                 attr = identicurse.colour_fields['tabbar_active']
             else:
                 attr = identicurse.colour_fields['tabbar']
+            tab_title = self.tabs[tab_num]
+            if config.config["enumerate_tabs"]:
+                tab_title = "%d %s" % (tab_num, tab_title)
             if (not config.config["enable_colours"]) and (tab_num == self.current_tab):
-                tab_list.append((self.tabs[tab_num].upper(), attr))
+                tab_list.append((tab_title.upper(), attr))
             else:
-                tab_list.append((self.tabs[tab_num], attr))
-            total_length += len(self.tabs[tab_num])
+                tab_list.append((tab_title, attr))
+            total_length += len(tab_title)
             if (self.left_index + maxx) > total_length:
                 if total_length > maxx:  # we've still got more than a screen's worth, we just happen to have closed a tab (most likely)
                     self.left_index = (total_length) - (maxx - 1)

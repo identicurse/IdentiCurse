@@ -347,6 +347,8 @@ class IdentiCurse(object):
             config.config["new_reply_mode"] = False
         if not "status_slogans" in config.config:
             config.config["status_slogans"] = True
+        if not "enumerate_tabs" in config.config:
+            config.config["enumerate_tabs"] = True
 
         if not "keys" in config.config:
             config.config['keys'] = {}
