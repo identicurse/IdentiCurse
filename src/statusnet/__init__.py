@@ -158,6 +158,7 @@ class StatusNet(object):
                 request = urllib2.Request(oauth_request.to_url(), headers=oauth_request.to_header())
 
         success = False
+        response = None
         attempt_count = 0
         while not success:
             success = True  # succeed unless we hit BadStatusLine
@@ -178,6 +179,9 @@ class StatusNet(object):
             except httplib.BadStatusLine, e:
                 success = False
             attempt_count += 1
+
+        if response is None:
+            raise StatusNetError(-1, "Could not successfully read any response. Please check that your connection is working.")
 
         content = response.read()
     
