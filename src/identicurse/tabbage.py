@@ -586,7 +586,7 @@ class Timeline(Tab):
                 line.append((" | ", identicurse.colour_fields["none"]))
 
             try:
-                notice_entities = helpers.split_entities(n['text'])
+                notice_entities = helpers.split_entities(n['text'] or "")
                 for entity in notice_entities:
                     if len(entity['text']) > 0:
                         if entity['type'] in ['user', 'group', 'tag']:
