@@ -71,7 +71,7 @@ PRESET_SLOGANS = [
     "do the federation!",
     "some BAD SOFTWARE with regrettable REALNESS ATTRIBUTE",
     "as seen on RealiTV!",
-    "IDENTICURSE DISLIKES SMOKE"
+    "IDENTICURSE DISLIKES SMOKE",
     ]
 
 def main():
