@@ -1249,9 +1249,9 @@ class IdentiCurse(object):
                                 user = user[1:]
                         else:
                             if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
-                                user = self.tabs[self.current_tab].timeline[int(token) - 1]["retweeted_status"]["user"]["screen_name"]
+                                user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["retweeted_status"]["user"]["screen_name"]
                             else:
-                                user = self.tabs[self.current_tab].timeline[int(token) - 1]["user"]["screen_name"]
+                                user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
                         
                         self.cmd_user(user)
     
@@ -1268,9 +1268,9 @@ class IdentiCurse(object):
                                     user = user[1:]
                         else:
                             if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
-                                user = self.tabs[self.current_tab].timeline[int(token) - 1]["retweeted_status"]["user"]["screen_name"]
+                                user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["retweeted_status"]["user"]["screen_name"]
                             else:
-                                user = self.tabs[self.current_tab].timeline[int(token) - 1]["user"]["screen_name"]
+                                user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
                         self.cmd_subscribe(user)
                         
                     elif tokens[0] == "/unsubscribe" and len(tokens) == 2:
@@ -1283,9 +1283,9 @@ class IdentiCurse(object):
                                     user = user[1:]
                         else:
                             if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
-                                user = self.tabs[self.current_tab].timeline[int(token) - 1]["retweeted_status"]["user"]["screen_name"]
+                                user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["retweeted_status"]["user"]["screen_name"]
                             else:
-                                user = self.tabs[self.current_tab].timeline[int(token) - 1]["user"]["screen_name"]
+                                user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
                         self.cmd_unsubscribe(user)
     
                     elif tokens[0] == "/group" and len(tokens) == 2:
