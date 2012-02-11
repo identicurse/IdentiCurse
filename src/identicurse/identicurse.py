@@ -312,7 +312,7 @@ class IdentiCurse(object):
         if not "browser" in config.config:
             config.config['browser'] = "xdg-open '%s'"
         if not "border" in config.config:
-            config.config['border'] = True
+            config.config['border'] = False
         if not "compact_notices" in config.config:
             config.config['compact_notices'] = False
         if not "user_rainbow" in config.config:
