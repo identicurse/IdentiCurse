@@ -467,6 +467,10 @@ If all 16 colours *are* supported, the following are also usable:
     "grey", "light_red", "light_green", "yellow", "light_blue",
     "light_magenta", "light_cyan", "light_white"
 
+Border:
+The "border" setting controls whether a border is drawn around the UI.
+The default is false (no border).
+
 UI order:
 The "ui_order" config setting allows you to place the various sections
 of the UI in a different vertical order to default. It is in the format of
@@ -496,6 +500,12 @@ ignored, and any element types omitted entirely (again, except dividers) will
 be added to the bottom. So for example, the example setting given above would
 produce the same layout with or without the tabbar line, since the tab bar
 would simply be added there since it was missing.
+
+Tab enumeration:
+The "enumerate_tabs" config setting controls whether tabs are numbered. The
+default is true (do display numbers). The numbers for tabs 1-9 correspond to
+the keys that switch to those tabs (clarification: the keys still work
+regardless of whether numbers are shown in the tab titles).
 
 Initial tabs:
 The tabs that are automatically loaded on startup can be configured by
@@ -647,6 +657,13 @@ directory. In this file, you should place slogans, one per line. These
 will then be displayed on starting IdentiCurse. The default slogans
 will not be used in this case, so if there are any you want to keep,
 you will need to add them to your slogans file.
+
+Status bar slogans:
+As of 0.9, slogans are displayed in the status bar when IdentiCurse is
+idle. This is controlled by the "status_slogans" config setting, with
+true (the default) setting them to be shown, and false setting them
+not to be shown - the traditional "Doing nothing." status will be shown
+instead.
 
 OAuth:
 If not enabled on first run, OAuth can be enabled at a later date using
