@@ -1,3 +1,15 @@
+0.9:
+ - "from ostatus" is now replaced by "from $INSTANCE_URL" for remote notices.
+ - Thanks to @moggers87, we now have mostly functional UTF text entry support (i.e., non-ASCII characters work properly) - true support would depend on Python 2.x actually getting a curses module with proper wide-char support.
+ - Slogans now appear instead of the "doing nothing" message. Can be restored to old behaviour by setting "status_slogans" to false in config.
+ - Tabs are now numbered - for tabs 1-9, the number is the same one you press to switch straight to it. Can be disabled by setting "enumerate_tabs" to false in config.
+ - Border is now off by default. However, if you already set "border" in config, it will remain how you set it.
+ - New slogans, as usual.
+ - Bugfixes for:
+      - Non-sane application of "new_reply_mode" when splitting notices.
+      - All the "NoneType has no length" errors so far unearthed.
+      - Crashes on "/user (n)"-type commands, where (n) is a notice number.
+
 0.8.2:
  - Fixed broken setup_py2exe.py.
  - Fixed broken OAuth code.
