@@ -32,7 +32,7 @@ except:
 
 setup(
     name="identicurse",
-    version='0.9-dev',
+    version='0.9',
     description="A simple Identi.ca client with a curses-based UI.",
     long_description=("A simple Identi.ca client with a curses-based UI."),
     author="Psychedelic Squid and Reality",

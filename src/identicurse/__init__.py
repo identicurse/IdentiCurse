@@ -116,7 +116,7 @@ def main():
         slogans = PRESET_SLOGANS
     additional_config['slogans'] = slogans
 
-    print "Welcome to IdentiCurse 0.9-dev (i r back) - %s" % (random.choice(slogans))
+    print "Welcome to IdentiCurse 0.9 (Inverkeilor) - %s" % (random.choice(slogans))
     IdentiCurse(additional_config)
 
 def colour_check():
