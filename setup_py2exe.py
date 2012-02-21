@@ -69,7 +69,7 @@ setup(
                 "ascii": 1,
                 "bundle_files": 1,
                 "packages": 'encodings, identicurse',
-                "includes": 'identicurse.config, identicurse.textbox, identicurse.helpers, identicurse.statusbar, identicurse.statusnet, identicurse.tabbage, identicurse.tabbar',
+                "includes": 'identicurse.config, identicurse.textbox, identicurse.helpers, identicurse.statusbar, statusnet, identicurse.tabbage, identicurse.tabbar',
                 "dll_excludes": 'w9xpopen.exe',  # unneeded, since we don't intend to be runnable on Win9x
             }
     },
