@@ -1,0 +1,1 @@
+Implement an SSL-validating handler for the statusnet library. Maybe take a look at @jezra's implementation in Heybuddy?
