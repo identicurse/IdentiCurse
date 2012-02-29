@@ -74,6 +74,7 @@ PRESET_SLOGANS = [
     "IDENTICURSE DISLIKES SMOKE",
     "we got a gorilla for sale, Magilla gorilla for sale.",
     "but Cuba",
+    "JO'Z HEER",
     ]
 
 def main():
