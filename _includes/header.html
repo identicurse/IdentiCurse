@@ -1,0 +1,33 @@
+<html>
+  <head>
+    <title>IdentiCurse{% if page.title %} - {{ page.title }}{% endif %}</title>
+    <link href='http://fonts.googleapis.com/css?family=Inconsolata' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <link rel="shortcut icon" href="logo_favicon.png" />
+    <script type="text/javascript">
+    /* <![CDATA[ */
+        (function() {
+            var s = document.createElement('script'), t = document.getElementsByTagName('script')[0];
+            s.type = 'text/javascript';
+            s.async = true;
+            s.src = 'http://api.flattr.com/js/0.6/load.js?mode=auto';
+            t.parentNode.insertBefore(s, t);
+        })();
+    /* ]]> */
+    </script>
+  </head>
+  <body>
+    <div id="frame-outer">
+      <div id="frame-inner">
+        <div id="content">
+          <div id="header">
+              <ul id="navmenu">
+                  <li><a href="index.html">Home</a></li>
+                  <li><a href="changelog.html">Changelog</a></li>
+                  <li><a href="download.html">Download</a></li>
+                  <li><a href="donate.html">Donate</a></li>
+                  <li><a href="http://issues.identicurse.net/">Issues</a></li>
+              </ul>
+              <a href="index.html"><div id="logo"><h1>IdentiCurse</h1></div></a>
+          </div>
+          {% if page.title %}<h1>{{ page.title }}</h1>{% endif %}

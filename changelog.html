@@ -1,0 +1,351 @@
+---
+layout: default
+title: Changelog
+---
+
+<a id="nav">
+<p>Jump to version:
+<a href="#0_9">0.9</a>
+<a href="#0_8_2">0.8.2</a>
+<a href="#0_8_1">0.8.1</a>
+<a href="#0_8">0.8</a>
+<a href="#0_7_3">0.7.3</a>
+<a href="#0_7_2">0.7.2</a>
+<a href="#0_7_1">0.7.1</a>
+<a href="#0_7">0.7</a>
+<a href="#0_6_4">0.6.4</a>
+<a href="#0_6_3">0.6.3</a>
+<a href="#0_6_2">0.6.2</a>
+<a href="#0_6_1">0.6.1</a>
+<a href="#0_6">0.6</a>
+<a href="#0_5_1">0.5.1</a>
+<a href="#0_5">0.5</a>
+<a href="#0_4_1">0.4.1</a>
+<a href="#0_4">0.4</a>
+<a href="#0_3_2">0.3.2</a>
+<a href="#0_3_1">0.3.1</a>
+<a href="#0_3">0.3</a>
+<a href="#0_2_2">0.2.2</a>
+<a href="#0_2_1">0.2.1</a>
+<a href="#0_2">0.2</a>
+</p>
+</a>
+<a id="0_9">
+<h2>0.9: <a href="#nav">&uarr;</a></h2>
+<ul>
+<li>"from ostatus" is now replaced by "from $INSTANCE_URL" for remote notices.</li>
+<li>Thanks to <a href="http://identi.ca/moggers87">@moggers87</a>, we now have mostly functional UTF text entry support (i.e., non-ASCII characters work properly) - true support would depend on Python 2.x actually getting a curses module with proper wide-char support.</li>
+<li>Slogans now appear instead of the "doing nothing" message. Can be restored to old behaviour by setting "status_slogans" to false in config.</li>
+<li>Tabs are now numbered - for tabs 1-9, the number is the same one you press to switch straight to it. Can be disabled by setting "enumerate_tabs" to false in config.</li>
+<li>Border is now off by default. However, if you already set "border" in config, it will remain how you set it.</li>
+<li>New slogans, as usual.</li>
+<li>Bugfixes for:
+    <ul>
+        <li>Non-sane application of "new_reply_mode" when splitting notices.</li>
+        <li>All the "NoneType has no length" errors so far unearthed.</li>
+        <li>Crashes on "/user (n)"-type commands, where (n) is a notice number.</li>
+    </ul>
+</li>
+</ul>
+</a>
+<a id="0_8_2">
+<h2>0.8.2: <a href="#nav">&uarr;</a></h2>
+<ul>
+<li>Fixed broken setup_py2exe.py.</li>
+<li>Fixed broken OAuth code.</li>
+</ul>
+</a>
+<a id="0_8_1">
+<h2>0.8.1: <a href="#nav">&uarr;</a></h2>
+<ul>
+<li>Fixed broken setup.py.</li>
+</ul>
+</a>
+<a id="0_8">
+<h2>0.8: <a href="#nav">&uarr;</a></h2>
+<ul>
+<li>New slogans.</li>
+<li>Pausing (p to toggle pause on the current tab, P for all tabs), with a pause line to indicate which notices are before/after a pause.</li>
+<li>Unfavouriting notices (command /unfavourite, or hotkey F).</li>
+<li>Z (shift+z) keybinding to move to last dent in timeline.</li>
+<li>Config is now stored in ~/.identicurse/config.json. Any existing setups will be automatically converted upon start.</li>
+<li>Colourschemes can now be stored as discrete files, and pulled in with the "colorscheme" config key. Sample colourscheme provided under misc/.</li>
+<li>Default keybindings can now be fully overriden.</li>
+<li>d/D default bindings are now reply mode/reply respectively, the opposite way round to in 0.7, since reply mode is generally more useful.</li>
+<li>L (shift+l) keybinding to display notice links, for use in (for example) linking others to a specific dent.</li>
+<li>Support for Status.net 1.0's conversation API, allowing full conversations to be viewed at last. (only on 1.0+ instances)</li>
+<li>Support for displaying "user -> user"-style addressee information on 1.0+ instances.</li>
+<li>Moved to using Leah Culver's python-oauth module (MIT licensed), resolves some weird OAuth edgecase bugs.</li>
+<li>&lt;TAB&gt;/+ and &lt;shift+TAB&gt;/- bindings for cycling through tabs (second pair cycles backwards).</li>
+<li>New regex-based filtering mode. More complex, but more flexible.</li>
+<li>m and M keybindings, and /mute and /unmute commands, for muting/unmuting entire conversations. Any notice in a muted conversation will simply not be displayed. (only on 1.0+ instances)</li>
+<li>Message-splitting behaviour adjusted to make more sense with 1.0 instances.</li>
+<li>"new_reply_mode" config key for not auto-prepending @usernames when starting reply mode.</li>
+<li>Bugfixes for:
+    <ul>
+        <li>IdentiCurse gave a "bad credentials" error on trying to use valid credentials, if the Status.net instance was down.</li>
+        <li>Some "currently-selected dent" commands crashed the whole program on exceptions.</li>
+        <li>/link would not match ftp:// URLs.</li>
+        <li>/link commands would crash IdentiCurse if no link was present in the target dent.</li>
+        <li>Repeating wouldn't work on 1.0+ instances.</li>
+    </ul>
+</li>
+</ul>
+</a>
+<a id="0_7_3">
+<h2>0.7.3: <a href="#nav">&uarr;</a></h2>
+<ul>
+<li>Tab completion is now more reliable across different systems.</li>
+<li>When deleting characters from multiline input boxes, the remaining lines are correctly moved over the line boundary.</li>
+<li>"/link [notice number]" no longer causes a crash</li>
+<li>Odd edge case fixed, where username/tag/group identification within a dent misidentified an entire dent as a single username/tag/group.</li>
+<li>An import bug that prevented running successfully on python 2.5 is now fixed.</li>
+</ul>
+</a>
+<a id="0_7_2">
+<h2>0.7.2: <a href="#nav">&uarr;</a></h2>
+<ul>
+<li>The favourites tab no longer crashes on load.</li>
+</ul>
+</a>
+<a id="0_7_1">
+<h2>0.7.1: <a href="#nav">&uarr;</a></h2>
+<ul>
+<li>No longer gets the wrong path on initial setup on Windows, which would crash it.</li>
+</ul>
+</a>
+<a id="0_7">
+<h2>0.7: <a href="#nav">&uarr;</a></h2>
+</a>
+<ul>
+<li>New slogans.</li>
+<li>The screen will now flash when an update fetches new mentions/direct messages.</li>
+<li>Smoother scrolling when using a/s to switch notices; when moving to a notice that is partially/fully off the screen, IdentiCurse will now only scroll enough to make it visible, rather than scroll by an entire page. Controlled by the 'smooth_cscroll' config option, default true.</li>
+<li>/quote command added, for adding/changing text when repeating a notice.</li>
+<li>If HTTPS is not used when initially creating an account, IdentiCurse now double-checks that this is definitely what the user wants.</li>
+<li>There is now a tab bar, which displays all tabs in order. This replaces the former "Tab x: Name" that was on the right of the status bar.</li>
+<li>UI elements can now be placed in an arbitrary order, with the default layout remaining the same as the fixed layout of previous versions (except for the addition of the tab bar). See README for syntax details.</li>
+<li>OAuth is now supported, and can be enabled either on initial setup, or by setting the config option 'use_oauth' to true.</li>
+<li>Links for the web view of each notice can be displayed after them. Config option 'show_notice_links', default false.</li>
+<li>Size of the input box can now be changed, by setting the 'length_override' config option to the minimum number of characters that should be able to fit in the input box.</li>
+<li>Tab completion of usernames, groups, and tags. Determines whether to use groups/tags by looking for # or ! at the start of the word. Defaults to usernames if either @ or no sign present. Only aware of users/groups/tags already seen, unless config option 'prefill_user_cache' is set to true (this will result in all users you follow being available for tab completion, at the cost of slower startup).</li>
+<li>Tab completion of commands, identified by an initial /.</li>
+<li>URLs will be shortened using ur1.ca on pressing tab immediately after them (as if you were trying to tab-complete them).</li>
+<li>In-development (-dev) versions now have distinct codenames from their corresponding final releases, though they share the same initial letter.</li>
+<li>/quit command, has the same effect as the q keybinding.</li>
+<li>'initial_tabs' now supports the favourites tab type, and also has a terser syntax for some tab types. See README for more detail.</li>
+<li>"Updating" status message now also states which tab is currently being updated.</li>
+<li>Reply mode: normal replying, but with the ability to edit the entire notice, rather than automatically getting the target user's name added.</li>
+<li>Compact mode is now extremely compact, but disabled by default. The new non-compact is the same as 0.6's compact.</li>
+<li>'show_source' option, to show/hide the source messages ("from $client") for notices. Default is true.</li>
+<li>Refreshing now only fetches notices not already received, resulting in speed improvements for refreshing.</li>
+<li>The cursor is now hidden when not in the input box.</li>
+<li>There is now support for building on Windows.</li>
+<li>The terminal's title is now set to "IdentiCurse".</li>
+<li>Messages from the --colour-support command-line option are now more correct.</li>
+<li>New keybindings (case sensitive: E is different to e, for example):
+    <ul>
+        <li>: goes into insert mode with an initial / already present. Useful for quick commands.</li>
+        <li>E goes into quote mode with the currently selected notice.</li>
+        <li>D goes into reply mode with the currently selected notice.</li>
+        <li>, moves the current tab one place left in the tab bar.</li>
+        <li>. moves the current tab one place right in the tab bar.</li>
+        <li># deletes the currently selected notice.</li>
+    </ul>
+</li>
+<li>Bugfixes for:
+    <ul>
+        <li>HOME/END do not work in input box.</li>
+        <li>HTML entities are not expanded when encountered during remote notice expansion.</li>
+        <li>All known remaining reflowing bugs.</li>
+        <li>IdentiCurse crashes on very fast resizing of window.</li>
+        <li>IdentiCurse crashes when certain Unicode characters are present in a notice and are not supported by the user's system.</li>
+        <li>Notice time/date is displayed incorrectly when the instance has non-zero offset in its timestrings.</li>
+        <li>IdentiCurse crashes on attempting to view the profile of a non-existent user.</li>
+        <li>Spaces are discarded when at the start/end of lines in multi-line input box.</li>
+    </ul>
+</li>
+</ul>
+<a id="0_6_4">
+<h2>0.6.4: <a href="#nav">&uarr;</a></h2>
+</a>
+<ul>
+<li>API implementation changed to fit with changes to the Status.net API.</li>
+</ul>
+<a id="0_6_3">
+<h2>0.6.3: <a href="#nav">&uarr;</a></h2>
+</a>
+<ul>
+<li>Buffer errors on Cygwin fixed.</li>
+</ul>
+<a id="0_6_2">
+<h2>0.6.2: <a href="#nav">&uarr;</a></h2>
+</a>
+<ul>
+<li>Fixed broken codepath encountered only by upgrading users.</li>
+</ul>
+<a id="0_6_1">
+<h2>0.6.1: <a href="#nav">&uarr;</a></h2>
+</a>
+<ul>
+<li>Colours enabled by default.</li>
+</ul>
+<a id="0_6">
+<h2>0.6: <a href="#nav">&uarr;</a></h2>
+</a>
+<ul>
+<li>New slogans.</li>
+<li>Borders can now be switched off, with the 'border' config option.</li>
+<li>Notices can now be displayed in compact mode (new default), or non-compact mode (as in old versions), as dictated by the 'compact_notices' config option..</li>
+<li>Catch typos like "/r1 foo", and automatically treat as "/r 1 foo" (favours exactly what was typed if it's interpretable as valid).</li>
+<li>Added the ability to colour various parts of the application either manually or with a default colour scheme. You can turn it off.</li>
+<li>Automatic configuration is now done on first run if you don't have a config - no need to manually set up config any more.</li>
+<li>Reflowing now tries to split on word boundaries where possible - less words split over lines.</li>
+<li>Notice times given are now approximate.</li>
+<li>Config is now looked for at ~/.identicurse, then /etc/identicurse.conf. The latter is recommended only if you absolutely need more than one user to share a single config file.</li>
+<li>New /alias command for creating aliases from within IdentiCurse.</li>
+<li>Usernames in notices are highlighted in the same colour as usernames in the notice details.</li>
+<li>User, tag, and group rainbows, where each user/group/tag is assigned a random colour that persists wherever that user/group/tag is mentioned in the timeline. Config options are "user_rainbow", "group_rainbow", "tag_rainbow", possible values true or false.</li>
+<li>Experimental expansion for remote notices that were truncated due to local instance having shorter length_limit Config option is "expand_remote", possible values true or false.</li>
+<li>Search results are now highlighted (provided colour is enabled).</li>
+<li>Bugfixes for:
+    <ul>
+        <li>Time is several hours out for notices whose post time (according to the server) is ahead of local time.</li>
+        <li>Profile crashes if URL, Bio or Location is not set for a user.</li>
+    </ul>
+</li>
+</ul>
+<a id="0_5_1">
+<h2>0.5.1: <a href="#nav">&uarr;</a></h2>
+</a>
+<ul>
+<li>Initial setup documentation clarified.</li>
+<li>Failure to revert to correct status after in-page search fixed.</li>
+<li>README reflowed to thinner width.</li>
+</ul>
+<a id="0_5">
+<h2>0.5: <a href="#nav">&uarr;</a></h2>
+</a>
+<ul>
+<li>New slogans.</li>
+<li>Directs can now be sent by notice number as well as by name.</li>
+<li>In-page search, activated with / key. n/N can be used to quickly move between matches.</li>
+<li>Dents that begin with / but aren't commands will now be sent as normal dents.</li>
+<li>/reply in DM tabs is treated as /direct, to prevent messages intended to be private from accidentally being sent publicly.</li>
+<li>Tab-switching is now keys < and >.</li>
+<li>Quick Reply: Can now type 'l' then a number between 1-9 to quickly reply to that dent.</li>
+<li>Current Reply, Current Favourite, Current Repeat, and Current Context: Can now type 'd' to reply to the currently selected dent, 'f' to favourite it, 'e' to repeat it, or 'c' to view its context. Use 'a' and 's' to switch current dent, or 'z' to switch back to the first dent in the current page.</li>
+<li>Can now press = to go back to the top of the newest page (in paged tabs).</li>
+<li>Page number indicator in tab names.</li>
+<li>Character counter for insert mode.</li>
+<li>Slogans will now be read from ~/.identicurse_slogans (see README for format details) if it exists.</li>
+<li>Repeats are now displayed and handled the same as their source dent (except that the user section of the dent gains a "repeat by" section on repeats).</li>
+<li>Bugfixes for:
+    <ul>
+        <li>Split statuses cause crashes if set to preserve the first word (i.e., replies, bug reports, and feature requests).</li>
+        <li>Timestamp is " ago" if the dent was created within a second of current time. (Fixed timestamp in this situation is "Now".)</li>
+    </ul>
+</li>
+</ul>
+<a id="0_4_1">
+<h2>0.4.1: <a href="#nav">&uarr;</a></h2>
+</a>
+<ul>
+<li>Incorrect license in setup.py fixed.</li>
+</ul>
+<a id="0_4">
+<h2>0.4: <a href="#nav">&uarr;</a></h2>
+</a>
+<ul>
+<li>Tabs know if they are active, so the display can be updated for the active tab as soon as its data is finished updating.</li>
+<li>Links in a notice can now be opened in a browser with the /link command.</li>
+<li>Daily average for number of notices.</li>
+<li>New slogans.</li>
+<li>SPACE/b for moving down/up a whole screen's worth.</li>
+<li>HOME/g for scrolling to the top of the page, END/G for scrolling to the bottom of the page.</li>
+<li>Moving to older/newer pages automatically scrolls to the top/bottom, respectively.</li>
+<li>Keybindings can be customised in config.</li>
+<li>HTTP errors when communicating with the SN instance now display in the status-bar instead of messing up the screen.</li>
+<li>New split indicator <code>..</code>, shorter than the original <code>(...)</code>.</li>
+<li>/groupmember command for checking group membership.</li>
+<li>Bugfixes for:
+    <ul>
+        <li>Viewing profiles where bio/location contains non-ascii characters causes an exception.</li>
+    </ul>
+</li>
+</ul>
+<a id="0_3_2">
+<h2>0.3.2: <a href="#nav">&uarr;</a></h2>
+</a>
+<ul>
+<li>Incorrect version number in setup.py fixed.</li>
+</ul>
+<a id="0_3_1">
+<h2>0.3.1: <a href="#nav">&uarr;</a></h2>
+</a>
+<ul>
+<li>Incorrect first-run instructions fixed.</li>
+</ul>
+<a id="0_3">
+<h2>0.3: <a href="#nav">&uarr;</a></h2>
+</a>
+<ul>
+<li>Filters</li>
+<li>Adjust number of notices fetched per page (all timelines excluding Public, Search, Favourites)</li>
+<li>Scrolling with j/k.</li>
+<li>Leaving insert mode with ESC.</li>
+<li>DEL now functions correctly in insert mode.</li>
+<li>Tab switching with n/p.</li>
+<li>New slogans.</li>
+<li>Clean reflowing of buffers to prevent overflowing the screen and causing crashes.</li>
+<li>Aliases can alias to commands with parameters included, instead of just bare commands.</li>
+<li>Commands can now contain an arbitrary number of spaces between parameters.</li>
+<li>Long dent handling now defaults to splitting.</li>
+<li>Context view now follows repeats back to the original notice, as if they were a reply (repeats that can be followed this way are denoted by [~]).</li>
+<li>Expanded profile pages.</li>
+<li>As of this version, IdentiCurse is distributed as an installable package, using setuptools.</li>
+<li>Notices posted are now automatically shown on the timeline without refreshing every time (faster)</li>
+<li>More detail in StatusNet error messages.</li>
+<li>Bugfixes for:
+    <ul>
+        <li>Exceptions occurred when ending, even on clean quit.</li>
+    </ul>
+</li>
+</ul>
+<a id="0_2_2">
+<h2>0.2.2: <a href="#nav">&uarr;</a></h2>
+</a>
+<ul>
+<li>Textbox crashing fixed.</li>
+</ul>
+<a id="0_2_1">
+<h2>0.2.1: <a href="#nav">&uarr;</a></h2>
+</a>
+<ul>
+<li>Enter now works to submit in multiline text-boxes.</li>
+<li>Python 2.5 compatibility.</li>
+</ul>
+<a id="0_2">
+<h2>0.2: <a href="#nav">&uarr;</a></h2>
+</a>
+<ul>
+<li>Long dent handling, default behaviour is to truncate.</li>
+<li>IdentiCurse now looks for config in ~/.identicurse before trying ./config.json.</li>
+<li>IdentiCurse inherits terminal colours (previously defaulted to an ugly grey on some terms).</li>
+<li>Multiline input, requires CTRL+G to submit.</li>
+<li>Stacked tab order, so you return to the last tab you were on when closing another.</li>
+<li>Timelines auto-update, except while in insert mode.</li>
+<li>Dents have timestamps.</li>
+<li>Paged timelines.</li>
+<li>Automatic resizing of windows now results in IdentiCurse also resizing.</li>
+<li>Initial tabset is now configurable.</li>
+<li>/config command.</li>
+<li>/home, /mentions, /direct, and /public commands.</li>
+<li>Correctly handles unlimited-length StatusNet instances.</li>
+<li>Bugfixes for:
+    <ul>
+        <li>User timelines could not be viewed with /user [notice number] syntax.</li>
+        <li>Profile pages get duplicate information on refresh.</li>
+    </ul>
+</li>
+</ul>
