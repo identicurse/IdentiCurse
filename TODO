@@ -2,3 +2,4 @@ Implement an SSL-validating handler for the statusnet library. Maybe take a look
 Tree-based context!
 Reply-to-all, because I guess @johnnynull would like it?
 Twitter support, _maybe_. Depends how friendly twitter is with the oauth library, and how much extra work it'd be.
+Option for infinite scroll.
