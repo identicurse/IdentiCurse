@@ -9,7 +9,7 @@ body {
 div#logo {
     width: 192px;
     height: 30px;
-    background: url(/logo.png);
+    background: url(logo.png);
 }
 
 div#logo * {
