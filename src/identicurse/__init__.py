@@ -75,6 +75,7 @@ PRESET_SLOGANS = [
     "we got a gorilla for sale, Magilla gorilla for sale.",
     "but Cuba",
     "JO'Z HEER",
+    "evan is a likable product",
     ]
 
 def main():
