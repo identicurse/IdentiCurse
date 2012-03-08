@@ -28,24 +28,26 @@ class Buffer(list):
     def append(self, item):
         clean_item = []
         for block in item:
+            if len(block) < 3:
+                block = tuple(list(block) + [0])
             clean_blocks = []
             try:
                 if "\n" in block[0]:
-                    clean_blocks.append((block[0].split("\n")[0].replace("\r", ""), block[1]))
+                    clean_blocks.append((block[0].split("\n")[0].replace("\r", ""), block[1], block[2]))
                     for sub_block in block[0].split("\n")[1:]:
-                        clean_blocks.append((" "+sub_block.replace("\r", ""), block[1]))
+                        clean_blocks.append((" "+sub_block.replace("\r", ""), block[1], block[2]))
                 else:
                     clean_blocks.append(block)
                 for block in clean_blocks: 
                     if "\t" in block[0]:
-                        block = ("    ".join(block[0].split("\t")), block[1])
+                        block = ("    ".join(block[0].split("\t")), block[1], block[2])
                     clean_text = ""
                     for char in block[0]:
                         try:
                             clean_text += char.encode(sys.getfilesystemencoding())
                         except UnicodeEncodeError:
                             clean_text += "?"
-                    clean_block = (clean_text, block[1])
+                    clean_block = (clean_text, block[1], block[2])
                     clean_item.append(clean_block)
             except TypeError:
                 raise Exception(item)
@@ -69,11 +71,13 @@ class Buffer(list):
                     block_len = len(block[0].encode(sys.getfilesystemencoding()))
                 except:
                     block_len = len(block)
+                if line_length < block[2]:  # block would be to the left of its min x offset
+                    line_length = block[2]
                 if (block_len + line_length) > width:
                     split_point = helpers.find_split_point(block[0], width - line_length)
-                    reflowed_buffer[-1].append((block[0][:split_point], block[1]))  # add the first half of the block as usual
+                    reflowed_buffer[-1].append((block[0][:split_point], block[1], block[2]))  # add the first half of the block as usual
                     reflowed_buffer.append([])
-                    line.append((block[0][split_point:], block[1]))  # put the rest of the block back on the stack
+                    line.append((block[0][split_point:], block[1], block[2]))  # put the rest of the block back on the stack
                     line_length = 0
                 else:
                     reflowed_buffer[-1].append(block)
@@ -209,7 +213,11 @@ class Tab(object):
         for line in buffer[self.start_line:maxy - 3 + self.start_line]:
             remaining_line_length = maxx - 2
             try:
-                for (part, attr) in line:
+                for (part, attr, min_x_offset) in line:
+                    if ((maxx - 2) - remaining_line_length) < min_x_offset:
+                        remain_indent = min_x_offset - ((maxx - 2) - remaining_line_length)
+                        self.window.addstr(" "*remain_indent, curses.color_pair(attr))
+                        remaining_line_length -= remain_indent
                     if attr == identicurse.colour_fields["pause_line"]:  # we want pause lines to fill the width
                         self.window.addstr("-"*(remaining_line_length-1), curses.color_pair(identicurse.colour_fields['pause_line']))
                     if line_num == self.search_highlight_line:
