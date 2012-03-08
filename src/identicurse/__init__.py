@@ -76,6 +76,7 @@ PRESET_SLOGANS = [
     "but Cuba",
     "JO'Z HEER",
     "evan is a likable product",
+    "☃",
     ]
 
 def main():
