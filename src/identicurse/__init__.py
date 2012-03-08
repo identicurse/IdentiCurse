@@ -77,6 +77,7 @@ PRESET_SLOGANS = [
     "JO'Z HEER",
     "evan is a likable product",
     "☃",
+    "will go for the discotech and move my parts for the fun times",
     ]
 
 def main():
