@@ -1,7 +1,6 @@
 Implement an SSL-validating handler for the statusnet library. Maybe take a look at @jezra's implementation in Heybuddy?
-Tree-based context!
+Tree-based context! -- in-progress (@psquid)
 Reply-to-all, because I guess @johnnynull would like it?
 Twitter support, _maybe_. Depends how friendly twitter is with the oauth library, and how much extra work it'd be.
 Option for infinite scroll.
-Fix compact_notices wrapping to indent continuation to the same level as the notice["text"] portion of the first line.
 Maybe add a "super compact?" question to the automagic config, so as to make (compact_notices + show_source false) easier to discover?
