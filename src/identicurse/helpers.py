@@ -138,7 +138,7 @@ def find_split_point(text, width):
         elif split_point < 0:
             split_point = 0
             break
-        if text[split_point-1] == " ":
+        if text[split_point-1] in (string.whitespace+'-'):
             break
         else:
             split_point -= 1
