@@ -221,10 +221,10 @@ class Tab(object):
                     if attr == identicurse.colour_fields["pause_line"]:  # we want pause lines to fill the width
                         self.window.addstr("-"*(remaining_line_length-1), curses.color_pair(identicurse.colour_fields['pause_line']))
                     if line_num == self.search_highlight_line:
-                        remaining_line_length -= len(part)
                         self.window.addstr(part, curses.color_pair(identicurse.colour_fields['search_highlight']))
                     else:
                         self.window.addstr(part, curses.color_pair(attr))
+                    remaining_line_length -= len(part)
                 if line_num == self.search_highlight_line:
                     self.window.addstr(" "*remaining_line_length, curses.color_pair(identicurse.colour_fields['search_highlight']))
                 if line_num <= (maxy - 3 + self.start_line):
