@@ -594,6 +594,7 @@ class Timeline(Tab):
                 line.append((" | ", identicurse.colour_fields["none"]))
 
             try:
+                min_x_offset = reduce((lambda acc_length, block: (acc_length if (len(block) < 3) else max(acc_length, block[2])) + len(block[0])), line, 0)  # determine how far along the line items beginning now would be; this will be used so that wrapped lines get correct indentation
                 notice_entities = helpers.split_entities(n['text'] or "")
                 for entity in notice_entities:
                     if len(entity['text']) > 0:
@@ -603,14 +604,14 @@ class Timeline(Tab):
                             if not entity_text_no_symbol in cache:
                                 cache[entity_text_no_symbol] = random.choice(identicurse.base_colours.items())[1]
                             if config.config['%s_rainbow' % (entity['type'])]:
-                                line.append((entity['text'], cache[entity_text_no_symbol]))
+                                line.append((entity['text'], cache[entity_text_no_symbol], min_x_offset))
                             else:
                                 if entity['type'] == "user":
-                                    line.append((entity['text'], identicurse.colour_fields["username"]))
+                                    line.append((entity['text'], identicurse.colour_fields["username"], min_x_offset))
                                 else:
-                                    line.append((entity['text'], identicurse.colour_fields[entity['type']]))
+                                    line.append((entity['text'], identicurse.colour_fields[entity['type']], min_x_offset))
                         else:
-                            line.append((entity['text'], identicurse.colour_fields["notice"]))
+                            line.append((entity['text'], identicurse.colour_fields["notice"], min_x_offset))
 
                 self.buffer.append(line)
 
