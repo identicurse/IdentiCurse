@@ -171,10 +171,10 @@ class Textbox(textpad.Textbox):
                     if overhang_ch <= 127:
                         self.win.insch(cursor_y+1, 0, overhang_ch)
                     elif overhang_ch <= 256:
-                        for c in self.unicode_demangle(overhang_ch):
+                        for c in self.utf_demangle(overhang_ch):
                             self.win.insch(cursor_y+1, 0, ord(c))
 
-                for c in self.unicode_demangle(ch):
+                for c in self.utf_demangle(ch):
                     self.win.insch(cursor_y, cursor_x, ord(c))
 
                 if cursor_x < self.maxx:
@@ -189,7 +189,7 @@ class Textbox(textpad.Textbox):
                     if overhang_ch <= 127:
                         self.win.insch(cursor_y+1, 0, overhang_ch)
                     elif overhang_ch <= 256:
-                        for c in self.unicode_demangle(overhang_ch):
+                        for c in self.utf_demangle(overhang_ch):
                             self.win.insch(cursor_y+1, 0, ord(c))
 
                 self.win.insch(cursor_y, cursor_x, ch)
@@ -217,25 +217,25 @@ class Textbox(textpad.Textbox):
             self.win.refresh()
             return None
 
-    def unicode_demangle(self, unicode_ch):
+    def utf_demangle(self, utf_ch):
         #liberated from http://groups.google.com/group/comp.lang.python/browse_thread/thread/67dce30f0a2742a6?fwc=2&pli=1
         def check_next_byte():
-            unicode_ch = self.win.getch()
-            if 128 <= unicode_ch <= 191:
-                return unicode_ch
+            utf_ch = self.win.getch()
+            if 128 <= utf_ch <= 191:
+                return utf_ch
             else:
                 raise UnicodeError
 
         bytes = []
-        bytes.append(unicode_ch)
-        if 194 <= unicode_ch <= 223:
+        bytes.append(utf_ch)
+        if 194 <= utf_ch <= 223:
             #2 bytes
             bytes.append(check_next_byte())
-        elif 224 <= unicode_ch <= 239:
+        elif 224 <= utf_ch <= 239:
             #3 bytes
             bytes.append(check_next_byte())
             bytes.append(check_next_byte())
-        elif 240 <= unicode_ch <= 244:
+        elif 240 <= utf_ch <= 244:
             #4 bytes
             bytes.append(check_next_byte())
             bytes.append(check_next_byte())
