@@ -126,7 +126,14 @@ class StatusNet(object):
         self.token = oauth.OAuthToken(str(self.oauth_token), str(self.oauth_token_secret))
 
     def __makerequest(self, resource_path, raw_params={}, force_get=False):
-        params = urllib.urlencode(raw_params)
+        params = {}
+        for key, value in raw_params.items():
+            try:
+                params[key] = value.encode('utf-8')
+            except AttributeError:
+                params[key] = value
+
+        params = urllib.urlencode(params)
         
         if not resource_path in ["oauth/request_token", "oauth/access_token"]:
             resource_path = "%s.json" % (resource_path)

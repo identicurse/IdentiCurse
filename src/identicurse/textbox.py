@@ -241,7 +241,10 @@ class Textbox(textpad.Textbox):
             bytes.append(check_next_byte())
             bytes.append(check_next_byte())
 
-        return "".join([chr(b) for b in bytes])
+        buf = "".join([chr(b) for b in bytes])
+        #TODO: fix whatever is making this line screw everything up
+        #buf = buf.decode('utf-8')
+        return buf
 
     def delch(self):  # delch, but with provisions for moving characters across lines
         cursor_y, cursor_x = self.win.getyx()
@@ -266,12 +269,8 @@ class Textbox(textpad.Textbox):
                     result.append("")
                     break
 
-                # deal with non-ascii
                 char = self.win.inch(y, x)
-                if char == curses.ascii.ascii(char):
-                    char = chr(curses.ascii.ascii(char))
-                else:
-                    char = '&#%u;' % char
+                char = unichr(char)
 
                 if char == " ":
                     result.append("")
