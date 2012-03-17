@@ -211,7 +211,7 @@ class OAuthRequest(object):
 
     def to_postdata(self):
         """Serialize as post data for a POST request."""
-        return '&'.join(['%s=%s' % (escape(str(k)), escape(str(v))) \
+        return '&'.join(['%s=%s' % (escape(_utf8_str(k)), escape(_utf8_str(v))) \
             for k, v in self.parameters.iteritems()])
 
     def to_url(self):
