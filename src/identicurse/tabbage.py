@@ -506,7 +506,7 @@ class Timeline(Tab):
 
             for user in [user for user in [from_user, to_user, repeating_user] if user is not None]:
                 if not user in config.session_store.user_cache:
-                    config.session_store.user_cache[user] = random.choice(identicurse.base_colours.items())[1]
+                    config.session_store.user_cache[user] = helpers.colour_from_name([item[1] for item in identicurse.base_colours.items()], user.lower())
            
             if "ic__paused_on" in n and c != 1:
                 self.buffer.append([("-", identicurse.colour_fields["pause_line"])])
@@ -602,7 +602,7 @@ class Timeline(Tab):
                             entity_text_no_symbol = entity['text'][1:]
                             cache = getattr(config.session_store, '%s_cache' % (entity['type']))
                             if not entity_text_no_symbol in cache:
-                                cache[entity_text_no_symbol] = random.choice(identicurse.base_colours.items())[1]
+                                cache[entity_text_no_symbol] = helpers.colour_from_name([item[1] for item in identicurse.base_colours.items()], entity_text_no_symbol.lower())
                             if config.config['%s_rainbow' % (entity['type'])]:
                                 line.append((entity['text'], cache[entity_text_no_symbol], min_x_offset))
                             else:

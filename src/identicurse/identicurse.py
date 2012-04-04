@@ -480,7 +480,7 @@ class IdentiCurse(object):
             for user in users:
                 if not hasattr(config.session_store, "user_cache"):
                     config.session_store.user_cache = {}
-                config.session_store.user_cache[user] = random.choice(range(8))
+                config.session_store.user_cache[user] = helpers.colour_from_name([item[1] for item in base_colours.items()], user.lower())
 
         self.insert_mode = False
         self.search_mode = False

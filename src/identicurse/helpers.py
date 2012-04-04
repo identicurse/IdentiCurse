@@ -254,3 +254,7 @@ def split_entities(raw_notice_text):
     else:
         entities[-1]['text'] = entities[-1]['text'][:-1]
     return entities
+
+def colour_from_name(colourset, name):
+    name_sum = sum([ord(c) for c in name])
+    return colourset[name_sum % len(colourset)]
