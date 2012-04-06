@@ -1444,7 +1444,7 @@ class IdentiCurse(object):
                 for tab in self.tabs:
                     if not hasattr(tab, 'timeline_type'):
                         continue
-                    if tab.timeline_type == "home":
+                    if tab.timeline_type in ["home", "public"]:
                         if isinstance(update, list):
                             for notice in update:
                                 tab.timeline.insert(0, notice)
