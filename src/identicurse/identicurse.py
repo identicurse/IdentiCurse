@@ -154,70 +154,8 @@ class IdentiCurse(object):
                 if not config.config.load():
                     config.config.load(os.path.join("/etc", "identicurse.conf"))
             else:
-                import getpass, time
                 # no config yet, so let's build one
-                config.config.load(os.path.join(self.path, "config.json"))
-                print "No config was found, so we will now run through a few quick questions to set up a basic config for you (which will be saved as %s so you can manually edit it later). If the default (where defaults are available, they're stated in []) is already fine for any question, just press Enter without typing anything, and the default will be used." % (config.config.filename)
-                print "This version of IdentiCurse supports OAuth login. Using OAuth to log in means that you do not need to enter your username and password."
-                use_oauth = raw_input("Use OAuth [Y/n]? ").upper()
-                if use_oauth == "":
-                    use_oauth = "Y"
-                if use_oauth[0] == "Y":
-                    config.config['use_oauth'] = True
-                else:
-                    config.config['use_oauth'] = False
-                if not config.config['use_oauth']:
-                    config.config['username'] = raw_input("Username: ")
-                    config.config['password'] = getpass.getpass("Password: ")
-                api_path = raw_input("API path [%s]: " % (config.config['api_path']))
-                if api_path != "":
-                    if len(api_path) < 7 or api_path[:7] != "http://" and api_path[:8] != "https://":
-                        api_path = "http://" + api_path
-                    if len(api_path) >= 7 and api_path[:5] != "https":
-                        https_api_path = "https" + api_path[4:]
-                        response = raw_input("You have not used an https URL. This means everything you do with IdentiCurse will travel over your connection _unencrypted_. Would you rather use '%s' as your API path [Y/n]? " % (https_api_path)).upper()
-                        if response == "":
-                            response = "Y"
-                        if response[0] == "Y":
-                            api_path = https_api_path
-                    config.config['api_path'] = api_path
-                update_interval = raw_input("Auto-refresh interval (in whole seconds) [%d]: " % (config.config['update_interval']))
-                if update_interval != "":
-                    try:
-                        config.config['update_interval'] = int(update_interval)
-                    except ValueError:
-                        print "Sorry, you entered an invalid interval. The default of %d will be used instead." % (config.config['update_interval'])
-                notice_limit = raw_input("Number of notices to fetch per timeline page [%d]: " % (config.config['notice_limit']))
-                if notice_limit != "":
-                    try:
-                        config.config['notice_limit'] = int(notice_limit)
-                    except ValueError:
-                        print "Sorry, you entered an invalid number of notices. The default of %d will be used instead." % (config.config['notice_limit'])
-                # try:
-                if config.config['use_oauth']:
-                    instance = helpers.domain_regex.findall(config.config['api_path'])[0][2]
-                    if not instance in oauth_consumer_keys:
-                        print "No suitable consumer keys stored locally, fetching latest list..."
-                        req = urllib2.Request("http://identicurse.net/api_keys.json")
-                        resp = urllib2.urlopen(req)
-                        api_keys = json.loads(resp.read())
-                        if not instance in api_keys['keys']:
-                            print "No suitable key found remotely, attempting anonymous OAuth..."
-			    temp_conn = StatusNet(config.config['api_path'], auth_type="oauth", consumer_key="anonymous", consumer_secret="anonymous", save_oauth_credentials=config.store_oauth_keys)
-                            config.config["consumer_key"] = "anonymous"
-                            config.config["consumer_secret"] = "anonymous"
-                        else:
-                            temp_conn = StatusNet(config.config['api_path'], auth_type="oauth", consumer_key=api_keys['keys'][instance], consumer_secret=api_keys['secrets'][instance], save_oauth_credentials=config.store_oauth_keys)
-                            config.config["consumer_key"] = api_keys['keys'][instance]
-                            config.config["consumer_secret"] = api_keys['secrets'][instance]
-                    else:
-                        temp_conn = StatusNet(config.config['api_path'], auth_type="oauth", consumer_key=oauth_consumer_keys[instance], consumer_secret=oauth_consumer_secrets[instance], save_oauth_credentials=config.store_oauth_keys)
-                else:
-                    temp_conn = StatusNet(config.config['api_path'], config.config['username'], config.config['password'])
-                # except Exception, (errmsg):
-                    # sys.exit("Couldn't establish connection: %s" % (errmsg))
-                print "Okay! Everything seems good! Your new config will now be saved, then IdentiCurse will start properly."
-                config.config.save()
+                self.init_config(config)
         except ValueError, e:
             sys.exit("ERROR: Your config file could not be succesfully loaded due to JSON syntax error(s). Please fix it.\nOriginal error: %s" % (str(e)))
 
@@ -487,6 +425,71 @@ class IdentiCurse(object):
         self.quote_mode = False
         self.reply_mode = False
         curses.wrapper(self.initialise)
+
+    def init_config(self, config):
+        import getpass, time
+        config.config.load(os.path.join(self.path, "config.json"))
+        print "No config was found, so we will now run through a few quick questions to set up a basic config for you (which will be saved as %s so you can manually edit it later). If the default (where defaults are available, they're stated in []) is already fine for any question, just press Enter without typing anything, and the default will be used." % (config.config.filename)
+        print "This version of IdentiCurse supports OAuth login. Using OAuth to log in means that you do not need to enter your username and password."
+        use_oauth = raw_input("Use OAuth [Y/n]? ").upper()
+        if use_oauth == "":
+            use_oauth = "Y"
+        if use_oauth[0] == "Y":
+            config.config['use_oauth'] = True
+        else:
+            config.config['use_oauth'] = False
+        if not config.config['use_oauth']:
+            config.config['username'] = raw_input("Username: ")
+            config.config['password'] = getpass.getpass("Password: ")
+        api_path = raw_input("API path [%s]: " % (config.config['api_path']))
+        if api_path != "":
+            if len(api_path) < 7 or api_path[:7] != "http://" and api_path[:8] != "https://":
+                api_path = "http://" + api_path
+            if len(api_path) >= 7 and api_path[:5] != "https":
+                https_api_path = "https" + api_path[4:]
+                response = raw_input("You have not used an https URL. This means everything you do with IdentiCurse will travel over your connection _unencrypted_. Would you rather use '%s' as your API path [Y/n]? " % (https_api_path)).upper()
+                if response == "":
+                    response = "Y"
+                if response[0] == "Y":
+                    api_path = https_api_path
+            config.config['api_path'] = api_path
+        update_interval = raw_input("Auto-refresh interval (in whole seconds) [%d]: " % (config.config['update_interval']))
+        if update_interval != "":
+            try:
+                config.config['update_interval'] = int(update_interval)
+            except ValueError:
+                print "Sorry, you entered an invalid interval. The default of %d will be used instead." % (config.config['update_interval'])
+        notice_limit = raw_input("Number of notices to fetch per timeline page [%d]: " % (config.config['notice_limit']))
+        if notice_limit != "":
+            try:
+                config.config['notice_limit'] = int(notice_limit)
+            except ValueError:
+                print "Sorry, you entered an invalid number of notices. The default of %d will be used instead." % (config.config['notice_limit'])
+        # try:
+        if config.config['use_oauth']:
+            instance = helpers.domain_regex.findall(config.config['api_path'])[0][2]
+            if not instance in oauth_consumer_keys:
+                print "No suitable consumer keys stored locally, fetching latest list..."
+                req = urllib2.Request("http://identicurse.net/api_keys.json")
+                resp = urllib2.urlopen(req)
+                api_keys = json.loads(resp.read())
+                if not instance in api_keys['keys']:
+                    print "No suitable key found remotely, attempting anonymous OAuth..."
+                    temp_conn = StatusNet(config.config['api_path'], auth_type="oauth", consumer_key="anonymous", consumer_secret="anonymous", save_oauth_credentials=config.store_oauth_keys)
+                    config.config["consumer_key"] = "anonymous"
+                    config.config["consumer_secret"] = "anonymous"
+                else:
+                    temp_conn = StatusNet(config.config['api_path'], auth_type="oauth", consumer_key=api_keys['keys'][instance], consumer_secret=api_keys['secrets'][instance], save_oauth_credentials=config.store_oauth_keys)
+                    config.config["consumer_key"] = api_keys['keys'][instance]
+                    config.config["consumer_secret"] = api_keys['secrets'][instance]
+            else:
+                temp_conn = StatusNet(config.config['api_path'], auth_type="oauth", consumer_key=oauth_consumer_keys[instance], consumer_secret=oauth_consumer_secrets[instance], save_oauth_credentials=config.store_oauth_keys)
+        else:
+            temp_conn = StatusNet(config.config['api_path'], config.config['username'], config.config['password'])
+        # except Exception, (errmsg):
+            # sys.exit("Couldn't establish connection: %s" % (errmsg))
+        print "Okay! Everything seems good! Your new config will now be saved, then IdentiCurse will start properly."
+        config.config.save()
 
     def redraw(self):
         self.screen.clear()
