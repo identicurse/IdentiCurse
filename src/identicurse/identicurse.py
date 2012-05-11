@@ -311,7 +311,7 @@ class IdentiCurse(object):
 
         keybind_actions = ("firstpage", "newerpage", "olderpage", "refresh",
             "input", "commandinput", "search", "quit", "closetab", "help", "nexttab", "prevtab",
-            "qreply", "creply", "cfav", "cunfav", "ccontext", "crepeat", "cnext", "cprev", "cfirst",
+            "qreply", "creply", "cfav", "cunfav", "ccontext", "cuser", "crepeat", "cnext", "cprev", "cfirst",
             "clast", "nextmatch", "prevmatch", "creplymode", "cquote", "tabswapleft", "tabswapright",
             "cdelete", "pausetoggle", "pausetoggleall", "scrollup", "scrolltop", "pageup", "pagedown",
             "scrolldown", "scrollbottom", "togglenoticelinks", "nexttabcycle", "prevtabcycle",
@@ -356,6 +356,7 @@ class IdentiCurse(object):
             "crepeat": ["e"],
             "cquote": ["E"],
             "ccontext": ["c"],
+            "cuser": ["v"],
             "pausetoggle": ["p"],
             "togglenoticelinks": ["L"],
             "mute": ["m"],
@@ -1036,6 +1037,15 @@ class IdentiCurse(object):
                         self.cmd_context(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
                     except Exception, (errmsg):
                         self.status_bar.timed_update("ERROR: Couldn't get context: %s" % (errmsg))
+                elif input in self.keybindings['cuser']:
+                    try:
+                        if "retweeted_status" in self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]:
+                            user = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]["retweeted_status"]["user"]["screen_name"]
+                        else:
+                            user = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]["user"]["screen_name"]
+                        self.cmd_user(user)
+                    except Exception, (errmsg):
+                        self.status_bar.timed_update("ERROR: Couldn't load user timeline: %s" % (errmsg))
                 elif input in self.keybindings['pausetoggle']:
                     self.tabs[self.current_tab].paused = not self.tabs[self.current_tab].paused
                     if self.tabs[self.current_tab].paused and (len(self.tabs[self.current_tab].timeline) > 0):

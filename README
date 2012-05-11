@@ -77,6 +77,7 @@ the following:
     e               Repeat currently selected dent.
     E               Quote currently selected dent.
     c               View context for currently selected dent.
+    v               View timeline of the user who posted the currently selected dent.
     #               Attempt to delete the currently selected dent.
     s               Move dent selection down (indicated by * character).
     a               Move dent selection up (indicated by * character).
