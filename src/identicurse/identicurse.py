@@ -45,7 +45,7 @@ colour_fields = {
     "source": 7,
     "notice_count": 8,
     "notice": 9,
-    "profile_title": 10,
+#    "profile_title": 10,
     "profile_fields": 11,
     "profile_values": 12,
     "group": 13,
@@ -168,7 +168,6 @@ class IdentiCurse(object):
             "/repeat",
             "/direct",
             "/delete",
-            "/profile",
             "/spamreport",
             "/block",
             "/unblock",
@@ -700,12 +699,7 @@ class IdentiCurse(object):
                             break
                 if not already_have_one:
                     self.tabs.append(Timeline(self.conn, self.notice_window, tab[0]))
-            elif tab[0] == "profile":
-                screen_name = tab[1]
-                if screen_name[0] == "@":
-                    screen_name = screen_name[1:]
-                self.tabs.append(Profile(self.conn, self.notice_window, screen_name))
-            elif tab[0] == "user":
+            elif tab[0] in ["user", "profile"]:
                 screen_name = tab[1]
                 if screen_name[0] == "@":
                     screen_name = screen_name[1:]
@@ -1194,21 +1188,6 @@ class IdentiCurse(object):
                     elif tokens[0] == "/delete" and len(tokens) == 2:
                         self.cmd_delete(self.tabs[self.current_tab].timeline[int(tokens[1]) - 1])
     
-                    elif tokens[0] == "/profile" and len(tokens) == 2:
-                        # Yeuch
-                        try:
-                            float(tokens[1])
-                        except ValueError:
-                            user = tokens[1]
-                            if user[0] == "@":
-                                    user = user[1:]
-                        else:
-                            if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
-                                user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["retweeted_status"]["user"]["screen_name"]
-                            else:
-                                user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
-                        self.cmd_profile(user)
-    
                     elif tokens[0] == "/spamreport" and len(tokens) >= 3:
                         # Yeuch
                         try:
@@ -1584,11 +1563,6 @@ class IdentiCurse(object):
                     if tl_notice["id"] == n_id:
                         tab.timeline.remove(tl_notice)
                 tab.update_buffer()
-
-    @shows_status("Loading profile")
-    @opens_tab()
-    def cmd_profile(self, username):
-        return Profile(self.conn, self.notice_window, username)
 
     @shows_status("Deploying orbital nukes")
     @posts_notice

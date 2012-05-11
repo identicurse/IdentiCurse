@@ -315,6 +315,26 @@ class Timeline(Tab):
             raw_timeline = self.conn.direct_messages(count=get_count, page=self.page, since_id=last_id)
         elif self.timeline_type == "user":
             raw_timeline = self.conn.statuses_user_timeline(user_id=self.type_params['user_id'], screen_name=self.type_params['screen_name'], count=get_count, page=self.page, since_id=last_id)
+            try:
+                self.profile = self.conn.users_show(screen_name=self.type_params['screen_name'])
+                # numerical fields, convert them to strings to make the buffer code more clean
+                for field in ['id', 'created_at', 'followers_count', 'friends_count', 'favourites_count', 'statuses_count']:
+                    self.profile[field] = str(self.profile[field])
+
+                # special handling for following
+                if self.profile['following']:
+                    self.profile['following'] = "Yes"
+                else:
+                    self.profile['following'] = "No"
+
+                # create this field specially
+                datetime_joined = helpers.normalise_datetime(self.profile['created_at'])
+                days_since_join = helpers.single_unit(helpers.time_since(datetime_joined), "days")['days']
+                self.profile['notices_per_day'] = "%0.2f" % (float(self.profile['statuses_count']) / days_since_join)
+
+            except StatusNetError, e:
+                if e.errcode == 404:
+                    self.profile = None
         elif self.timeline_type == "group":
             raw_timeline = self.conn.statusnet_groups_timeline(group_id=self.type_params['group_id'], nickname=self.type_params['nickname'], count=get_count, page=self.page, since_id=last_id)
         elif self.timeline_type == "tag":
@@ -410,6 +430,38 @@ class Timeline(Tab):
 
     def update_buffer(self):
         self.buffer.clear()
+
+        if self.timeline_type == "user":
+            if self.profile is not None:
+                for field in [
+                    # display name,           internal field name,  skip a line after this field?
+                    ("Real Name",             "name",               True),
+                    ("Bio",                   "description",        False),
+                    ("Location",              "location",           False),
+                    ("URL",                   "url",                False),
+                    ("User ID",               "id",                 False),
+                    ("Joined at",             "created_at",         True),
+                    ("Followed by",           "followers_count",    False),
+                    ("Following",             "friends_count",      False),
+                    ("Followed by you",       "following",          True),
+                    ("Favourites",            "favourites_count",   False),
+                    ("Notices",               "statuses_count",     False),
+                    ("Average daily notices", "notices_per_day",    True)
+                ]:
+                    if self.profile[field[1]] is not None:
+                        line = []
+
+                        line.append((field[0] + ":", identicurse.colour_fields['profile_fields']))
+                        line.append((" ", identicurse.colour_fields['none']))
+
+                        line.append((self.profile[field[1]], identicurse.colour_fields['profile_values']))
+
+                        self.buffer.append(line)
+
+                    if field[2]:
+                        self.buffer.append([("", identicurse.colour_fields['none'])])
+            else:
+                self.buffer.append([("There is no user called @%s on this instance." % (self.id), identicurse.colour_fields['none'])])
 
         maxx = self.window.getmaxyx()[1]
         c = 1
@@ -632,76 +684,3 @@ class Timeline(Tab):
                 self.buffer.append([])
 
             c += 1
-
-           
-class Profile(Tab):
-    def __init__(self, conn, window, id):
-        self.conn = conn
-        self.id = id
-
-        self.name = "Profile (%s)" % self.id
-
-        self.fields = [
-                # display name,           internal field name,  skip a line after this field?
-                ("Real Name",             "name",               True),
-                ("Bio",                   "description",        False),
-                ("Location",              "location",           False),
-                ("URL",                   "url",                False),
-                ("User ID",               "id",                 False),
-                ("Joined at",             "created_at",         True),
-                ("Followed by",           "followers_count",    False),
-                ("Following",             "friends_count",      False),
-                ("Followed by you",       "following",          True),
-                ("Favourites",            "favourites_count",   False),
-                ("Notices",               "statuses_count",     False),
-                ("Average daily notices", "notices_per_day",    True)
-                ]
-
-        Tab.__init__(self, window)
-
-    def update(self):
-        try:
-            self.profile = self.conn.users_show(screen_name=self.id)
-            # numerical fields, convert them to strings to make the buffer code more clean
-            for field in ['id', 'created_at', 'followers_count', 'friends_count', 'favourites_count', 'statuses_count']:
-                self.profile[field] = str(self.profile[field])
-
-            # special handling for following
-            if self.profile['following']:
-                self.profile['following'] = "Yes"
-            else:
-                self.profile['following'] = "No"
-
-            # create this field specially
-            datetime_joined = helpers.normalise_datetime(self.profile['created_at'])
-            days_since_join = helpers.single_unit(helpers.time_since(datetime_joined), "days")['days']
-            self.profile['notices_per_day'] = "%0.2f" % (float(self.profile['statuses_count']) / days_since_join)
-
-        except StatusNetError, e:
-            if e.errcode == 404:
-                self.profile = None
-
-        self.update_buffer()
-
-    def update_buffer(self):
-        self.buffer.clear()
-
-        if self.profile is not None:
-            self.buffer.append([("@" + self.profile['screen_name'] + "'s Profile", identicurse.colour_fields['profile_title'])])
-            self.buffer.append([("", identicurse.colour_fields['none'])])
-
-            for field in self.fields:
-                if self.profile[field[1]] is not None:
-                    line = []
-
-                    line.append((field[0] + ":", identicurse.colour_fields['profile_fields']))
-                    line.append((" ", identicurse.colour_fields['none']))
-
-                    line.append((self.profile[field[1]], identicurse.colour_fields['profile_values']))
-
-                    self.buffer.append(line)
-
-                if field[2]:
-                    self.buffer.append([("", identicurse.colour_fields['none'])])
-        else:
-            self.buffer.append([("There is no user called @%s on this instance." % (self.id), identicurse.colour_fields['none'])])
