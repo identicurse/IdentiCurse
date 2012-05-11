@@ -337,6 +337,15 @@ class Timeline(Tab):
                     self.profile = None
         elif self.timeline_type == "group":
             raw_timeline = self.conn.statusnet_groups_timeline(group_id=self.type_params['group_id'], nickname=self.type_params['nickname'], count=get_count, page=self.page, since_id=last_id)
+            try:
+                self.profile = self.conn.statusnet_groups_show(nickname=self.type_params['nickname'])
+                # numerical fields, convert them to strings to make the buffer code more clean
+                for field in ['id', 'created', 'member_count']:
+                    self.profile[field] = str(self.profile[field])
+
+            except StatusNetError, e:
+                if e.errcode == 404:
+                    self.profile = None
         elif self.timeline_type == "tag":
             raw_timeline = self.conn.statusnet_tags_timeline(tag=self.type_params['tag'], count=get_count, page=self.page, since_id=last_id)
         elif self.timeline_type == "sentdirect":
@@ -448,7 +457,7 @@ class Timeline(Tab):
                     ("Notices",               "statuses_count",     False),
                     ("Average daily notices", "notices_per_day",    True)
                 ]:
-                    if self.profile[field[1]] is not None:
+                    if (self.profile[field[1]] is not None) and (self.profile[field[1]] != ""):
                         line = []
 
                         line.append((field[0] + ":", identicurse.colour_fields['profile_fields']))
@@ -461,7 +470,34 @@ class Timeline(Tab):
                     if field[2]:
                         self.buffer.append([("", identicurse.colour_fields['none'])])
             else:
-                self.buffer.append([("There is no user called @%s on this instance." % (self.id), identicurse.colour_fields['none'])])
+                self.buffer.append([("There is no user called @%s on this instance." % (self.type_params['screen_name']), identicurse.colour_fields['none'])])
+
+        if self.timeline_type == "group":
+            if self.profile is not None:
+                for field in [
+                    # display name,           internal field name,  skip a line after this field?
+                    ("Name",                  "fullname",           True),
+                    ("Description",           "description",        False),
+                    ("Location",              "location",           False),
+                    ("Homepage",              "homepage",           False),
+                    ("Group ID",              "id",                 False),
+                    ("Created at",            "created",            False),
+                    ("Members",               "member_count",       True),
+                ]:
+                    if (self.profile[field[1]] is not None) and (self.profile[field[1]] != ""):
+                        line = []
+
+                        line.append((field[0] + ":", identicurse.colour_fields['profile_fields']))
+                        line.append((" ", identicurse.colour_fields['none']))
+
+                        line.append((self.profile[field[1]], identicurse.colour_fields['profile_values']))
+
+                        self.buffer.append(line)
+
+                    if field[2]:
+                        self.buffer.append([("", identicurse.colour_fields['none'])])
+            else:
+                self.buffer.append([("There is no group called !%s on this instance." % (self.type_params['nickname']), identicurse.colour_fields['none'])])
 
         maxx = self.window.getmaxyx()[1]
         c = 1
