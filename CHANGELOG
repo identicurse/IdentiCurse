@@ -1,3 +1,12 @@
+0.10:
+ - New Windows version! 0.9 was skipped due to @psquid being stupid and/or lazy.
+ - OAuth will now fall back to the "anonymous app" consumer profile rather than failing to connect if no keypair has been generated for the instance. (Thanks to @chimo@sn.chromic.org for the suggestion.)
+ - New slogans? Yep.
+ - Multiline notices now indent to the same point on every line in compact mode.
+ - user_rainbow, group_rainbow, and tag_rainbow colours are now based on a simple function of the username/group name/tag involved, which should make them consistent between sessions. (Thanks to @minti@rainbowdash.net for the suggestion.)
+ - User/group timelines now include user/group profile, old user-profile tab has been removed.
+ - New hotkey cuser (default binding: v) for opening the timeline/profile of the user who posted the selected notice.
+
 0.9:
  - "from ostatus" is now replaced by "from $INSTANCE_URL" for remote notices.
  - Thanks to @moggers87, we now have mostly functional UTF text entry support (i.e., non-ASCII characters work properly) - true support would depend on Python 2.x actually getting a curses module with proper wide-char support.

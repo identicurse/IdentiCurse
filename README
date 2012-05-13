@@ -167,14 +167,6 @@ Available commands are as follows:
    This will delete the notice with the notice number specified. It
    will only work for your notices, not those created by other users.
 
-/profile [notice number]                        (aliases: /p)
-   This will open a new tab showing the profile of the user who
-   created the notice with the notice number specified.
-
-/profile [(@)username]                          (aliases: /p)
-   This will open a new tab showing the profile of the user specified.
-   As with /reply and /direct, the @ is optional.
-
 /user [notice number]                           (aliases: /u)
    This will open a new tab showing the timeline of the user who
    created the notice with the notice number specified.
@@ -309,8 +301,8 @@ Available commands are as follows:
    This will create the alias given as an alias for the command
    given. For example:
 
-        /alias /pme /profile @psquid
-        This would make "/pme" an alias for "/profile @psquid"
+        /alias /me /user @psquid
+        This would make "/pme" an alias for "/user @psquid"
 
    The / before both the alias and the resultant command is optional,
    as it will be added if it is not present. Therefore,
@@ -443,9 +435,8 @@ The possible field names are:
     "source"            Notice sources (e.g. 'from foo').
     "notice_count"      Notice numbers.
     "notice"            Notice text.
-    "profile_title"     The title in profile tabs.
-    "profile_fields"    Fields in profile tabs.
-    "profile_values"    Values in profile tabs.
+    "profile_fields"    Fields in user/group profiles.
+    "profile_values"    Values in user/group profiles.
     "search_highlight"  Anything on the line of the currently
                             highlighted search result.
     "notice_link"       The links added when show_notice_links is enabled.
@@ -527,8 +518,6 @@ separated by vertical bars (|). The valid tab names are as follows:
           !GROUP           Same as group:GROUP.
           help             A help tab, the same as is opened when h
                            is pressed during use.
-          profile:NAME     A user profile tab for the user with
-                           username @NAME.
           search:QUERY     A search tab with results from searching
                            for QUERY.
           ?QUERY           Same as search:QUERY.
@@ -614,6 +603,7 @@ The full range of keys you can set custom bindings for is as follows:
     cunfav         Unfavourite selected notice.
     crepeat        Repeat selected notice.
     ccontext       View context for selected notice.
+    cuser          View profile of user who posted selected notice.
     creplymode     Go into Reply Mode, with selected notice as target.
     cquote         Go into Quote Mode, with selected notice as target.
     cdelete        Delete selected notice.
@@ -673,21 +663,13 @@ the "use_oauth" config setting, which can be either true or false.
 Additionally, the "oauth_token" and "oauth_token_secret" settings hold your
 OAuth connection details if/when you have successfully used OAuth to connect.
 
-To use OAuth with any instance, IdentiCurse must be registered with that
+To use OAuth with any instance, IdentiCurse should be registered with that
 instance as an app, which will give it a consumer key/secret that identify
 it to that instance as being IdentiCurse. As of version 0.7, the consumer
 key/secret for identi.ca are built in, so anyone using that will not need to
-read any more of this section.
-
-For other instances, IdentiCurse will first check the "consumer_key" and
-"consumer_secret" config settings, and if that also fails, it will fetch
-the list at http://identicurse.net/api_keys.json, which is intended to hold
-all public instance keys that have been registered for IdentiCurse. Also,
-with each new release, any new keys in http://identicurse.net/api_keys.json
-will also be added to its local store, so it doesn't have to access
-identicurse.net for them. If it has to do this, the resulting key/secret will
-be stored in "consumer_key" and "consumer_secret", so IdentiCurse does not
-need to fetch the list on future start-ups.
+read any more of this section. As of version 0.10, IdentiCurse will attempt to
+fall back to the OAuth "anonymous app" profile where supported, allowing it
+to operate when no consumer key/secret is available.
 
 If you are using a public instance not already added to that list, please
 contact @psquid with the name of the instance, and IdentiCurse will be added
