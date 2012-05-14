@@ -45,7 +45,7 @@ colour_fields = {
     "source": 7,
     "notice_count": 8,
     "notice": 9,
-#    "profile_title": 10,
+    "profile_title": 10,
     "profile_fields": 11,
     "profile_values": 12,
     "group": 13,
@@ -690,7 +690,11 @@ class IdentiCurse(object):
             elif tabspec[0] == "?":
                 tabspec = "search:" + tabspec[1:]
             tab = tabspec.split(':')
-            if tab[0] in ("home", "mentions", "direct", "public", "sentdirect", "favourites"):
+            if tab[0] in ("home", "mentions", "direct", "directs", "public", "sentdirect", "sentdirects", "favourites", "favorites", "favourite", "favorite"):
+                if tab[0] in ("directs", "sentdirects"):
+                    tab[0] = tab[0][:-1]
+                elif tab[0] in ("favorites", "favourite", "favorite"):
+                    tab[0] = "favourites"
                 already_have_one = False
                 for tab_obj in self.tabs:  # awkward name, but we already have a tab variable
                     if hasattr(tab_obj, 'timeline_type'):
