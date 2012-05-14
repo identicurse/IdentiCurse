@@ -302,7 +302,7 @@ Available commands are as follows:
    given. For example:
 
         /alias /me /user @psquid
-        This would make "/pme" an alias for "/user @psquid"
+        This would make "/me" an alias for "/user @psquid"
 
    The / before both the alias and the resultant command is optional,
    as it will be added if it is not present. Therefore,
