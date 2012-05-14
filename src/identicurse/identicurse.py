@@ -703,7 +703,7 @@ class IdentiCurse(object):
                             break
                 if not already_have_one:
                     self.tabs.append(Timeline(self.conn, self.notice_window, tab[0]))
-            elif tab[0] in ["user", "profile"]:
+            elif tab[0] in ("user", "profile"):
                 screen_name = tab[1]
                 if screen_name[0] == "@":
                     screen_name = screen_name[1:]
