@@ -1,25 +1,37 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2010-2012 Reality <tinmachin3@gmail.com> and Psychedelic Squid <psquid@psquid.net>
-# 
-# This program is free software: you can redistribute it and/or modify 
-# it under the terms of the GNU General Public License as published by 
-# the Free Software Foundation, either version 3 of the License, or 
-# (at your option) any later version. 
-# 
-# This program is distributed in the hope that it will be useful, 
-# but WITHOUT ANY WARRANTY; without even the implied warranty of 
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
-# GNU General Public License for more details. 
-# 
-# You should have received a copy of the GNU General Public License 
+# Copyright (C) 2010-2012 Reality <tinmachin3@gmail.com> and
+#                         Psychedelic Squid <psquid@psquid.net>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import os, sys, curses, locale, re, subprocess, random, platform, getpass, time
+import os
+import sys
+import curses
+import locale
+import re
+import subprocess
+import random
+import platform
+import getpass
+import time
+
 try:
     import json
 except ImportError:
     import simplejson as json
+
 from threading import Timer
 from textbox import Textbox
 import urllib2
@@ -34,6 +46,10 @@ import helpers
 
 locale.setlocale(locale.LC_ALL, '')
 code = locale.getpreferredencoding()
+
+messagefile = open("messages.json", "r")
+msg = json.load(messagefile, encoding="utf-8")
+messagefile.close()
 
 colour_fields = {
     "none": 0,
@@ -58,7 +74,10 @@ colour_fields = {
     "pause_line": 20,
 }
 
-if platform.system() == "Windows":  # Handle Windows' colour-order fuckery. This is only true if we are running on pure Windows. If we're on Cygwin, which handles colours correctly anyway, this won't match.
+# Handle Windows' colour-order fuckery. This is only if we are running
+# on pure Windows. If we're on Cygwin, which handle colours correctly
+# anyway, this won't match.
+if platform.system() == "Windows":
     colours = {
         "none": -1,
         "black": 0,
@@ -108,27 +127,38 @@ oauth_consumer_secrets = {
     "identi.ca": "8fb75c0a9bbca78fe0e85acc62a9169c",
     }
 
+
 class IdentiCurse(object):
     """Contains Main IdentiCurse application"""
-    
+
     def __init__(self, additional_config={}):
         helpers.set_terminal_title("IdentiCurse")
-        if hasattr(sys, "frozen"):  # if this matches, we're running under py2exe, so we need to do some magic to get the correct path
+        # if this matches, we're running under py2exe, so we need to do some
+        # magic to get the correct path
+        if hasattr(sys, "frozen"):
             executable_path = sys.executable
         else:
             executable_path = __file__
-        self.path = os.path.dirname(os.path.realpath(unicode(executable_path, sys.getfilesystemencoding())))
+        self.path = os.path.dirname(os.path.realpath(
+                                    unicode(executable_path,
+                                            sys.getfilesystemencoding())))
         self.qreply = False
         config.session_store.slogans = additional_config["slogans"]
-        
-        if "config_dirname" in additional_config:
-            config.config.basedir = os.path.expanduser(additional_config['config_dirname'])
-        else:
-            config.config.basedir = os.path.join(os.path.expanduser("~") ,".identicurse")
-        config.config.filename = os.path.join(config.config.basedir, "config.json")
-        config.config.auth_filename = os.path.join(config.config.basedir, "auth.json")
 
-        if os.path.exists(config.config.basedir) and not os.path.isdir(config.config.basedir):  # (if a .identicurse file, as used by <= 0.7.x, exists)
+        if "config_dirname" in additional_config:
+            config.config.basedir = os.path.expanduser(
+                additional_config['config_dirname'])
+        else:
+            config.config.basedir = os.path.join(os.path.expanduser("~"),
+                                                 ".identicurse")
+        config.config.filename = os.path.join(config.config.basedir,
+                                              "config.json")
+        config.config.auth_filename = os.path.join(config.config.basedir,
+                                                   "auth.json")
+
+        # (if a .identicurse file, as used by <= 0.7.x, exists)
+        if os.path.exists(config.config.basedir) and not\
+                os.path.isdir(config.config.basedir):
             config_temp = open(config.config.basedir, "r").read()
             os.remove(config.config.basedir)
             os.mkdir(config.config.basedir)
@@ -137,8 +167,10 @@ class IdentiCurse(object):
         if not os.path.exists(config.config.basedir):
             os.mkdir(config.config.basedir)
 
-        if os.path.exists(config.config.filename) and not os.path.exists(config.config.auth_filename):
-            unclean_config = json.loads(open(config.config.filename, "r").read())
+        if os.path.exists(config.config.filename) and not\
+                os.path.exists(config.config.auth_filename):
+            unclean_config = json.loads(
+                open(config.config.filename, "r").read())
             clean_config = {}
             auth_config = {}
             for key, value in unclean_config.items():
@@ -146,20 +178,27 @@ class IdentiCurse(object):
                     auth_config[key] = value
                 else:
                     clean_config[key] = value
-            open(config.config.filename, "w").write(json.dumps(clean_config, indent=4))
-            open(config.config.auth_filename, "w").write(json.dumps(auth_config, indent=4))
+            open(config.config.filename, "w").write(
+                json.dumps(clean_config, indent=4))
+            open(config.config.auth_filename, "w").write(
+                json.dumps(auth_config, indent=4))
 
         try:
-            if os.path.exists(config.config.filename) or os.path.exists(os.path.join("/etc", "identicurse.conf")):
+            if os.path.exists(config.config.filename) or os.path.exists(
+                os.path.join("/etc", "identicurse.conf")):
                 if not config.config.load():
-                    config.config.load(os.path.join("/etc", "identicurse.conf"))
+                    config.config.load(os.path.join("/etc",
+                                                    "identicurse.conf"))
             else:
                 # no config yet, so let's build one
                 self.init_config(config)
         except ValueError, e:
-            sys.exit("ERROR: Your config file could not be succesfully loaded due to JSON syntax error(s). Please fix it.\nOriginal error: %s" % (str(e)))
+            # FIXME: This message should be inside a json file and later
+            # be load by this script.
+            sys.exit(msg['ConfigFileError'] % str(e))
 
-        self.last_page_search = {'query':"", 'occurs':[], 'viewing':0, 'tab':-1}
+        self.last_page_search = {'query': '', 'occurs': [],
+                                 'viewing': 0, 'tab': -1}
 
         # prepare the known commands list
         self.known_commands = [
@@ -199,9 +238,12 @@ class IdentiCurse(object):
         ]
 
         # load all known commands and aliases into the command list
-        config.session_store.commands = [command[1:] for command in self.known_commands] + [alias[1:] for alias in config.config["aliases"]]
-        
-        # Set some defaults for configs that we will always need to use, but that are optional
+        config.session_store.commands =\
+            [command[1:] for command in self.known_commands] + [alias[1:]\
+                         for alias in config.config["aliases"]]
+
+        # Set some defaults for configs that we will
+        # always need to use, but that are optional
         if not "enable_colours" in config.config:
             config.config["enable_colours"] = True
 
@@ -235,7 +277,8 @@ class IdentiCurse(object):
             else:
                 for part in colour_fields:
                     if not part in config.config["colours"]:
-                        config.config["colours"][part] = default_colour_scheme[part]
+                        config.config["colours"][part] =\
+                            default_colour_scheme[part]
 
         if not "search_case_sensitive" in config.config:
             config.config['search_case_sensitive'] = "sensitive"
@@ -245,7 +288,8 @@ class IdentiCurse(object):
             config.config['long_dent'] = "split"
         if not "filters" in config.config:
             config.config['filters'] = []
-        if (not "filter_mode" in config.config) or (not config.config["filter_mode"] in ["plain", "regex"]):
+        if (not "filter_mode" in config.config) or\
+                (not config.config["filter_mode"] in ["plain", "regex"]):
             config.config['filter_mode'] = "plain"
         if not "notice_limit" in config.config:
             config.config['notice_limit'] = 25
@@ -279,7 +323,8 @@ class IdentiCurse(object):
             config.config["prefill_user_cache"] = False
         if not "show_source" in config.config:
             config.config["show_source"] = True
-        if (not "tab_complete_mode" in config.config) or (not config.config["tab_complete_mode"] in ["exact", "fuzzy"]):
+        if (not "tab_complete_mode" in config.config) or\
+                (not config.config["tab_complete_mode"] in ["exact", "fuzzy"]):
             config.config["tab_complete_mode"] = "exact"
         if not "hide_activities" in config.config:
             config.config["hide_activities"] = False
@@ -294,12 +339,19 @@ class IdentiCurse(object):
             config.config['keys'] = {}
 
         if not "ui_order" in config.config:
-            config.config['ui_order'] = ["divider", "entry", "divider", "notices", "statusbar", "tabbar"]  # this will recreate the same layout as the old UI
+            # this will recreate the same layout as the old UI
+            config.config['ui_order'] = ["divider", "entry",
+                                         "divider", "notices",
+                                         "statusbar", "tabbar"]
 
-        for ui_item in ["entry", "notices", "statusbar", "tabbar"]:  # ensure no UI element is ommitted by appending any missing ones to the end
+        for ui_item in ["entry", "notices", "statusbar", "tabbar"]:
+            # ensure no UI element is ommitted
+            # by appending any missing ones to the end
             if not ui_item in config.config['ui_order']:
                 config.config['ui_order'].append(ui_item)
-            while config.config['ui_order'].count(ui_item) > 1:  # if item listed more than once, remove all but the last occurence
+            while config.config['ui_order'].count(ui_item) > 1:
+                # if item listed more than once,
+                # remove all but the last occurence
                 config.config['ui_order'].remove(ui_item)
 
         if config.config["filter_mode"] == "regex":
@@ -309,12 +361,16 @@ class IdentiCurse(object):
                 config.config["filters"].append(re.compile(raw_filter))
 
         keybind_actions = ("firstpage", "newerpage", "olderpage", "refresh",
-            "input", "commandinput", "search", "quit", "closetab", "help", "nexttab", "prevtab",
-            "qreply", "creply", "cfav", "cunfav", "ccontext", "cuser", "crepeat", "cnext", "cprev", "cfirst",
-            "clast", "nextmatch", "prevmatch", "creplymode", "cquote", "tabswapleft", "tabswapright",
-            "cdelete", "pausetoggle", "pausetoggleall", "scrollup", "scrolltop", "pageup", "pagedown",
-            "scrolldown", "scrollbottom", "togglenoticelinks", "nexttabcycle", "prevtabcycle",
-            "mute", "unmute")
+                           "input", "commandinput", "search", "quit",
+                           "closetab", "help", "nexttab", "prevtab",
+                           "qreply", "creply", "cfav", "cunfav", "ccontext",
+                           "cuser", "crepeat", "cnext", "cprev", "cfirst",
+                           "clast", "nextmatch", "prevmatch", "creplymode",
+                           "cquote", "tabswapleft", "tabswapright", "cdelete",
+                           "pausetoggle", "pausetoggleall", "scrollup",
+                           "scrolltop", "pageup", "pagedown", "scrolldown",
+                           "scrollbottom", "togglenoticelinks", "nexttabcycle",
+                           "prevtabcycle", "mute", "unmute")
 
         default_keys = {
             "nexttab": [">"],
@@ -382,12 +438,13 @@ class IdentiCurse(object):
                     if not key in assigned_keys:
                         self.keybindings[action].append(key)
                     elif len(self.keybindings) == 0:
-                        print "WARNING: Tried to assign action '%(action)s' to key '%(key)s', but a user-set keybinding already uses '%(key)s'. This will leave '%(action)s' with no keybindings, so make sure to add a custom binding for '%(action)s' if you still want to use it." % {'action': action, 'key': orig_key}
+                        print msg['TriedToAssignKeyActionWarning'] %\
+                            {'action': action, 'key': orig_key}
 
         self.start_connection(config)
 
         if config.config["prefill_user_cache"]:
-            print "Prefilling the user cache based on your followed users. This will take a little while, especially on slower connections. Please be patient."
+            print msg['PrefillingUserCacheInfo']
             users = []
             for user_profile in self.conn.statuses_friends():
                 screen_name = user_profile["screen_name"]
@@ -396,7 +453,9 @@ class IdentiCurse(object):
             for user in users:
                 if not hasattr(config.session_store, "user_cache"):
                     config.session_store.user_cache = {}
-                config.session_store.user_cache[user] = helpers.colour_from_name([item[1] for item in base_colours.items()], user.lower())
+                config.session_store.user_cache[user] =\
+                    helpers.colour_from_name(
+                    [item[1] for item in base_colours.items()], user.lower())
 
         self.insert_mode = False
         self.search_mode = False
@@ -406,8 +465,8 @@ class IdentiCurse(object):
 
     def init_config(self, config):
         config.config.load(os.path.join(self.path, "config.json"))
-        print "No config was found, so we will now run through a few quick questions to set up a basic config for you (which will be saved as %s so you can manually edit it later). If the default (where defaults are available, they're stated in []) is already fine for any question, just press Enter without typing anything, and the default will be used." % (config.config.filename)
-        print "This version of IdentiCurse supports OAuth login. Using OAuth to log in means that you do not need to enter your username and password."
+        print msg['NoConfigFoundInfo'] % (config.config.filename)
+        print msg['IdenticurseSupportOAuthInfo']
         use_oauth = raw_input("Use OAuth [Y/n]? ").upper()
         if use_oauth == "":
             use_oauth = "Y"
@@ -420,76 +479,147 @@ class IdentiCurse(object):
             config.config['password'] = getpass.getpass("Password: ")
         api_path = raw_input("API path [%s]: " % (config.config['api_path']))
         if api_path != "":
-            if len(api_path) < 7 or api_path[:7] != "http://" and api_path[:8] != "https://":
+            if len(api_path) < 7 or api_path[:7] != "http://" and\
+                    api_path[:8] != "https://":
                 api_path = "http://" + api_path
             if len(api_path) >= 7 and api_path[:5] != "https":
                 https_api_path = "https" + api_path[4:]
-                response = raw_input("You have not used an https URL. This means everything you do with IdentiCurse will travel over your connection _unencrypted_. Would you rather use '%s' as your API path [Y/n]? " % (https_api_path)).upper()
+                response = raw_input(msg['NotUsingHTTPSInfo'] % (
+                        https_api_path)).upper()
                 if response == "":
                     response = "Y"
                 if response[0] == "Y":
                     api_path = https_api_path
             config.config['api_path'] = api_path
-        update_interval = raw_input("Auto-refresh interval (in whole seconds) [%d]: " % (config.config['update_interval']))
+        update_interval = raw_input(msg['UpdateIntervalInput'] % (
+                config.config['update_interval']))
         if update_interval != "":
             try:
                 config.config['update_interval'] = int(update_interval)
             except ValueError:
-                print "Sorry, you entered an invalid interval. The default of %d will be used instead." % (config.config['update_interval'])
-        notice_limit = raw_input("Number of notices to fetch per timeline page [%d]: " % (config.config['notice_limit']))
+                print msg['InvalidUpdateIntervalError'] % (
+                    config.config['update_interval'])
+        notice_limit = raw_input(msg['NumberNoticesInput'] % (
+                config.config['notice_limit']))
         if notice_limit != "":
             try:
                 config.config['notice_limit'] = int(notice_limit)
             except ValueError:
-                print "Sorry, you entered an invalid number of notices. The default of %d will be used instead." % (config.config['notice_limit'])
+                print msg['InvalidNumberNoticesError'] % (
+                    config.config['notice_limit'])
         # try:
         if config.config['use_oauth']:
-            instance = helpers.domain_regex.findall(config.config['api_path'])[0][2]
+            instance = helpers.domain_regex.findall(
+                config.config['api_path'])[0][2]
             if not instance in oauth_consumer_keys:
-                print "No suitable consumer keys stored locally, fetching latest list..."
+                print msg['NoLocallyConsumerKeysInfo']
                 req = urllib2.Request("http://identicurse.net/api_keys.json")
                 resp = urllib2.urlopen(req)
                 api_keys = json.loads(resp.read())
                 if not instance in api_keys['keys']:
-                    print "No suitable key found remotely, attempting anonymous OAuth..."
-                    temp_conn = StatusNet(config.config['api_path'], auth_type="oauth", consumer_key="anonymous", consumer_secret="anonymous", save_oauth_credentials=config.store_oauth_keys)
+                    print msg["NoRemoteConsumerKeysInfor"]
+                    temp_conn = StatusNet(config.config['api_path'],
+                                          auth_type="oauth",
+                                          consumer_key="anonymous",
+                                          consumer_secret="anonymous",
+                                          save_oauth_credentials=\
+                                              config.store_oauth_keys)
                     config.config["consumer_key"] = "anonymous"
                     config.config["consumer_secret"] = "anonymous"
                 else:
-                    temp_conn = StatusNet(config.config['api_path'], auth_type="oauth", consumer_key=api_keys['keys'][instance], consumer_secret=api_keys['secrets'][instance], save_oauth_credentials=config.store_oauth_keys)
+                    temp_conn = StatusNet(config.config['api_path'],
+                                          auth_type="oauth",
+                                          consumer_key=\
+                                              api_keys['keys'][instance],
+                                          consumer_secret=\
+                                              api_keys['secrets'][instance],
+                                          save_oauth_credentials=\
+                                              config.store_oauth_keys)
                     config.config["consumer_key"] = api_keys['keys'][instance]
-                    config.config["consumer_secret"] = api_keys['secrets'][instance]
+                    config.config["consumer_secret"] =\
+                        api_keys['secrets'][instance]
             else:
-                temp_conn = StatusNet(config.config['api_path'], auth_type="oauth", consumer_key=oauth_consumer_keys[instance], consumer_secret=oauth_consumer_secrets[instance], save_oauth_credentials=config.store_oauth_keys)
+                temp_conn = StatusNet(config.config['api_path'],\
+                                      auth_type="oauth",
+                                      consumer_key=\
+                                          oauth_consumer_keys[instance],
+                                      consumer_secret=\
+                                          oauth_consumer_secrets[instance],
+                                      save_oauth_credentials=\
+                                          config.store_oauth_keys)
         else:
-            temp_conn = StatusNet(config.config['api_path'], config.config['username'], config.config['password'])
+            temp_conn = StatusNet(config.config['api_path'],
+                                  config.config['username'],
+                                  config.config['password'])
         # except Exception, (errmsg):
-            # sys.exit("Couldn't establish connection: %s" % (errmsg))
-        print "Okay! Everything seems good! Your new config will now be saved, then IdentiCurse will start properly."
+        #     sys.exit("Couldn't establish connection: %s" % (errmsg))
+        print msg["ConfigIsOKInfo"]
         config.config.save()
 
     def start_connection(self, config):
         try:
             if config.config["use_oauth"]:
-                instance = helpers.domain_regex.findall(config.config['api_path'])[0][2]
+                instance = helpers.domain_regex.findall(
+                    config.config['api_path'])[0][2]
                 if "consumer_key" in config.config:
-                    self.conn = StatusNet(config.config['api_path'], auth_type="oauth", consumer_key=config.config["consumer_key"], consumer_secret=config.config["consumer_secret"], oauth_token=config.config["oauth_token"], oauth_token_secret=config.config["oauth_token_secret"], save_oauth_credentials=config.store_oauth_keys)
+                    self.conn = StatusNet(config.config['api_path'],
+                                          auth_type="oauth",
+                                          consumer_key=\
+                                              config.config["consumer_key"],
+                                          consumer_secret=\
+                                              config.config["consumer_secret"],
+                                          oauth_token=\
+                                              config.config["oauth_token"],
+                                          oauth_token_secret=\
+                                              config.config[\
+                                                  "oauth_token_secret"],
+                                          save_oauth_credentials=\
+                                              config.store_oauth_keys)
                 elif not instance in oauth_consumer_keys:
-                    print "No suitable consumer keys stored locally, fetching latest list..."
-                    req = urllib2.Request("http://identicurse.net/api_keys.json")
+                    print msg['NoLocallyConsumerKeysInfo']
+                    req = urllib2.Request(
+                        "http://identicurse.net/api_keys.json")
                     resp = urllib2.urlopen(req)
                     api_keys = json.loads(resp.read())
                     if not instance in api_keys['keys']:
-                        sys.exit("Sorry, IdentiCurse currently lacks the API keys needed to support OAuth with your instance (%(instance)s). If %(instance)s is a public instance, let us know which one it is (filing a bug at http://bugzilla.identicurse.net/ is the preferred way of doing so), and we'll add support as soon as possible." % (locals()))
+                        sys.exit(msg['YourInstanceAPIKeysError'] % (locals()))
                     else:
-                        self.conn = StatusNet(config.config['api_path'], auth_type="oauth", consumer_key=api_keys['keys'][instance], consumer_secret=api_keys['secrets'][instance], oauth_token=config.config["oauth_token"], oauth_token_secret=config.config["oauth_token_secret"], save_oauth_credentials=config.store_oauth_keys)
-                        config.config["consumer_key"] = api_keys['keys'][instance]
-                        config.config["consumer_secret"] = api_keys['secrets'][instance]
+                        self.conn = StatusNet(config.config['api_path'],
+                                              auth_type="oauth",
+                                              consumer_key=\
+                                                  api_keys['keys'][instance],
+                                              consumer_secret=\
+                                                 api_keys['secrets'][instance],
+                                              oauth_token=\
+                                                  config.config["oauth_token"],
+                                              oauth_token_secret=\
+                                                  config.config[\
+                                                      "oauth_token_secret"],
+                                              save_oauth_credentials=\
+                                                  config.store_oauth_keys)
+                        config.config["consumer_key"] =\
+                            api_keys['keys'][instance]
+                        config.config["consumer_secret"] =\
+                            api_keys['secrets'][instance]
                         config.config.save()
                 else:
-                    self.conn = StatusNet(config.config['api_path'], auth_type="oauth", consumer_key=oauth_consumer_keys[instance], consumer_secret=oauth_consumer_secrets[instance], oauth_token=config.config["oauth_token"], oauth_token_secret=config.config["oauth_token_secret"], save_oauth_credentials=config.store_oauth_keys)
+                    self.conn = StatusNet(config.config['api_path'],
+                                          auth_type="oauth",
+                                          consumer_key=\
+                                              oauth_consumer_keys[instance],
+                                          consumer_secret=\
+                                              oauth_consumer_secrets[instance],
+                                          oauth_token=\
+                                              config.config["oauth_token"],
+                                          oauth_token_secret=\
+                                              config.config[\
+                                                  "oauth_token_secret"],
+                                          save_oauth_credentials=\
+                                              config.store_oauth_keys)
             else:
-                self.conn = StatusNet(config.config['api_path'], config.config['username'], config.config['password'])
+                self.conn = StatusNet(config.config['api_path'],
+                                      config.config['username'],
+                                      config.config['password'])
         except Exception, (errmsg):
             sys.exit("ERROR: Couldn't establish connection: %s" % (errmsg))
 
@@ -500,14 +630,16 @@ class IdentiCurse(object):
 
         if config.config['border']:
             if self.screen.getmaxyx() == (self.y, self.x):
-                self.main_window = self.screen.subwin(self.y-3, self.x-3, 2, 2)
+                self.main_window = self.screen.subwin(self.y - 3,
+                                                      self.x - 3, 2, 2)
             else:
                 return self.redraw()
 
             self.main_window.box(0, 0)
         else:
             if self.screen.getmaxyx() == (self.y, self.x):
-                self.main_window = self.screen.subwin(self.y-1, self.x-1, 1, 1)
+                self.main_window = self.screen.subwin(self.y - 1,
+                                                      self.x - 1, 1, 1)
             else:
                 return self.redraw()
             
@@ -519,7 +651,8 @@ class IdentiCurse(object):
             current_y += 3
             y -= 3
 
-        if self.conn.length_limit == 0 and config.config["length_override"] != 0:
+        if self.conn.length_limit == 0 and\
+                config.config["length_override"] != 0:
             entry_lines = 3
         else:
             if config.config["length_override"] != 0:
@@ -528,7 +661,8 @@ class IdentiCurse(object):
                 notice_length = self.conn.length_limit
             entry_lines = (notice_length / x) + 1
 
-        if entry_lines > (y / 2):  # if entry box would take more than 1/2 of the screen height
+        # if entry box would take more than 1/2 of the screen height
+        if entry_lines > (y / 2):
             entry_lines = y / 2
 
         for part in config.config['ui_order']:
@@ -537,32 +671,43 @@ class IdentiCurse(object):
             elif part == "entry":
                 if config.config['border']:
                     if self.screen.getmaxyx() == (self.y, self.x):
-                        self.entry_window = self.main_window.subwin(entry_lines, x-6, current_y, 5)
+                        self.entry_window = self.main_window.subwin(
+                            entry_lines, x-6, current_y, 5)
                         current_y += entry_lines
                     else:
                         return self.redraw()
                 else:
                     if self.screen.getmaxyx() == (self.y, self.x):
-                        self.entry_window = self.main_window.subwin(entry_lines, x-2, current_y, 1)
+                        self.entry_window = self.main_window.subwin(
+                            entry_lines, x-2, current_y, 1)
                         current_y += entry_lines
                     else:
                         return self.redraw()
 
-                self.text_entry = Textbox(self.entry_window, self.validate, insert_mode=True)
+                self.text_entry = Textbox(self.entry_window, self.validate,
+                                          insert_mode=True)
 
                 self.text_entry.stripspaces = 1
 
             elif part == "notices":
                 if config.config['border']:
                     if self.screen.getmaxyx() == (self.y, self.x):
-                        self.notice_window = self.main_window.subwin(y-(entry_lines + 1 + config.config['ui_order'].count("divider")), x-4, current_y, 5)
-                        current_y += y - (entry_lines + 1 + config.config['ui_order'].count("divider"))
+                        self.notice_window = self.main_window.subwin(
+                            y - (entry_lines + 1 +\
+                                 config.config['ui_order'].count("divider")),
+                            x-4, current_y, 5)
+                        current_y += y - (entry_lines + 1 +\
+                                    config.config['ui_order'].count("divider"))
                     else:
                         return self.redraw()
                 else:
                     if self.screen.getmaxyx() == (self.y, self.x):
-                        self.notice_window = self.main_window.subwin(y-(entry_lines + 1 + config.config['ui_order'].count("divider")), x, current_y, 1)
-                        current_y += y - (entry_lines + 1 + config.config['ui_order'].count("divider"))
+                        self.notice_window = self.main_window.subwin(
+                            y - (entry_lines + 1 +\
+                                 config.config['ui_order'].count("divider")),
+                            x, current_y, 1)
+                        current_y += y - (entry_lines + 1 +\
+                                    config.config['ui_order'].count("divider"))
                     else:
                         return self.redraw()
 
@@ -574,13 +719,15 @@ class IdentiCurse(object):
             elif part == "statusbar":
                 if config.config['border']:
                     if self.screen.getmaxyx() == (self.y, self.x):
-                        self.status_window = self.main_window.subwin(1, x-5, current_y, 5)
+                        self.status_window = self.main_window.subwin(
+                            1, x - 5, current_y, 5)
                         current_y += 1
                     else:
                         return self.redraw()
                 else:
                     if self.screen.getmaxyx() == (self.y, self.x):
-                        self.status_window = self.main_window.subwin(1, x, current_y, 1)
+                        self.status_window = self.main_window.subwin(
+                            1, x, current_y, 1)
                         current_y += 1
                     else:
                         return self.redraw()
@@ -588,13 +735,15 @@ class IdentiCurse(object):
             elif part == "tabbar":
                 if config.config['border']:
                     if self.screen.getmaxyx() == (self.y, self.x):
-                        self.tab_bar_window = self.main_window.subwin(1, x-5, current_y, 5)
+                        self.tab_bar_window = self.main_window.subwin(
+                            1, x - 5, current_y, 5)
                         current_y += 1
                     else:
                         return self.redraw()
                 else:
                     if self.screen.getmaxyx() == (self.y, self.x):
-                        self.tab_bar_window = self.main_window.subwin(1, x, current_y, 1)
+                        self.tab_bar_window = self.main_window.subwin(
+                            1, x, current_y, 1)
                         current_y += 1
                     else:
                         return self.redraw()
@@ -607,16 +756,22 @@ class IdentiCurse(object):
 
         self.screen.bkgd(" ", curses.color_pair(colour_fields["none"]))
         self.main_window.bkgd(" ", curses.color_pair(colour_fields["none"]))
-        self.notice_window.bkgd(" ", curses.color_pair(colour_fields["timelines"]))
-        self.status_window.bkgd(" ", curses.color_pair(colour_fields["statusbar"]))
-        self.tab_bar_window.bkgd(" ", curses.color_pair(colour_fields["tabbar"]))
+        self.notice_window.bkgd(" ", curses.color_pair(
+                                     colour_fields["timelines"]))
+        self.status_window.bkgd(" ", curses.color_pair(
+                                     colour_fields["statusbar"]))
+        self.tab_bar_window.bkgd(" ", curses.color_pair(
+                                     colour_fields["tabbar"]))
         self.screen.refresh()
 
     def initialise(self, screen):
         self.screen = screen
 
+        # try to hide the cursor.
+        # Textbox makes it visible again,
+        # then hides it on exit
         try:
-            curses.curs_set(0)  # try to hide the cursor. Textbox makes it visible again, then hides it on exit
+            curses.curs_set(0)
         except:
             pass
 
@@ -631,18 +786,24 @@ class IdentiCurse(object):
                 temp_colours = colours.copy()
                 temp_colours.update(config.config['custom_colours'])
                 if not curses.can_change_color():
-                    raise Exception("Cannot set custom colours, since your terminal does not support changing colour values. Using \"export TERM=xterm-256color\" may resolve this, since some terminals only enable that function when 256 colours are available.")
+                    raise Exception(msg["CannotSetCustomColors1Exception"])
                 elif len(temp_colours) >= curses.COLORS:
-                    raise Exception("Cannot set custom colours, since your terminal supports only %d colour slots. Adding all the custom colours defined in your config would need %d slots. For many terminals, using \"export TERM=xterm-256color\" will allow use of 256 slots." % (curses.COLORS, len(temp_colours)))
+                    raise Exception(msg["CannotSetCustomColors2Exception"] % (
+                            curses.COLORS, len(temp_colours)))
                 else:
                     colour_num = len(colours)
-                    for colour_name, colour_value in config.config['custom_colours'].items():
+                    for colour_name, colour_value in\
+                            config.config['custom_colours'].items():
                         if colour_value[0] == "#":
                             colour_value = colour_value[1:]
-                        r = int((ord(colour_value[0:2].decode("hex")) * 1000.0) / 255.0)
-                        g = int((ord(colour_value[2:4].decode("hex")) * 1000.0) / 255.0)
-                        b = int((ord(colour_value[4:6].decode("hex")) * 1000.0) / 255.0)
-                        if colour_name in colours:  # if we're redefining an already existing colour
+                        r = int((ord(colour_value[0:2].decode("hex")) *\
+                                     1000.0) / 255.0)
+                        g = int((ord(colour_value[2:4].decode("hex")) *\
+                                     1000.0) / 255.0)
+                        b = int((ord(colour_value[4:6].decode("hex")) *\
+                                     1000.0) / 255.0)
+                        # if we're redefining an already existing colour
+                        if colour_name in colours:
                             curses.init_color(colours[colour_name], r, g, b)
                         else:
                             curses.init_color(colour_num, r, g, b)
@@ -651,7 +812,8 @@ class IdentiCurse(object):
 
             for field, (fg, bg) in config.config['colours'].items():
                 try:
-                    curses.init_pair(colour_fields[field], colours[fg], colours[bg])
+                    curses.init_pair(colour_fields[field],
+                                     colours[fg], colours[bg])
                 except:
                     continue
             c = 50
@@ -659,7 +821,8 @@ class IdentiCurse(object):
                 if (value + 1) > curses.COLORS:
                     continue
 
-                if not key in ("black", "white", "none") and key != config.config['colours']['notice']:
+                if not key in ("black", "white", "none") and\
+                        key != config.config['colours']['notice']:
                     base_colours[colours[key]] = c
                     curses.init_pair(c, value, colours["none"])
                     c += 1
@@ -690,49 +853,65 @@ class IdentiCurse(object):
             elif tabspec[0] == "?":
                 tabspec = "search:" + tabspec[1:]
             tab = tabspec.split(':')
-            if tab[0] in ("home", "mentions", "direct", "directs", "public", "sentdirect", "sentdirects", "favourites", "favorites", "favourite", "favorite"):
+            if tab[0] in ("home", "mentions", "direct", "directs", "public",
+                          "sentdirect", "sentdirects", "favourites",
+                          "favorites", "favourite", "favorite"):
                 if tab[0] in ("directs", "sentdirects"):
                     tab[0] = tab[0][:-1]
                 elif tab[0] in ("favorites", "favourite", "favorite"):
                     tab[0] = "favourites"
                 already_have_one = False
-                for tab_obj in self.tabs:  # awkward name, but we already have a tab variable
+                # awkward name, but we already have a tab variable
+                for tab_obj in self.tabs:
                     if hasattr(tab_obj, 'timeline_type'):
                         if tab_obj.timeline_type == tab[0]:
                             already_have_one = True
                             break
                 if not already_have_one:
-                    self.tabs.append(Timeline(self.conn, self.notice_window, tab[0]))
+                    self.tabs.append(Timeline(self.conn, self.notice_window,
+                                              tab[0]))
             elif tab[0] in ("user", "profile"):
                 screen_name = tab[1]
                 if screen_name[0] == "@":
                     screen_name = screen_name[1:]
                 user_id = self.conn.users_show(screen_name=screen_name)['id']
-                self.tabs.append(Timeline(self.conn, self.notice_window, "user", {'screen_name':screen_name, 'user_id':user_id}))
+                self.tabs.append(Timeline(self.conn, self.notice_window,
+                                          "user", {'screen_name':screen_name,
+                                                   'user_id':user_id}))
             elif tab[0] == "group":
                 nickname = tab[1]
                 if nickname[0] == "!":
                     nickname = nickname[1:]
-                group_id = int(self.conn.statusnet_groups_show(nickname=nickname)['id'])
-                self.tabs.append(Timeline(self.conn, self.notice_window, "group", {'nickname':nickname, 'group_id':group_id}))
+                group_id = int(self.conn.statusnet_groups_show(
+                               nickname=nickname)['id'])
+                self.tabs.append(Timeline(self.conn, self.notice_window,
+                                          "group", {'nickname':nickname,
+                                                    'group_id':group_id}))
             elif tab[0] == "tag":
                 tag = tab[1]
                 if tag[0] == "#":
                     tag = tag[1:]
-                self.tabs.append(Timeline(self.conn, self.notice_window, "tag", {'tag':tag}))
+                self.tabs.append(Timeline(self.conn, self.notice_window, "tag",
+                                          {'tag': tag}))
             elif tab[0] == "search":
-                self.tabs.append(Timeline(self.conn, self.notice_window, "search", {'query':tab[1]}))
-            #not too sure why anyone would need to auto-open these last two, but it couldn't hurt to add them
+                self.tabs.append(Timeline(self.conn, self.notice_window,
+                                          "search", {'query': tab[1]}))
+            # not too sure why anyone would need to auto-open these last two,
+            # but it couldn't hurt to add them
             elif tab[0] == "context":
                 notice_id = int(tab[1])
-                self.tabs.append(Timeline(self.conn, self.notice_window, "context", {'notice_id':notice_id}))
+                self.tabs.append(Timeline(self.conn, self.notice_window,
+                                          "context", {'notice_id': notice_id}))
             elif tab[0] == "conversation":
                 conv_id = int(tab[1])
-                self.tabs.append(Timeline(self.conn, self.notice_window, "context", {'conversation_id':conv_id}))
+                self.tabs.append(Timeline(self.conn, self.notice_window,
+                                          "context",
+                                          {'conversation_id': conv_id}))
             elif tab[0] == "help":
                 self.tabs.append(Help(self.notice_window, self.path))
 
-        self.update_timer = Timer(config.config['update_interval'], self.update_tabs)
+        self.update_timer = Timer(config.config['update_interval'],
+                                  self.update_tabs)
         self.update_timer.start()
 
         self.current_tab = 0
@@ -758,7 +937,8 @@ class IdentiCurse(object):
             self.tab_bar.update()
             TabUpdater(self.tabs, self, 'end_update_tabs').start()
         else:
-            self.update_timer = Timer(config.config['update_interval'], self.update_tabs)
+            self.update_timer = Timer(config.config['update_interval'],
+                                      self.update_tabs)
 
     def end_update_tabs(self):
         self.display_current_tab()
@@ -768,7 +948,8 @@ class IdentiCurse(object):
         self.tab_bar.tabs = [tab.name for tab in self.tabs]
         self.tab_bar.current_tab = self.current_tab
         self.tab_bar.update()
-        self.update_timer = Timer(config.config['update_interval'], self.update_tabs)
+        self.update_timer = Timer(config.config['update_interval'],
+                                  self.update_tabs)
         self.update_timer.start()
 
     def update_tab_buffers(self):
@@ -806,7 +987,7 @@ class IdentiCurse(object):
                 for x in range(0, len(self.tabs)):
                     if x >= 9:
                         break
-                    if input == ord(str(x+1)):
+                    if input == ord(str(x + 1)):
                         switch_to_tab = x
                 if input in self.keybindings['nexttab']:
                     if self.current_tab < (len(self.tabs) - 1):
@@ -826,15 +1007,22 @@ class IdentiCurse(object):
                         switch_to_tab = len(self.tabs) - 1
                 elif input in self.keybindings['tabswapright']:
                     if self.current_tab < (len(self.tabs) - 1):
-                        self.tabs[self.current_tab], self.tabs[self.current_tab+1] = self.tabs[self.current_tab+1], self.tabs[self.current_tab]
+                        (self.tabs[self.current_tab],
+                         self.tabs[self.current_tab + 1]) =\
+                         (self.tabs[self.current_tab + 1],
+                          self.tabs[self.current_tab])
                         switch_to_tab = self.current_tab + 1
                 elif input in self.keybindings['tabswapleft']:
                     if self.current_tab >= 1:
-                        self.tabs[self.current_tab-1], self.tabs[self.current_tab] = self.tabs[self.current_tab], self.tabs[self.current_tab-1]
+                        (self.tabs[self.current_tab - 1],
+                         self.tabs[self.current_tab]) =\
+                         (self.tabs[self.current_tab],
+                          self.tabs[self.current_tab - 1])
                         switch_to_tab = self.current_tab - 1
 
                 if switch_to_tab is not None:
-                    self.tab_order.insert(0, self.tab_order.pop(self.tab_order.index(switch_to_tab)))
+                    self.tab_order.insert(0, self.tab_order.pop(
+                            self.tab_order.index(switch_to_tab)))
                     self.tabs[self.current_tab].active = False
                     self.current_tab = switch_to_tab
                     self.tabs[self.current_tab].active = True
@@ -843,7 +1031,8 @@ class IdentiCurse(object):
                     if input == ord(str(x)):
                         self.update_timer.cancel()
                         self.insert_mode = True
-                        self.parse_input(self.text_entry.edit("/r " + str(x) + " "))
+                        self.parse_input(self.text_entry.edit("/r " +\
+                                                              str(x) + " "))
                 self.qreply = False
             
             if input in self.keybindings['scrollup']:
@@ -853,7 +1042,10 @@ class IdentiCurse(object):
                 self.tabs[self.current_tab].scrollup(0)
                 self.display_current_tab()
             elif input in self.keybindings['pageup']:
-                self.tabs[self.current_tab].scrollup(self.main_window.getmaxyx()[0] - 11) # the 11 offset gives 2 lines of overlap between the pre-scroll view and post-scroll view
+                # the 11 offset gives 2 lines of overlap
+                # between the pre-scroll view and post-scroll view
+                self.tabs[self.current_tab].scrollup(
+                    self.main_window.getmaxyx()[0] - 11)
                 self.display_current_tab()
             elif input in self.keybindings['scrolldown']:
                 self.tabs[self.current_tab].scrolldown(1)
@@ -862,7 +1054,9 @@ class IdentiCurse(object):
                 self.tabs[self.current_tab].scrolldown(0)
                 self.display_current_tab()
             elif input in self.keybindings['pagedown']:
-                self.tabs[self.current_tab].scrolldown(self.main_window.getmaxyx()[0] - 11) # as above
+                # as above
+                self.tabs[self.current_tab].scrolldown(
+                    self.main_window.getmaxyx()[0] - 11)
                 self.display_current_tab()
             elif input in self.keybindings['firstpage']:
                 if self.tabs[self.current_tab].prevpage(0):
@@ -908,30 +1102,51 @@ class IdentiCurse(object):
             elif input in self.keybindings['qreply']:
                 self.qreply = True
             elif input in self.keybindings['nextmatch']:
-                if (self.last_page_search['query'] != "") and (self.last_page_search['tab'] == self.current_tab):
-                    if self.last_page_search['viewing'] < (len(self.last_page_search['occurs']) - 1):
+                if (self.last_page_search['query'] != "") and\
+                        (self.last_page_search['tab'] == self.current_tab):
+                    if self.last_page_search['viewing'] < (len(
+                            self.last_page_search['occurs']) - 1):
                         self.last_page_search['viewing'] += 1
                     else:
                         self.last_page_search['viewing'] = 0
-                    self.tabs[self.current_tab].scrollto(self.last_page_search['occurs'][self.last_page_search['viewing']])
-                    self.tabs[self.current_tab].search_highlight_line = self.last_page_search['occurs'][self.last_page_search['viewing']]
+                    self.tabs[self.current_tab].scrollto(
+                        self.last_page_search['occurs'][\
+                            self.last_page_search['viewing']])
+                    self.tabs[self.current_tab].search_highlight_line =\
+                        self.last_page_search['occurs'][\
+                        self.last_page_search['viewing']]
                     if self.last_page_search['viewing'] == 0:
-                        self.status_bar.update("Viewing result #%d for '%s' (search hit BOTTOM, continuing at TOP)" % (self.last_page_search['viewing'] + 1, self.last_page_search['query']))
+                        self.status_bar.update(msg["ViewingResult1Info"] % (
+                                self.last_page_search['viewing'] + 1,
+                                self.last_page_search['query']))
                     else:
-                        self.status_bar.update("Viewing result #%d for '%s'" % (self.last_page_search['viewing'] + 1, self.last_page_search['query']))
+                        self.status_bar.update(msg["ViewingResult2Info"] % (
+                                self.last_page_search['viewing'] + 1,
+                                self.last_page_search['query']))
                     self.display_current_tab()
             elif input in self.keybindings['prevmatch']:
-                if (self.last_page_search['query'] != "") and (self.last_page_search['tab'] == self.current_tab):
+                if (self.last_page_search['query'] != "") and\
+                        (self.last_page_search['tab'] == self.current_tab):
                     if self.last_page_search['viewing'] > 0:
                         self.last_page_search['viewing'] -= 1
                     else:
-                        self.last_page_search['viewing'] = len(self.last_page_search['occurs']) - 1
-                    self.tabs[self.current_tab].scrollto(self.last_page_search['occurs'][self.last_page_search['viewing']])
-                    self.tabs[self.current_tab].search_highlight_line = self.last_page_search['occurs'][self.last_page_search['viewing']]
-                    if self.last_page_search['viewing'] == (len(self.last_page_search['occurs']) - 1):
-                        self.status_bar.update("Viewing result #%d for '%s' (search hit TOP, continuing at BOTTOM)" % (self.last_page_search['viewing'] + 1, self.last_page_search['query']))
+                        self.last_page_search['viewing'] = len(
+                            self.last_page_search['occurs']) - 1
+                    self.tabs[self.current_tab].scrollto(
+                        self.last_page_search['occurs'][\
+                            self.last_page_search['viewing']])
+                    self.tabs[self.current_tab].search_highlight_line =\
+                        self.last_page_search['occurs'][\
+                        self.last_page_search['viewing']]
+                    if self.last_page_search['viewing'] == (len(
+                            self.last_page_search['occurs']) - 1):
+                        self.status_bar.update(msg["ViewingResult3Info"] % (
+                                self.last_page_search['viewing'] + 1,
+                                self.last_page_search['query']))
                     else:
-                        self.status_bar.update("Viewing result #%d for '%s'" % (self.last_page_search['viewing'] + 1, self.last_page_search['query']))
+                        self.status_bar.update(msg["ViewingResult2Info"] % (
+                                self.last_page_search['viewing'] + 1,
+                                self.last_page_search['query']))
                     self.display_current_tab()
             elif input == curses.ascii.ctrl(ord("l")):
                 self.redraw()
@@ -940,129 +1155,195 @@ class IdentiCurse(object):
                     if hasattr(tab, "timeline"):
                         tab.paused = not tab.paused
                         if tab.paused and (len(tab.timeline) > 0):
-                            self.tabs[self.current_tab].timeline[0]["ic__paused_on"] = True
+                            self.tabs[self.current_tab].timeline[0][\
+                                "ic__paused_on"] = True
                         tab.update_buffer()
                         tab.update_name()
                 self.tab_bar.tabs = [tab.name for tab in self.tabs]
                 self.tab_bar.current_tab = self.current_tab
                 self.tab_bar.update()
             elif input in self.keybindings['togglenoticelinks']:
-                config.config["show_notice_links"] = not config.config["show_notice_links"]
+                config.config["show_notice_links"] =\
+                    not config.config["show_notice_links"]
                 self.update_tab_buffers()
-            # and now the c* actions, and anything else that shouldn't run on non-timeline tabs
-            if isinstance(self.tabs[self.current_tab], Timeline) and len(self.tabs[self.current_tab].timeline) > 0:  # don't try to do the c* actions unless on a populated timeline
-                if (self.tabs[self.current_tab].chosen_one + 1) > len(self.tabs[self.current_tab].timeline):  # reduce chosen_one if it's beyond the end
-                    self.tabs[self.current_tab].chosen_one = len(self.tabs[self.current_tab].timeline) - 1
+            # and now the c* actions, and anything else
+            # that shouldn't run on non-timeline tabs
+            # --
+            # don't try to do the c* actions unless on a populated timeline
+            if isinstance(self.tabs[self.current_tab], Timeline) and len(
+                self.tabs[self.current_tab].timeline) > 0:
+                # reduce chosen_one if it's beyond the end
+                if (self.tabs[self.current_tab].chosen_one + 1) > len(
+                    self.tabs[self.current_tab].timeline):
+                    self.tabs[self.current_tab].chosen_one = len(
+                        self.tabs[self.current_tab].timeline) - 1
                     self.tabs[self.current_tab].update_buffer()
 
                 if input in self.keybindings['creply']:
                     self.update_timer.cancel()
                     self.insert_mode = True
                     if "direct" in self.tabs[self.current_tab].timeline_type:
-                        self.parse_input(self.text_entry.edit("/dm " + str(self.tabs[self.current_tab].chosen_one + 1) + " "))
+                        self.parse_input(self.text_entry.edit("/dm " + str(
+                                    self.tabs[self.current_tab].chosen_one +\
+                                        1) + " "))
                     else:
-                        self.parse_input(self.text_entry.edit("/r " + str(self.tabs[self.current_tab].chosen_one + 1) + " "))
+                        self.parse_input(self.text_entry.edit("/r " + str(
+                                    self.tabs[self.current_tab].chosen_one +\
+                                        1) + " "))
                 elif input in self.keybindings['creplymode']:
                     self.update_timer.cancel()
                     if "direct" in self.tabs[self.current_tab].timeline_type:
                         self.insert_mode = True
-                        self.parse_input(self.text_entry.edit("/dm " + str(self.tabs[self.current_tab].chosen_one + 1) + " "))
+                        self.parse_input(self.text_entry.edit("/dm " + str(
+                                    self.tabs[self.current_tab].chosen_one +\
+                                        1) + " "))
                     else:
                         try:
-                            self.cmd_reply(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
+                            self.cmd_reply(
+                                self.tabs[self.current_tab].timeline[\
+                                    self.tabs[self.current_tab].chosen_one])
                         except Exception, (errmsg):
-                            self.status_bar.timed_update("ERROR: Couldn't post status: %s" % (errmsg))
+                            self.status_bar.timed_update(
+                                msg["CouldntPostError"] % (errmsg))
                 elif input in self.keybindings['cdelete']:
                     try:
-                        self.cmd_delete(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
+                        self.cmd_delete(
+                            self.tabs[self.current_tab].timeline[\
+                                self.tabs[self.current_tab].chosen_one])
                     except Exception, (errmsg):
-                        self.status_bar.timed_update("ERROR: Couldn't delete notice: %s" % (errmsg))
+                        self.status_bar.timed_update(
+                            msg["CouldntDeleteError"] % (errmsg))
                 elif input in self.keybindings['cnext']:
-                    if self.tabs[self.current_tab].chosen_one != (len(self.tabs[self.current_tab].timeline) - 1):
+                    if self.tabs[self.current_tab].chosen_one != (len(
+                            self.tabs[self.current_tab].timeline) - 1):
                         self.tabs[self.current_tab].chosen_one += 1
                         self.tabs[self.current_tab].update_buffer()
-                        self.tabs[self.current_tab].scrolltodent(self.tabs[self.current_tab].chosen_one, smooth_scroll=config.config["smooth_cscroll"])
+                        self.tabs[self.current_tab].scrolltodent(
+                            self.tabs[self.current_tab].chosen_one,
+                            smooth_scroll=config.config["smooth_cscroll"])
                 elif input in self.keybindings['cprev']:
                     if self.tabs[self.current_tab].chosen_one != 0:
                         self.tabs[self.current_tab].chosen_one -= 1
                         self.tabs[self.current_tab].update_buffer()
-                        self.tabs[self.current_tab].scrolltodent(self.tabs[self.current_tab].chosen_one, smooth_scroll=config.config["smooth_cscroll"])
+                        self.tabs[self.current_tab].scrolltodent(
+                            self.tabs[self.current_tab].chosen_one,
+                            smooth_scroll=config.config["smooth_cscroll"])
                 elif input in self.keybindings['cfirst']:
                     if self.tabs[self.current_tab].chosen_one != 0:
                         self.tabs[self.current_tab].chosen_one = 0
                         self.tabs[self.current_tab].update_buffer()
-                        self.tabs[self.current_tab].scrolltodent(self.tabs[self.current_tab].chosen_one)
+                        self.tabs[self.current_tab].scrolltodent(
+                            self.tabs[self.current_tab].chosen_one)
                 elif input in self.keybindings['clast']:
                     last_index = len(self.tabs[self.current_tab].timeline) - 1
                     if self.tabs[self.current_tab].chosen_one != last_index:
                         self.tabs[self.current_tab].chosen_one = last_index
                         self.tabs[self.current_tab].update_buffer()
-                        self.tabs[self.current_tab].scrolltodent(self.tabs[self.current_tab].chosen_one)
+                        self.tabs[self.current_tab].scrolltodent(
+                            self.tabs[self.current_tab].chosen_one)
                 elif input in self.keybindings['cfav']:
                     try:
-                        self.cmd_favourite(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
+                        self.cmd_favourite(
+                            self.tabs[self.current_tab].timeline[\
+                                self.tabs[self.current_tab].chosen_one])
                     except Exception, (errmsg):
-                        self.status_bar.timed_update("ERROR: Couldn't favourite notice: %s" % (errmsg))
+                        self.status_bar.timed_update(
+                            msg["CouldntFavouriteError"] % (errmsg))
                 elif input in self.keybindings['cunfav']:
                     try:
-                        self.cmd_unfavourite(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
+                        self.cmd_unfavourite(
+                            self.tabs[self.current_tab].timeline[\
+                                self.tabs[self.current_tab].chosen_one])
                     except Exception, (errmsg):
-                        self.status_bar.timed_update("ERROR: Couldn't unfavourite notice: %s" % (errmsg))
+                        self.status_bar.timed_update(
+                            msg["CouldntUnfavouriteError"] % (errmsg))
                 elif input in self.keybindings['crepeat']:
                     can_repeat = True
                     try:
-                        if self.tabs[self.current_tab].timeline_type in ["direct", "sentdirect"]:
+                        if self.tabs[self.current_tab].timeline_type in\
+                                ["direct", "sentdirect"]:
                             can_repeat = False
                     except AttributeError:
-                        pass  # we must be in a Context tab, so repeating is fine.
+                        # we must be in a Context tab, so repeating is fine.
+                        pass
                     if can_repeat:
                         try:
-                            self.cmd_repeat(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
+                            self.cmd_repeat(
+                                self.tabs[self.current_tab].timeline[\
+                                    self.tabs[self.current_tab].chosen_one])
                         except Exception, (errmsg):
-                            self.status_bar.timed_update("ERROR: Couldn't repeat notice: %s" % (errmsg))
+                            self.status_bar.timed_update(
+                                msg["CouldntRepeateError"] % (errmsg))
                 elif input in self.keybindings['cquote']:
                     can_repeat = True
                     try:
-                        if self.tabs[self.current_tab].timeline_type in ["direct", "sentdirect"]:
+                        if self.tabs[self.current_tab].timeline_type in\
+                                ["direct", "sentdirect"]:
                             can_repeat = False
                     except AttributeError:
-                        pass  # we must be in a Context tab, so repeating is fine.
+                        # we must be in a Context tab, so repeating is fine.
+                        pass
                     if can_repeat:
                         self.update_timer.cancel()
-                        self.cmd_quote(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
+                        self.cmd_quote(
+                            self.tabs[self.current_tab].timeline[\
+                                self.tabs[self.current_tab].chosen_one])
                 elif input in self.keybindings['ccontext']:
                     try:
-                        self.cmd_context(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
+                        self.cmd_context(
+                            self.tabs[self.current_tab].timeline[\
+                                self.tabs[self.current_tab].chosen_one])
                     except Exception, (errmsg):
-                        self.status_bar.timed_update("ERROR: Couldn't get context: %s" % (errmsg))
+                        self.status_bar.timed_update(
+                            msg["CouldntContextError"] % (errmsg))
                 elif input in self.keybindings['cuser']:
                     try:
-                        if "retweeted_status" in self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]:
-                            user = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]["retweeted_status"]["user"]["screen_name"]
+                        if "retweeted_status" in\
+                                self.tabs[self.current_tab].timeline[\
+                            self.tabs[self.current_tab].chosen_one]:
+                            user =\
+                                self.tabs[self.current_tab].timeline[\
+                                self.tabs[self.current_tab].chosen_one][\
+                                "retweeted_status"]["user"]["screen_name"]
                         else:
-                            user = self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one]["user"]["screen_name"]
+                            user = \
+                                self.tabs[self.current_tab].timeline[\
+                                self.tabs[self.current_tab].chosen_one][\
+                                "user"]["screen_name"]
                         self.cmd_user(user)
                     except Exception, (errmsg):
-                        self.status_bar.timed_update("ERROR: Couldn't load user timeline: %s" % (errmsg))
+                        self.status_bar.timed_update(
+                            msg["CouldntLoadTimelineError"] % (errmsg))
                 elif input in self.keybindings['pausetoggle']:
-                    self.tabs[self.current_tab].paused = not self.tabs[self.current_tab].paused
-                    if self.tabs[self.current_tab].paused and (len(self.tabs[self.current_tab].timeline) > 0):
-                        self.tabs[self.current_tab].timeline[0]["ic__paused_on"] = True
-                    self.tabs[self.current_tab].update_buffer()  # get the pauseline drawn
-                    self.tabs[self.current_tab].update_name()  # force the tab names to update
+                    self.tabs[self.current_tab].paused =\
+                        not self.tabs[self.current_tab].paused
+                    if self.tabs[self.current_tab].paused and (len(
+                            self.tabs[self.current_tab].timeline) > 0):
+                        self.tabs[self.current_tab].timeline[0][\
+                            "ic__paused_on"] = True
+                    # get the pauseline drawn
+                    self.tabs[self.current_tab].update_buffer()
+                    # force the tab names to update
+                    self.tabs[self.current_tab].update_name()
                     self.tab_bar.tabs = [tab.name for tab in self.tabs]
                     self.tab_bar.current_tab = self.current_tab
                     self.tab_bar.update()
                 elif input in self.keybindings['mute']:
                     try:
-                        self.cmd_mute(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
+                        self.cmd_mute(
+                            self.tabs[self.current_tab].timeline[\
+                                self.tabs[self.current_tab].chosen_one])
                     except Exception, (errmsg):
-                        self.status_bar.timed_update("ERROR: Couldn't mute: %s" % (errmsg))
+                        self.status_bar.timed_update(
+                            msg["CouldntMuteError"] % (errmsg))
                 elif input in self.keybindings['unmute']:
                     try:
-                        self.cmd_unmute(self.tabs[self.current_tab].timeline[self.tabs[self.current_tab].chosen_one])
+                        self.cmd_unmute(
+                            self.tabs[self.current_tab].timeline[\
+                                self.tabs[self.current_tab].chosen_one])
                     except Exception, (errmsg):
-                        self.status_bar.timed_update("ERROR: Couldn't unmute: %s" % (errmsg))
+                        self.status_bar.timed_update(
+                            msg["CouldntUnmuteError"] % (errmsg))
 
 
             y, x = self.screen.getmaxyx()
@@ -1085,24 +1366,34 @@ class IdentiCurse(object):
             character_count = param
             if self.quote_mode:
                 if self.conn.length_limit == 0:
-                    self.status_bar.update("Quote Mode: " + str(character_count))
+                    self.status_bar.update(
+                        "Quote Mode: " + str(character_count))
                 else:
-                    self.status_bar.update("Quote Mode: " + str(self.conn.length_limit - character_count))
+                    self.status_bar.update("Quote Mode: " + str(
+                            self.conn.length_limit - character_count))
             elif self.reply_mode:
                 if self.conn.length_limit == 0:
-                    self.status_bar.update("Reply Mode: " + str(character_count))
+                    self.status_bar.update(
+                        "Reply Mode: " + str(character_count))
                 else:
-                    self.status_bar.update("Reply Mode: " + str(self.conn.length_limit - character_count))
+                    self.status_bar.update(
+                        "Reply Mode: " + str(
+                            self.conn.length_limit - character_count))
             elif self.search_mode:
                 if self.last_page_search['query'] != "":
-                    self.status_bar.update("In-page Search (last search: '%s')" % (self.last_page_search['query']))
+                    self.status_bar.update(
+                        "In-page Search (last search: '%s')" % (
+                            self.last_page_search['query']))
                 else:
                     self.status_bar.update("In-page Search")
             else:
                 if self.conn.length_limit == 0:
-                    self.status_bar.update("Insert Mode: " + str(character_count))
+                    self.status_bar.update(
+                        "Insert Mode: " + str(character_count))
                 else:
-                    self.status_bar.update("Insert Mode: " + str(self.conn.length_limit - character_count))
+                    self.status_bar.update(
+                        "Insert Mode: " + str(
+                            self.conn.length_limit - character_count))
 
     def parse_input(self, input):
         update = False
@@ -1111,37 +1402,60 @@ class IdentiCurse(object):
         if input is None:
             input = ""
 
-        if len(input) > 0:      # don't do anything if the user didn't enter anything
+        # don't do anything if the user didn't enter anything
+        if len(input) > 0:
             input = input.rstrip()
 
             tokens = [token for token in input.split(" ") if token != ""]
 
-            if tokens[0][0] == "i" and ((tokens[0][1:] in self.known_commands) or (tokens[0][1:] in config.config["aliases"])):
-                tokens[0] = tokens[0][1:]  # avoid doing the wrong thing when people accidentally submit stuff like "i/r 2 blabla"
+            if tokens[0][0] == "i" and\
+                    ((tokens[0][1:] in self.known_commands) or\
+                      (tokens[0][1:] in config.config["aliases"])):
+                # avoid doing the wrong thing when people
+                # accidentally submit stuff like "i/r 2 blabla"
+                tokens[0] = tokens[0][1:]
 
             for command in self.known_commands:
-                # catch mistakes like "/r1" - the last condition is so that, for example, "/directs" is not mistakenly converted to "/direct s"
-                if (tokens[0][:len(command)] == command) and (tokens[0] != command) and not (tokens[0] in self.known_commands) and not (tokens[0] in config.config['aliases']):
+                # catch mistakes like "/r1" - the last condition is so that,
+                # for example, "/directs" is not mistakenly
+                # converted to "/direct s"
+                if (tokens[0][:len(command)] == command) and\
+                        (tokens[0] != command) and not\
+                        (tokens[0] in self.known_commands) and not\
+                        (tokens[0] in config.config['aliases']):
                     tokens[:1] = [command, tokens[0].replace(command, "")]
                 # catch mis-capitalizations
-                if tokens[0].lower() == command.lower() and not tokens[0].lower() in [cmd.lower() for cmd in self.known_commands if cmd != command]:
+                if tokens[0].lower() == command.lower() and not\
+                        tokens[0].lower() in\
+                        [cmd.lower() for cmd in\
+                             self.known_commands if cmd != command]:
                     tokens[0] = command
             for alias in config.config['aliases']:
-                # catch mistakes like "/r1" - the last condition is so that, for example, "/directs" is not mistakenly converted to "/direct s"
-                if (tokens[0][:len(alias)] == alias) and (tokens[0] != alias) and not (tokens[0] in self.known_commands) and not (tokens[0] in config.config['aliases']):
+                # catch mistakes like "/r1" - the last condition is so that,
+                # for example, "/directs" is not mistakenly
+                # converted to "/direct s"
+                if (tokens[0][:len(alias)] == alias) and\
+                        (tokens[0] != alias) and not\
+                        (tokens[0] in self.known_commands) and not\
+                        (tokens[0] in config.config['aliases']):
                     tokens[:1] = [alias, tokens[0].replace(alias, "")]
                 # catch mis-capitalizations
-                if tokens[0].lower() == alias.lower() and not tokens[0].lower() in [als.lower() for als in config.config['aliases'] if als != alias]:
+                if tokens[0].lower() == alias.lower() and not\
+                        tokens[0].lower() in [als.lower() for als in\
+                            config.config['aliases'] if als != alias]:
                     tokens[0] = alias
 
             if tokens[0] in config.config["aliases"]:
-                tokens = config.config["aliases"][tokens[0]].split(" ") + tokens[1:]
+                tokens =\
+                    config.config["aliases"][tokens[0]].split(" ") + tokens[1:]
 
             try:
-                if ("direct" in self.tabs[self.current_tab].timeline_type) and (tokens[0] == "/reply"):
+                if ("direct" in self.tabs[self.current_tab].timeline_type) and\
+                        (tokens[0] == "/reply"):
                     tokens[0] = "/direct"
             except AttributeError:
-                # the tab has no timeline_type, so it's *definitely* not directs.
+                # the tab has no timeline_type,
+                # so it's *definitely* not directs.
                 pass
 
             if tokens[0] in self.known_commands:
@@ -1149,7 +1463,6 @@ class IdentiCurse(object):
                 try:
                     if tokens[0] == "/reply" and len(tokens) >= 2:
                         self.status_bar.update("Posting Reply...")
-    
                         try:
                             try:
                                 float(tokens[1])
@@ -1157,20 +1470,31 @@ class IdentiCurse(object):
                                 user = tokens[1]
                                 if user[0] == "@":
                                         user = user[1:]
-                                update = self.cmd_mention(user, " ".join(tokens[2:]))
+                                update = self.cmd_mention(user,
+                                                          " ".join(tokens[2:]))
                             else:
-                                update = self.cmd_reply(self.tabs[self.current_tab].timeline[int(tokens[1]) - 1], " ".join(tokens[2:]))
+                                update = self.cmd_reply(
+                                    self.tabs[self.current_tab].timeline[\
+                                        int(tokens[1]) - 1],
+                                    " ".join(tokens[2:]))
                         except Exception, (errmsg):
-                            self.status_bar.timed_update("ERROR: Couldn't post status: %s" % (errmsg))
+                            self.status_bar.timed_update(
+                                msg["CouldntPostError"] % (errmsg))
     
                     elif tokens[0] == "/favourite" and len(tokens) == 2:
-                        self.cmd_favourite(self.tabs[self.current_tab].timeline[int(tokens[1]) - 1])
+                        self.cmd_favourite(
+                            self.tabs[self.current_tab].timeline[\
+                                int(tokens[1]) - 1])
     
                     elif tokens[0] == "/unfavourite" and len(tokens) == 2:
-                        self.cmd_unfavourite(self.tabs[self.current_tab].timeline[int(tokens[1]) - 1])
+                        self.cmd_unfavourite(
+                            self.tabs[self.current_tab].timeline[\
+                                int(tokens[1]) - 1])
     
                     elif tokens[0] == "/repeat" and len(tokens) == 2:
-                        update = self.cmd_repeat(self.tabs[self.current_tab].timeline[int(tokens[1]) - 1])
+                        update = self.cmd_repeat(
+                            self.tabs[self.current_tab].timeline[\
+                                int(tokens[1]) - 1])
                         
                     elif tokens[0] == "/direct" and len(tokens) >= 3:
                         try:
@@ -1180,17 +1504,31 @@ class IdentiCurse(object):
                             if screen_name[0] == "@":
                                 screen_name = screen_name[1:]
                         else:
-                            if "direct" in self.tabs[self.current_tab].timeline_type:
-                                screen_name = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['sender']['screen_name']
+                            if "direct" in\
+                                    self.tabs[self.current_tab].timeline_type:
+                                screen_name =\
+                                    self.tabs[self.current_tab].timeline[\
+                                  int(tokens[1]) - 1]['sender']['screen_name']
                             else:
-                                if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
-                                    screen_name = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['retweeted_status']['user']['screen_name']
+                                if "retweeted_status" in\
+                                        self.tabs[self.current_tab].timeline[\
+                                    int(tokens[1]) - 1]:
+                                    screen_name =\
+                                        self.tabs[self.current_tab].timeline[\
+                                        int(
+                                          tokens[1]) - 1]['retweeted_status'][\
+                                            'user']['screen_name']
                                 else:
-                                    screen_name = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]['user']['screen_name']
+                                    screen_name =\
+                                        self.tabs[self.current_tab].timeline[\
+                                        int(tokens[1]) - 1][\
+                                        'user']['screen_name']
                         self.cmd_direct(screen_name, " ".join(tokens[2:]))
     
                     elif tokens[0] == "/delete" and len(tokens) == 2:
-                        self.cmd_delete(self.tabs[self.current_tab].timeline[int(tokens[1]) - 1])
+                        self.cmd_delete(
+                            self.tabs[self.current_tab].timeline[\
+                                int(tokens[1]) - 1])
     
                     elif tokens[0] == "/spamreport" and len(tokens) >= 3:
                         # Yeuch
@@ -1201,11 +1539,19 @@ class IdentiCurse(object):
                             if username[0] == "@":
                                     username = username[1:]
                         else:
-                            if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
-                                username = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["retweeted_status"]["user"]["screen_name"]
+                            if "retweeted_status" in\
+                                    self.tabs[self.current_tab].timeline[int(
+                                    tokens[1]) - 1]:
+                                username =\
+                                    self.tabs[self.current_tab].timeline[int(
+                                        tokens[1]) - 1]["retweeted_status"][\
+                                        "user"]["screen_name"]
                             else:
-                                username = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
-                        update = self.cmd_spamreport(username, " ".join(tokens[2:]))
+                                username =\
+                                    self.tabs[self.current_tab].timeline[int(
+                                        tokens[1]) - 1]["user"]["screen_name"]
+                        update = self.cmd_spamreport(username,
+                                                     " ".join(tokens[2:]))
     
                     elif tokens[0] == "/block" and len(tokens) >= 2:
                         for token in tokens[1:]:
@@ -1217,10 +1563,18 @@ class IdentiCurse(object):
                                 if user[0] == "@":
                                     user = user[1:]
                             else:
-                                if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
-                                    user = self.tabs[self.current_tab].timeline[int(token) - 1]["retweeted_status"]["user"]["screen_name"]
+                                if "retweeted_status" in self.tabs[\
+                                    self.current_tab].timeline[int(
+                                        tokens[1]) - 1]:
+                                    user = self.tabs[\
+                                        self.current_tab].timeline[\
+                                        int(token) - 1]["retweeted_status"][\
+                                            "user"]["screen_name"]
                                 else:
-                                    user = self.tabs[self.current_tab].timeline[int(token) - 1]["user"]["screen_name"]
+                                    user =\
+                                        self.tabs[\
+                                        self.current_tab].timeline[int(
+                                            token) - 1]["user"]["screen_name"]
                             self.cmd_block(user)
     
                     elif tokens[0] == "/unblock" and len(tokens) >= 2:
@@ -1234,10 +1588,17 @@ class IdentiCurse(object):
                                 if user[0] == "@":
                                     user = user[1:]
                             else:
-                                if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
-                                    user = self.tabs[self.current_tab].timeline[int(token) - 1]["retweeted_status"]["user"]["screen_name"]
+                                if "retweeted_status" in self.tabs[\
+                                    self.current_tab].timeline[int(
+                                        tokens[1]) - 1]:
+                                    user =\
+                                        self.tabs[self.current_tab].timeline[\
+                                        int(token) - 1]["retweeted_status"][\
+                                        "user"]["screen_name"]
                                 else:
-                                    user = self.tabs[self.current_tab].timeline[int(token) - 1]["user"]["screen_name"]
+                                    user =\
+                                        self.tabs[self.current_tab].timeline[\
+                                        int(token) - 1]["user"]["screen_name"]
                             self.cmd_unblock(user)
     
                     elif tokens[0] == "/user" and len(tokens) == 2:
@@ -1249,15 +1610,22 @@ class IdentiCurse(object):
                             if user[0] == "@":
                                 user = user[1:]
                         else:
-                            if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
-                                user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["retweeted_status"]["user"]["screen_name"]
+                            if "retweeted_status" in self.tabs[\
+                                self.current_tab].timeline[int(tokens[1]) - 1]:
+                                user =\
+                                    self.tabs[self.current_tab].timeline[\
+                                    int(tokens[1]) - 1]["retweeted_status"][\
+                                    "user"]["screen_name"]
                             else:
-                                user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
+                                user = self.tabs[self.current_tab].timeline[\
+                                    int(tokens[1]) - 1]["user"]["screen_name"]
                         
                         self.cmd_user(user)
     
                     elif tokens[0] == "/context" and len(tokens) == 2:
-                            self.cmd_context(self.tabs[self.current_tab].timeline[int(tokens[1]) - 1])
+                            self.cmd_context(
+                                self.tabs[self.current_tab].timeline[\
+                                    int(tokens[1]) - 1])
     
                     elif tokens[0] == "/subscribe" and len(tokens) == 2:
                         # Yeuch
@@ -1268,10 +1636,15 @@ class IdentiCurse(object):
                             if user[0] == "@":
                                     user = user[1:]
                         else:
-                            if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
-                                user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["retweeted_status"]["user"]["screen_name"]
+                            if "retweeted_status" in self.tabs[\
+                                self.current_tab].timeline[int(tokens[1]) - 1]:
+                                user =\
+                                    self.tabs[self.current_tab].timeline[\
+                                    int(tokens[1]) - 1]["retweeted_status"][\
+                                    "user"]["screen_name"]
                             else:
-                                user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
+                                user = self.tabs[self.current_tab].timeline[\
+                                    int(tokens[1]) - 1]["user"]["screen_name"]
                         self.cmd_subscribe(user)
                         
                     elif tokens[0] == "/unsubscribe" and len(tokens) == 2:
@@ -1283,10 +1656,14 @@ class IdentiCurse(object):
                             if user[0] == "@":
                                     user = user[1:]
                         else:
-                            if "retweeted_status" in self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]:
-                                user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["retweeted_status"]["user"]["screen_name"]
+                            if "retweeted_status" in self.tabs[\
+                                self.current_tab].timeline[int(tokens[1]) - 1]:
+                                user = self.tabs[self.current_tab].timeline[\
+                                    int(tokens[1]) - 1]["retweeted_status"][\
+                                    "user"]["screen_name"]
                             else:
-                                user = self.tabs[self.current_tab].timeline[int(tokens[1]) - 1]["user"]["screen_name"]
+                                user = self.tabs[self.current_tab].timeline[\
+                                    int(tokens[1]) - 1]["user"]["screen_name"]
                         self.cmd_unsubscribe(user)
     
                     elif tokens[0] == "/group" and len(tokens) == 2:
@@ -1353,10 +1730,16 @@ class IdentiCurse(object):
                         self.cmd_alias(tokens[1], " ".join(tokens[2:]))
 
                     elif tokens[0] == "/link" and len(tokens) >= 2:
-                        if len(tokens) == 2:  # only notice number given, assume first link
-                            self.cmd_link(self.tabs[self.current_tab].timeline[int(tokens[1]) - 1], 1)
-                        else:  # notice number and link number given
-                            self.cmd_link(self.tabs[self.current_tab].timeline[int(tokens[2]) - 1], tokens[1])
+                        # only notice number given, assume first link
+                        if len(tokens) == 2:
+                            self.cmd_link(
+                                self.tabs[self.current_tab].timeline[\
+                                    int(tokens[1]) - 1], 1)
+                        else:
+                            # notice number and link number given
+                            self.cmd_link(
+                                self.tabs[self.current_tab].timeline[\
+                                    int(tokens[2]) - 1], tokens[1])
 
                     elif tokens[0] == "/bugreport" and len(tokens) >= 2:
                         update = self.cmd_bugreport(" ".join(tokens[1:]))
@@ -1365,46 +1748,59 @@ class IdentiCurse(object):
                         update = self.cmd_featurerequest(" ".join(tokens[1:]))
 
                     elif tokens[0] == "/quote" and len(tokens) == 2:
-                        update = self.cmd_quote(self.tabs[self.current_tab].timeline[int(tokens[1]) - 1])
+                        update = self.cmd_quote(
+                            self.tabs[self.current_tab].timeline[int(
+                                    tokens[1]) - 1])
 
                     elif tokens[0] == "/mute" and len(tokens) == 2:
-                        update = self.cmd_mute(self.tabs[self.current_tab].timeline[int(tokens[1]) - 1])
+                        update = self.cmd_mute(
+                            self.tabs[self.current_tab].timeline[int(
+                                    tokens[1]) - 1])
 
                     elif tokens[0] == "/unmute" and len(tokens) == 2:
-                        update = self.cmd_unmute(self.tabs[self.current_tab].timeline[int(tokens[1]) - 1])
+                        update = self.cmd_unmute(
+                            self.tabs[self.current_tab].timeline[
+                                int(tokens[1]) - 1])
 
                     elif tokens[0] == "/quit" and len(tokens) == 1:
                         self.running = False
    
                 except StatusNetError, e:
-                    self.status_bar.timed_update("Status.Net error %d: %s" % (e.errcode, e.details))
+                    self.status_bar.timed_update(
+                        "Status.Net error %d: %s" % (e.errcode, e.details))
             else:
                 try:
                     update = self.cmd_post(input)
                 except StatusNetError, e:
-                    self.status_bar.timed_update("Status.Net error %d: %s" % (e.errcode, e.details))
+                    self.status_bar.timed_update(
+                        "Status.Net error %d: %s" % (e.errcode, e.details))
 
             if not update:
                 self.tabs[self.current_tab].update()
                 self.status_bar.do_nothing()
 
-        self.text_entry = Textbox(self.entry_window, self.validate, insert_mode=True)
+        self.text_entry = Textbox(self.entry_window, self.validate,
+                                  insert_mode=True)
         self.text_entry.stripspaces = 1
         self.tabs[self.current_tab].search_highlight_line = -1
         self.display_current_tab()
         self.status_bar.do_nothing()
         self.insert_mode = False
-        self.update_timer = Timer(config.config['update_interval'], self.update_tabs)
+        self.update_timer = Timer(config.config['update_interval'],
+                                  self.update_tabs)
         self.update_timer.start()
 
-    def opens_tab(fail_on_exists=None):  # decorator factory, creates decorators to deal with the standard switching to tab stuff
+    # decorator factory, creates decorators to deal with the
+    # standard switching to tab stuff
+    def opens_tab(fail_on_exists=None):
         def tabopen_decorator(cmd):
             def outcmd(*largs, **kargs):
                 self = largs[0]
                 already_have_one = False
                 if fail_on_exists is not None:
                     for tab in self.tabs:
-                        if hasattr(tab, "timeline_type") and tab.timeline_type == fail_on_exists:
+                        if hasattr(tab, "timeline_type") and\
+                                tab.timeline_type == fail_on_exists:
                             already_have_one = True
                             break
                 if not already_have_one:
@@ -1418,7 +1814,9 @@ class IdentiCurse(object):
             return outcmd
         return tabopen_decorator
 
-    def shows_status(status_msg):  # decorator factory, creates status decorators for commands that show statuses
+    # decorator factory, creates status decorators
+    # for commands that show statuses
+    def shows_status(status_msg):
         def status_decorator(cmd):
             def outcmd(*largs, **kargs):
                 self = largs[0]
@@ -1429,14 +1827,18 @@ class IdentiCurse(object):
             return outcmd
         return status_decorator
 
-    def posts_notice(cmd):  # decorator which inserts the newly-posted notice(s) for commands that post
+    # decorator which inserts the newly-posted notice(s)
+    # for commands that post
+    def posts_notice(cmd):
         def outcmd(*largs, **kargs):
             self = largs[0]
             update = cmd(*largs, **kargs)
             if update is not None:
-                update["ic__raw_datetime"] = helpers.normalise_datetime(update["created_at"])
+                update["ic__raw_datetime"] = helpers.normalise_datetime(
+                    update["created_at"])
                 update["ic__from_web"] = False
-                if self.tabs[self.current_tab].name == "Context":  # if we're in a context tab, add notice to there too
+                # if we're in a context tab, add notice to there too
+                if self.tabs[self.current_tab].name == "Context":
                     self.tabs[self.current_tab].timeline.insert(0, update)
                     self.tabs[self.current_tab].update_buffer()
                 for tab in self.tabs:
@@ -1453,9 +1855,13 @@ class IdentiCurse(object):
             return True
         return outcmd
 
-    def repeat_passthrough(cmd):  # decorator which unpacks repeats for any commands that should handle only the original notice
-        def outcmd(*largs, **kargs):  # requires that notice is the *second* argument, for now at least
-            largs = list(largs)  # largs is a tuple, we need it mutable
+    # decorator which unpacks repeats
+    # for any commands that should handle only the original notice
+    def repeat_passthrough(cmd):
+        # requires that notice is the *second* argument, for now at least
+        def outcmd(*largs, **kargs):
+            # largs is a tuple, we need it mutable
+            largs = list(largs)
             if "retweeted_status" in largs[1]:
                 largs[1] = largs[1]["retweeted_status"]
             return cmd(*largs, **kargs)
@@ -1485,13 +1891,20 @@ class IdentiCurse(object):
                 dup_first_word = False
             else:
                 dup_first_word = True
-            return self.conn.statuses_update(status, "IdentiCurse", int(notice["id"]), long_dent=config.config["long_dent"], dup_first_word=dup_first_word)
+            return self.conn.statuses_update(status, "IdentiCurse",
+                                             int(notice["id"]),
+                                             long_dent=\
+                                                 config.config["long_dent"],
+                                             dup_first_word=dup_first_word)
 
     @shows_status("Posting mention")
     @posts_notice
     def cmd_mention(self, username, message):
         status = "@%s %s" % (username, message)
-        return self.conn.statuses_update(status, "IdentiCurse", long_dent=config.config["long_dent"], dup_first_word=True)
+        return self.conn.statuses_update(status,
+                                         "IdentiCurse",
+                                         long_dent=config.config["long_dent"],
+                                         dup_first_word=True)
 
     @shows_status("Posting notice")
     @posts_notice
@@ -1499,7 +1912,11 @@ class IdentiCurse(object):
         if message is None:
             message = ""
         if len(message) > 0:
-            return self.conn.statuses_update(message, "IdentiCurse", long_dent=config.config["long_dent"], dup_first_word=False)
+            return self.conn.statuses_update(message,
+                                             "IdentiCurse",
+                                             long_dent=\
+                                                 config.config["long_dent"],
+                                             dup_first_word=False)
 
     @shows_status("Favouriting notice")
     @repeat_passthrough
@@ -1522,7 +1939,8 @@ class IdentiCurse(object):
     @repeat_passthrough
     def cmd_quote(self, notice):
         self.quote_mode = True
-        new_status_base_unclean = "RD @%s %s" % (notice['user']['screen_name'], notice['text'])
+        new_status_base_unclean = "RD @%s %s" % (notice['user']['screen_name'],
+                                                 notice['text'])
         new_status_base_clean = ""
         for entity in helpers.split_entities(new_status_base_unclean):
             if entity['type'] == "group":
@@ -1534,12 +1952,17 @@ class IdentiCurse(object):
         if status is None:
             status = ""
         if len(status) > 0:
-            return self.conn.statuses_update(status, "IdentiCurse", int(notice["id"]), long_dent=config.config["long_dent"], dup_first_word=False)
+            return self.conn.statuses_update(status, "IdentiCurse",
+                                             int(notice["id"]),
+                                             long_dent=\
+                                                 config.config["long_dent"],
+                                             dup_first_word=False)
 
     @shows_status("Sending direct message")
     def cmd_direct(self, username, message):
         user_id = self.conn.users_show(screen_name=username)['id']
-        self.conn.direct_messages_new(username, user_id, message, source="IdentiCurse")
+        self.conn.direct_messages_new(username, user_id,
+                                      message, source="IdentiCurse")
 
     @shows_status("Deleting notice")
     def cmd_delete(self, notice):
@@ -1549,20 +1972,33 @@ class IdentiCurse(object):
             delete_succeeded = True
         except StatusNetError, e:
             if e.errcode == 403:
-                if "retweeted_status" in notice:  # user doesn't own the repeat, so is probably trying to delete the original status
-                    self.conn.statuses_destroy(notice["retweeted_status"]["id"])
+                # user doesn't own the repeat, so
+                # is probably trying to delete the original status
+                if "retweeted_status" in notice:
+                    self.conn.statuses_destroy(
+                        notice["retweeted_status"]["id"])
                     delete_succeeded = True
-                else:  # user is trying to delete something they don't own. the API doesn't like this
-                    self.status_bar.timed_update("You cannot delete others' notices.", 3)
+                else:
+                    # user is trying to delete something they don't own.
+                    # the API doesn't like this
+                    self.status_bar.timed_update(
+                        "You cannot delete others' notices.", 3)
             else:  # it wasn't a 403, so re-raise
                 raise(e)
         try:
-            self.conn.statuses_destroy(notice["id"])  # for now, we try it twice, since identi.ca at least seems to have an issue where deleting must be done twice
+            # for now, we try it twice, since identi.ca
+            # at least seems to have an issue where deleting must be done twice
+            self.conn.statuses_destroy(notice["id"])
         except:
-            pass  # since we should've already got it (in an ideal situation), ignore the errors from this attempt.
+            # since we should've already got it (in an ideal situation),
+            # ignore the errors from this attempt.
+            pass
         if delete_succeeded:
-            for tab in [tab for tab in self.tabs if hasattr(tab, "timeline_type")]:
-                n_id = notice["id"]  # keep this in a variable of it's own, so deleting the original notice doesn't break the test in the next bit
+            for tab in [tab for tab in self.tabs if hasattr(
+                    tab, "timeline_type")]:
+                # keep this in a variable of it's own, so deleting the original
+                # notice doesn't break the test in the next bit
+                n_id = notice["id"]
                 for tl_notice in tab.timeline:
                     if tl_notice["id"] == n_id:
                         tab.timeline.remove(tl_notice)
@@ -1578,7 +2014,7 @@ class IdentiCurse(object):
         user_id = self.conn.users_show()['id']
         group_id = self.conn.statusnet_groups_show(nickname="spamreport")['id']
         if not self.conn.statusnet_groups_is_member(user_id, group_id):
-            self.status_bar.timed_update("You are not a member of the !spamreport group. Joining it is highly recommended if reporting spam.")
+            self.status_bar.timed_update(msg["SpamreportGroupInfo"])
         self.conn.blocks_create(user_id=target_user_id, screen_name=username)
         return self.conn.statuses_update(status, "IdentiCurse")
 
@@ -1596,27 +2032,34 @@ class IdentiCurse(object):
     @opens_tab()
     def cmd_user(self, username):
         user_id = self.conn.users_show(screen_name=username)["id"]
-        return Timeline(self.conn, self.notice_window, "user", {'user_id':user_id, 'screen_name':username})
+        return Timeline(self.conn, self.notice_window, "user",
+                        {'user_id': user_id, 'screen_name': username})
 
     @shows_status("Loading group timeline")
     @opens_tab()
     def cmd_group(self, group):
         group_id = int(self.conn.statusnet_groups_show(nickname=group)['id'])
-        return Timeline(self.conn, self.notice_window, "group", {'group_id':group_id, 'nickname':group})
+        return Timeline(self.conn, self.notice_window, "group",
+                        {'group_id':group_id, 'nickname': group})
 
     @shows_status("Loading tag timeline")
     @opens_tab()
     def cmd_tag(self, tag):
-        return Timeline(self.conn, self.notice_window, "tag", {'tag':tag})
+        return Timeline(self.conn, self.notice_window, "tag", {'tag': tag})
 
     @shows_status("Loading context")
     @opens_tab()
     @repeat_passthrough
     def cmd_context(self, notice):
         if "statusnet_conversation_id" in notice:
-            return Timeline(self.conn, self.notice_window, "context", {'conversation_id':notice['statusnet_conversation_id']})
+            return Timeline(
+                self.conn, self.notice_window,
+                "context",
+                {'conversation_id': notice['statusnet_conversation_id']})
         else:
-            return Timeline(self.conn, self.notice_window, "context", {'notice_id':notice['id']})
+            return Timeline(
+                self.conn,
+                self.notice_window, "context", {'notice_id': notice['id']})
 
     @shows_status("Subscribing to user")
     def cmd_subscribe(self, username):
@@ -1665,7 +2108,8 @@ class IdentiCurse(object):
     @shows_status("Searching")
     @opens_tab()
     def cmd_search(self, query):
-        return Timeline(self.conn, self.notice_window, "search", type_params={'query':query})
+        return Timeline(self.conn, self.notice_window, "search",
+                        type_params={'query':query})
 
     @shows_status("Loading home timeline")
     @opens_tab("home")
@@ -1685,7 +2129,12 @@ class IdentiCurse(object):
     @shows_status("Changing config")
     def cmd_config(self, key, value):
         key = key.split('.')
-        if len(key) == 2:      # there has to be a clean way to avoid hardcoded len checks, but I can't think what right now, and technically it works for all currently valid config keys
+        # there has to be a clean way to avoid hardcoded len checks,
+        # but I can't think what right now, and technically it works
+        # for all currently valid config keys
+        # shackra: what's wrong with len()? anyway, I did something
+        # about it, hope you like it.
+        if key.index(key[-1]) + 1 == 2:
             config.config[key[0]][key[1]] = value
         else:
             config.config[key[0]] = value
@@ -1721,43 +2170,56 @@ class IdentiCurse(object):
             except IndexError:
                 self.status_bar.timed_update("No matching link(s) found.")
         for link in links_to_open:
-            subprocess.Popen(config.config['browser'] % (link), shell=True, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
+            subprocess.Popen(config.config['browser'] % (link), shell=True,
+                             stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
 
     @shows_status("Sending bug report")
     @posts_notice
     def cmd_bugreport(self, report):
         status = "#icursebug " + report
-        return self.conn.statuses_update(status, "IdentiCurse", long_dent=config.config['long_dent'], dup_first_word=True)
+        return self.conn.statuses_update(status, "IdentiCurse",
+                                         long_dent=config.config['long_dent'],
+                                         dup_first_word=True)
 
     @shows_status("Sending feature request")
     @posts_notice
     def cmd_featurerequest(self, request):
         status = "#icurserequest " + request
-        return self.conn.statuses_update(status, "IdentiCurse", long_dent=config.config['long_dent'], dup_first_word=True)
+        return self.conn.statuses_update(status, "IdentiCurse",
+                                         long_dent=config.config['long_dent'],
+                                         dup_first_word=True)
 
     @shows_status("Muting conversation")
     @repeat_passthrough
     def cmd_mute(self, notice):
-        if (not "statusnet_conversation_id" in notice) or (notice["statusnet_conversation_id"] is None):
-            self.status_bar.timed_update("This instance does not provide conversation IDs, so muting will not be possible.")
+        if (not "statusnet_conversation_id" in notice) or (
+            notice["statusnet_conversation_id"] is None):
+            self.status_bar.timed_update(
+                msg["InstanceWithoutConversationsIDs"])
             return
         if not hasattr(config.session_store, "muted_conversations"):
             config.session_store.muted_conversations = []
-        if notice["statusnet_conversation_id"] in config.session_store.muted_conversations:
+        if notice["statusnet_conversation_id"] in\
+                config.session_store.muted_conversations:
             self.status_bar.timed_update("This conversation is already muted.")
         else:
-            config.session_store.muted_conversations.append(notice["statusnet_conversation_id"])
+            config.session_store.muted_conversations.append(
+                notice["statusnet_conversation_id"])
 
     @shows_status("Unmuting conversation")
     @repeat_passthrough
     def cmd_unmute(self, notice):
-        if (not "statusnet_conversation_id" in notice) or (notice["statusnet_conversation_id"] is None):
-            self.status_bar.timed_update("This instance does not provide conversation IDs, so unmuting will not be possible.")
+        if (not "statusnet_conversation_id" in notice) or (
+            notice["statusnet_conversation_id"] is None):
+            self.status_bar.timed_update(
+                msg["InstanceWithoutConversationsIDs2Info"])
             return
         if not hasattr(config.session_store, "muted_conversations"):
             config.session_store.muted_conversations = []
-        if notice["statusnet_conversation_id"] in config.session_store.muted_conversations:
-            config.session_store.muted_conversations.remove(notice["statusnet_conversation_id"])
+        if notice["statusnet_conversation_id"] in\
+                config.session_store.muted_conversations:
+            config.session_store.muted_conversations.remove(
+                notice["statusnet_conversation_id"])
         else:
             self.status_bar.timed_update("This conversation wasn't muted.")
 
@@ -1770,28 +2232,40 @@ class IdentiCurse(object):
             query = query.rstrip()
             if query == "":
                 query = self.last_page_search['query']
-            if (self.last_page_search['query'] == query) and not (query == "") and (self.last_page_search['tab'] == self.current_tab):
+            if (self.last_page_search['query'] == query) and not\
+                    (query == "") and (
+                self.last_page_search['tab'] == self.current_tab):
                 # this is a continued search
-                if self.last_page_search['viewing'] < (len(self.last_page_search['occurs']) - 1):
+                if self.last_page_search['viewing'] < (len(
+                        self.last_page_search['occurs']) - 1):
                     self.last_page_search['viewing'] += 1
-                    self.tabs[self.current_tab].scrollto(self.last_page_search['occurs'][self.last_page_search['viewing']])
-                    self.tabs[self.current_tab].search_highlight_line = self.last_page_search['occurs'][self.last_page_search['viewing']]
-                    self.status_bar.update("Viewing result #%d for '%s'" % (self.last_page_search['viewing'] + 1, query))
+                    self.tabs[self.current_tab].scrollto(
+                        self.last_page_search['occurs'][\
+                            self.last_page_search['viewing']])
+                    self.tabs[self.current_tab].search_highlight_line =\
+                        self.last_page_search['occurs'][\
+                        self.last_page_search['viewing']]
+                    self.status_bar.update("Viewing result #%d for '%s'" % (
+                            self.last_page_search['viewing'] + 1, query))
                     self.display_current_tab()
                 else:
                     self.tabs[self.current_tab].search_highlight_line = -1
-                    self.status_bar.update("No more results for '%s'" % (query))
+                    self.status_bar.update(
+                        "No more results for '%s'" % (query))
             else:
                 # new search
                 maxx = self.tabs[self.current_tab].window.getmaxyx()[1]
-                search_buffer = self.tabs[self.current_tab].buffer.reflowed(maxx - 2)
+                search_buffer = self.tabs[self.current_tab].buffer.reflowed(
+                    maxx - 2)
 
-                page_search = {'query':query, 'occurs':[], 'viewing':0, 'tab':self.current_tab}
+                page_search = {'query': query, 'occurs': [],
+                               'viewing': 0, 'tab': self.current_tab}
                 
                 for line_index in range(len(search_buffer)):
                     match_found = False
                     for block in search_buffer[line_index]:
-                        if config.config['search_case_sensitive'] == "sensitive":
+                        if config.config['search_case_sensitive'] ==\
+                                "sensitive":
                             if query in block[0]:
                                 match_found = True
                                 break
@@ -1803,29 +2277,39 @@ class IdentiCurse(object):
                         page_search['occurs'].append(line_index)
 
                 if len(page_search['occurs']) > 0:
-                    self.tabs[self.current_tab].scrollto(page_search['occurs'][0])
-                    self.tabs[self.current_tab].search_highlight_line = page_search['occurs'][0]
-                    self.status_bar.update("Viewing result #1 for '%s'" % (query))
-                    self.last_page_search = page_search  # keep this search
+                    self.tabs[self.current_tab].scrollto(
+                        page_search['occurs'][0])
+                    self.tabs[self.current_tab].search_highlight_line =\
+                        page_search['occurs'][0]
+                    self.status_bar.update(
+                        "Viewing result #1 for '%s'" % (query))
+                    # keep this search
+                    self.last_page_search = page_search
                 else:
                     self.tabs[self.current_tab].search_highlight_line = -1
                     self.status_bar.update("No results for '%s'" % (query))
-                    self.last_page_search = {'query':"", 'occurs':[], 'viewing':0, 'tab':-1}  # reset to no search
+                    # reset to no search
+                    self.last_page_search = {'query': '', 'occurs': [],
+                                             'viewing': 0, 'tab': -1}
         else:
             self.status_bar.do_nothing()
 
-        self.text_entry = Textbox(self.entry_window, self.validate, insert_mode=True)
+        self.text_entry = Textbox(
+            self.entry_window, self.validate, insert_mode=True)
         self.text_entry.stripspaces = 1
         self.display_current_tab()
         self.insert_mode = False
         self.search_mode = False
-        self.update_timer = Timer(config.config['update_interval'], self.update_tabs)
+        self.update_timer = Timer(
+            config.config['update_interval'], self.update_tabs)
         self.update_timer.start()
 
     def quit(self):
         try:
             self.update_timer.cancel()
-        except ValueError:  # it may already have been cancelled if it fired shortly before we quit, in which case we can't end it
+        except ValueError:
+            # it may already have been cancelled if it fired
+            # shortly before we quit, in which case we can't end it
             pass
         curses.endwin()
         sys.exit()
