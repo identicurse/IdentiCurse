@@ -42,7 +42,7 @@ setup(
 
     license="GPLv3+",
 
-    data_files=[('identicurse',['README', 'conf/config.json'])],
+    data_files=[('identicurse',['README', 'conf/config.json', 'conf/messages.json'])],
     packages=find_packages('src'),
     package_dir={'': 'src'},
     include_package_data=True,

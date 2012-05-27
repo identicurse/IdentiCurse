@@ -47,9 +47,18 @@ import helpers
 locale.setlocale(locale.LC_ALL, '')
 code = locale.getpreferredencoding()
 
-messagefile = open("messages.json", "r")
-msg = json.load(messagefile, encoding="utf-8")
-messagefile.close()
+# if this matches, we're running under py2exe, so we need to do some
+# magic to get the correct path
+if hasattr(sys, "frozen"):
+    executable_path = sys.executable
+else:
+    executable_path = __file__
+
+with open(os.path.join(os.path.dirname(os.path.realpath(
+                                    unicode(executable_path,
+                                            sys.getfilesystemencoding()))),
+                       "messages.json"), "r") as message_file:
+    msg = json.load(message_file, encoding="utf-8")
 
 colour_fields = {
     "none": 0,
@@ -133,12 +142,6 @@ class IdentiCurse(object):
 
     def __init__(self, additional_config={}):
         helpers.set_terminal_title("IdentiCurse")
-        # if this matches, we're running under py2exe, so we need to do some
-        # magic to get the correct path
-        if hasattr(sys, "frozen"):
-            executable_path = sys.executable
-        else:
-            executable_path = __file__
         self.path = os.path.dirname(os.path.realpath(
                                     unicode(executable_path,
                                             sys.getfilesystemencoding())))
