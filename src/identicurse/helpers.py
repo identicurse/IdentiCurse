@@ -36,7 +36,7 @@ def normalise_datetime(timestring):
             break
         except ValueError:  # something else changed the locale, and Python threw a hissy fit
             pass
-    locale.setlocale(locale.LC_TIME, '') # other half of the hacky fix
+    locale.setlocale(locale.LC_TIME, '') # other half of the hacky fix - resets locale
     return normalised_datetime
 
 def time_since(datetime_then):
