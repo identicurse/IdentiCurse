@@ -32,7 +32,7 @@ from tabbar import TabBar
 import config
 import helpers
 
-locale.resetlocale(locale.LC_ALL)
+locale.setlocale(locale.LC_ALL, '')
 code = locale.getpreferredencoding()
 
 colour_fields = {
