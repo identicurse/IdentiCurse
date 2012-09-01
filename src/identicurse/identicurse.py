@@ -44,7 +44,7 @@ from tabbar import TabBar
 import config
 import helpers
 
-locale.resetlocale(locale.LC_ALL)
+locale.setlocale(locale.LC_ALL, '')
 code = locale.getpreferredencoding()
 
 # if this matches, we're running under py2exe, so we need to do some
