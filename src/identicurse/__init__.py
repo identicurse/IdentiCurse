@@ -78,6 +78,7 @@ PRESET_SLOGANS = [
     "evan is a likable product",
     "☃",
     "will go for the discotech and move my parts for the fun times",
+    "Mule of the Ether"
     ]
 
 def main():
