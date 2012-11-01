@@ -344,11 +344,11 @@ class StatusNet(object):
                 params['status'] = status[:self.length_limit]
             elif long_dent=="split":
                 status_next = status[find_split_point(status, self.length_limit - 3):]
-                status = status.encode('utf-8')[:find_split_point(status, self.length_limit - 3)] + u".."
+                status = status.encode('utf-8')[:find_split_point(status, self.length_limit - 3)] + u"\u2026".encode('utf-8')
                 if dup_first_word:
-                    status_next = status.split(" ")[0].encode('utf-8') + " .. " + status_next
+                    status_next = status.split(" ")[0].encode('utf-8') + u"\u2026 ".encode('utf-8') + status_next
                 else:
-                    status_next = ".. " + status_next
+                    status_next = u"\u2026 ".encode('utf-8') + status_next
                 params['status'] = status
                 dents = [self.__makerequest("statuses/update", params)] # post the first piece as normal
                 if in_reply_to_status_id == 0:
