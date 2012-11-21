@@ -361,8 +361,8 @@ class StatusNet(object):
                     dents.append(next_dent)
             else:
                 raise Exception("Maximum status length exceeded by %d characters." % (len(status) - self.length_limit))
-        return self.__makerequest("statuses/update", params)
-    
+        return self.__makerequest("statuses/update", params)  
+
     def statuses_destroy(self, id):
         params = {'id':id}
         return self.__makerequest("statuses/destroy", params)
