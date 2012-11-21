@@ -305,5 +305,6 @@ class Textbox(textpad.Textbox):
                 if self.stripspaces and x > stop:
                     break
                 count += 1
+            count += 1
         self.win.move(cursor_position[0], cursor_position[1])
         return count
