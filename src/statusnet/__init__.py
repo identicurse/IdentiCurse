@@ -339,7 +339,7 @@ class StatusNet(object):
             params['place_id'] = place_id
         if display_coordinates:
             params['display_coordinates'] = "true"
-        if len(status.decode('utf-8')) > self.length_limit and self.length_limit != 0:
+        if len(status) > self.length_limit and self.length_limit != 0:
             if long_dent=="truncate":
                 params['status'] = status[:self.length_limit]
             elif long_dent=="split":
