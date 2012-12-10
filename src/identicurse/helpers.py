@@ -211,9 +211,15 @@ def ur1ca_shorten(longurl):
 
 def set_terminal_title(title_text):
     if platform.system() != "Windows":
-        sys.stdout.write("\x1b]0;" + title_text + "\x07")  # set the title the unix-y way
+        if 'screen' in os.environ['TERM']:
+            # set the title the tmux-y way (that is, rename the window rather than set the title)
+            sys.stdout.write('\033k' + title_text + '\033\\')
+        else:
+            # set the title the unix-y way
+            sys.stdout.write("\x1b]0;" + title_text + "\x07")
     else:
-        os.system("title " + title_text)  # do it the windows-y way
+        # do it the windows-y way
+        os.system("title " + title_text)
 
 def split_entities(raw_notice_text):
     entities = [{"text":"", "type":"plaintext"}]
