@@ -41,7 +41,9 @@ setup(
     author="Psychedelic Squid and Reality",
     author_email='psquid@psquid.net and tinmachin3@gmail.com',
     url="http://identicurse.net/",
-    install_requires=["oauth>=1.0.1"],
+    install_requires=[
+        "oauth >= 1.0.1"
+        ],
 
     download_url=("http://identicurse.net/release/"),
     license="GPLv3+",
@@ -55,7 +57,7 @@ setup(
         'console_scripts':
             ['identicurse = identicurse:main'],
     },
-    
+
     console=[{
         "script": 'src/identicurse/__init__.py',
         "icon_resources": [(1, 'res/identicurse.ico')],
