@@ -22,6 +22,9 @@ setup(
     name = 'statusnet',
     py_modules = ['statusnet'],
     version = '0.1.0-dev',
+    install_requires=[
+        "oauth >= 1.0.1",
+        ]
 
     author = "Psychedelic Squid and Reality",
     author_email = '<psquid@psquid.net> and <tinmachin3@gmail.com>',
