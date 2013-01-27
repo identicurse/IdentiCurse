@@ -40,7 +40,8 @@ setup(
     url="http://identicurse.net/",
     download_url=("http://identicurse.net/release/"),
     install_requires=[
-        "oauth >= 1.0.1"
+        "oauth >= 1.0.1",
+        "statusnet >= 0.1, <= 0.2"
         ],
 
     license="GPLv3+",

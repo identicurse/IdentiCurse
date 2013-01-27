@@ -42,7 +42,8 @@ setup(
     author_email='psquid@psquid.net and tinmachin3@gmail.com',
     url="http://identicurse.net/",
     install_requires=[
-        "oauth >= 1.0.1"
+        "oauth >= 1.0.1",
+        "statusnet >= 0.1, <= 0.2"
         ],
 
     download_url=("http://identicurse.net/release/"),
