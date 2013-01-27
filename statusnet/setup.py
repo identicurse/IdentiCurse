@@ -21,7 +21,7 @@ from distutils.core import setup
 setup(
     name = 'statusnet',
     py_modules = ['statusnet'],
-    version = '0.1.0-dev',
+    version = '0.1.0',
 
     author = "Psychedelic Squid and Reality",
     author_email = '<psquid@psquid.net> and <tinmachin3@gmail.com>',
