@@ -24,7 +24,7 @@ setup(
     version = '0.1.1',
     install_requires=[
         "oauth >= 1.0.1",
-        ]
+        ],
 
     author = "Psychedelic Squid and Reality",
     author_email = '<psquid@psquid.net> and <tinmachin3@gmail.com>',
