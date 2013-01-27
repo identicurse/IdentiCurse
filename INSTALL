@@ -3,12 +3,13 @@ INSTALLATION
 If you already have setuptools installed, installation is a simple
 two-step process:
 
-  1. As root, run setup.py:
-     # python setup.py install
+  1. Run setup.py (as root) for statusnet.py:
+     $ cd statusnet
+     $ sudo python setup.py install
 
-  2. Copy the example config file into your home directory as
-     .identicurse:
-     $ cp conf/config.json ~/.identicurse
+  2. Run setup.py (as root) for identicurse proper:
+     $ cd ..
+     $ sudo python setup.py install
 
 And you're done! Read the README to get up to speed on configuring
 IdentiCurse to your liking, or (this is recommended for most users)
@@ -26,7 +27,7 @@ distributions is known to be:
         python2-distribute  in  Arch
         pysetuptools        in  Slackware
         devel/py-setuptools in  OpenBSD, FreeBSD
-        
+
         (if your distribution of choice is not in this list yet,
         feel free to inform us of the correct package name)
 
