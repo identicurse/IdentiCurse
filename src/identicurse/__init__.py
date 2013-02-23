@@ -80,6 +80,9 @@ PRESET_SLOGANS = [
     "will go for the discotech and move my parts for the fun times",
     "Mule of the Ether",
     "OH GOD HE'S TAKING MY LAVA LAMP NO DON'T DO IT MANAGER DOG",
+    "Incited Rues",
+    "Ciders Unite",
+    "Cute Insider",
     ]
 
 def main():
