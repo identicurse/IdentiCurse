@@ -402,7 +402,7 @@ class StatusNet(object):
             params['user_id'] = user_id
         if not (screen_name == ""):
             params['screen_name'] = screen_name
-        return self.__makerequest("users/show", params)
+        return self.__makerequest("users/show", params, True)
 
 
 ######## Direct message resources ########
