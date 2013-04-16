@@ -83,6 +83,7 @@ PRESET_SLOGANS = [
     "Incited Rues",
     "Ciders Unite",
     "Cute Insider",
+    "Do not jump out of the cat-moat!",
     ]
 
 def main():
