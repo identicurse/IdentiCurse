@@ -37,9 +37,9 @@ class StatusBar(object):
         self.window.erase()
         maxx = self.window.getmaxyx()[1] - 2
         if len(self.text) >= (maxx):  # if the left text would end up too near the right text
-            self.window.addstr(0, 1, self.text[:maxx-3].strip() + "...")
+            self.window.addstr(0, 1, self.text[:maxx-3].strip().encode("utf-8") + "...")
         else:
-            self.window.addstr(0, 1, self.text)
+            self.window.addstr(0, 1, self.text.encode("utf-8"))
         self.window.refresh()
 
     def do_nothing(self):
