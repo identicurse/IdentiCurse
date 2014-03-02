@@ -11,8 +11,8 @@ two-step process:
      $ cd ..
      $ sudo python setup.py install
 
-N.B. you can add --user to both of these commands if you'd prefer to
-install for the local user only
+N.B. you can add --user to both of these commands (and drop sudo) if
+you'd prefer to install for the local user only
 
 And you're done! Read the README to get up to speed on configuring
 IdentiCurse to your liking, or (this is recommended for most users)
