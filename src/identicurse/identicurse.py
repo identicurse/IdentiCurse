@@ -130,10 +130,12 @@ else:
 base_colours = {}
 
 oauth_consumer_keys = {
-    "identi.ca": "d4f54e34af11ff8d35b79b7557ad771c",
+    "quitter.se": "7be891ec0ce81253bc3138446d9dae32",
+    "secure.rainbowdash.net": "e45257fe49a59d5771460c6cc2531e1b",
     }
 oauth_consumer_secrets = {
-    "identi.ca": "8fb75c0a9bbca78fe0e85acc62a9169c",
+    "quitter.se": "ba501f63bce00ef5b1e1621ee2660d7f",
+    "secure.rainbowdash.net": "6b21ded7b4a470e9d095db11f3359bb7",
     }
 
 
@@ -1770,13 +1772,13 @@ class IdentiCurse(object):
    
                 except StatusNetError, e:
                     self.status_bar.timed_update(
-                        "Status.Net error %d: %s" % (e.errcode, e.details))
+                        "OStatus error %d: %s" % (e.errcode, e.details))
             else:
                 try:
                     update = self.cmd_post(input)
                 except StatusNetError, e:
                     self.status_bar.timed_update(
-                        "Status.Net error %d: %s" % (e.errcode, e.details))
+                        "OStatus error %d: %s" % (e.errcode, e.details))
 
             if not update:
                 self.tabs[self.current_tab].update()
@@ -1989,7 +1991,7 @@ class IdentiCurse(object):
             else:  # it wasn't a 403, so re-raise
                 raise(e)
         try:
-            # for now, we try it twice, since identi.ca
+            # for now, we try it twice, since GNU Social
             # at least seems to have an issue where deleting must be done twice
             self.conn.statuses_destroy(notice["id"])
         except:

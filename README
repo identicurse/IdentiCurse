@@ -12,8 +12,8 @@ automatic config doesn't touch), you can do so as follows:
 
 Edit your config file in your favourite editor, changing
 "username": "user" and "password": "test" to appropriate values.
-You can also use IdentiCurse with other StatusNet instances by
-changing "api_path" to the API home for the instance you wish to use.
+To choose an instance of GNU Social change "api_path" to the API
+home for the instance you wish to use.
 
 Important note:
 IdentiCurse looks for your config file in two locations. First it
@@ -227,8 +227,7 @@ Available commands are as follows:
    
 /public
    This will open a new tab showing the public timeline, which
-   contains the 20 most recent notices from anyone on identi.ca (or
-   whichever instance you are using).
+   contains the 20 most recent notices from anyone on GNU Social.
 
 /directs                                        (aliases: /inbox)
    This will open a new tab showing the direct messages other users
@@ -267,14 +266,13 @@ Available commands are as follows:
    unblock all of them.
 
 /spamreport [notice number] [reason]      (aliases: /sr, /nuke)
-   This will submit a spam report dent in Identi.ca support's
-   preferred format and also create a block against the user who
-   created the notice with the notice number specified.
+   This will submit a spam report dent in support's preferred format
+   and also create a block against the user who created the notice
+   with the notice number specified.
 
 /spamreport [(@)username] [reason]        (aliases: /sr, /nuke)
-   This will submit a spam report dent in Identi.ca support's
-   preferred format and also create a block against the user
-   specified.
+   This will submit a spam report dent in support's preferred format
+   and also create a block against the user specified.
 
 /link [link number] [notice number]
    This will open the specified link (numbered starting from 1) from
@@ -665,11 +663,9 @@ OAuth connection details if/when you have successfully used OAuth to connect.
 
 To use OAuth with any instance, IdentiCurse should be registered with that
 instance as an app, which will give it a consumer key/secret that identify
-it to that instance as being IdentiCurse. As of version 0.7, the consumer
-key/secret for identi.ca are built in, so anyone using that will not need to
-read any more of this section. As of version 0.10, IdentiCurse will attempt to
-fall back to the OAuth "anonymous app" profile where supported, allowing it
-to operate when no consumer key/secret is available.
+it to that instance as being IdentiCurse. As of version 0.10, IdentiCurse
+will attempt to fall back to the OAuth "anonymous app" profile where
+supported, allowing it to operate when no consumer key/secret is available.
 
 If you are using a public instance not already added to that list, please
 contact @psquid with the name of the instance, and IdentiCurse will be added

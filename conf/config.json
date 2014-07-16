@@ -1,6 +1,6 @@
 {
     "username": "test", 
-    "api_path": "https://identi.ca/api", 
+    "api_path": "https://quitter.se/api", 
     "password": "test", 
     "initial_tabs": "home|mentions|direct|public", 
     "aliases": {

@@ -100,7 +100,7 @@ class TabUpdater(threading.Thread):
                 self.callback_object.status_bar.update("Updating '%s'..." % (tab.name))
                 tab.update()
             except StatusNetError, e:
-                config.session_store.update_error="Status.Net error %d in '%s': %s" % (e.errcode, tab.name, e.details)
+                config.session_store.update_error="OStatus error %d in '%s': %s" % (e.errcode, tab.name, e.details)
             if tab.active:
                 tab.display()  # update the display of the tab if it's the foreground one
 

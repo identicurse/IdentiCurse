@@ -36,8 +36,8 @@ except:
 setup(
     name="identicurse",
     version='0.10',  # 0.10-dev, but py2exe doesn't like that
-    description="A simple Identi.ca client with a curses-based UI.",
-    long_description=("A simple Identi.ca client with a curses-based UI."),
+    description="A simple GNU Social client with a curses-based UI.",
+    long_description=("A simple GNU Social client with a curses-based UI."),
     author="Psychedelic Squid and Reality",
     author_email='psquid@psquid.net and tinmachin3@gmail.com',
     url="http://identicurse.net/",
